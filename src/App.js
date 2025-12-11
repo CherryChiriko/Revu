@@ -7,6 +7,8 @@ import {
   selectDeckError,
 } from "./slices/deckSlice";
 import useAuth from "./hooks/useAuth";
+import useDeckLiveSync from "./hooks/useDeckLiveSync";
+
 import Navbar from "./components/Navbar/Navbar";
 import Dashboard from "./components/Dashboard/Dashboard";
 import DeckManager from "./components/Decks/views/DeckManager";
@@ -34,6 +36,8 @@ function App() {
 
   const publicPaths = ["/reset-password"];
   const isPublicPath = publicPaths.includes(location.pathname);
+
+  useDeckLiveSync(session && status === "succeeded");
 
   // Auth check
   if (authLoading) {

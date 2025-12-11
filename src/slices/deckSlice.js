@@ -62,6 +62,14 @@ const deckSlice = createSlice({
       state.activeDeckId = id;
       localStorage.setItem("activeDeckId", id);
     },
+    updateDeckFromRealtime(state, action) {
+      const deck = action.payload;
+      const index = state.decks.findIndex((d) => d.id === deck.id);
+
+      if (index !== -1) {
+        state.decks[index] = { ...state.decks[index], ...deck };
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -112,7 +120,7 @@ const deckSlice = createSlice({
   },
 });
 
-export const { setActiveDeck } = deckSlice.actions;
+export const { setActiveDeck, updateDeckFromRealtime } = deckSlice.actions;
 
 export const selectDecks = (state) => state.decks.decks;
 export const selectActiveDeck = (state) => {

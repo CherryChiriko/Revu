@@ -15,7 +15,7 @@ const StudySession = () => {
   const activeTheme = useSelector(selectActiveTheme);
   const activeDeck = useSelector(selectActiveDeck);
 
-  const navMode = params ?? (activeDeck.due ? "review" : "learn");
+  const navMode = params ?? (activeDeck.learning ? "review" : "learn");
 
   // --- Use new hook ---
   const { status, cards, error } = useStudySession({

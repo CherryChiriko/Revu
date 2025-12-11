@@ -185,7 +185,7 @@ export default function useStudySession({ deck, navMode }) {
       if (!currentCard || !currentPhase.allowRating) return;
 
       const updates = computeSM2(currentCard, rating);
-
+      console.log("updates", updates);
       const updatedCard = {
         user_id: currentCard.user_id,
         deck_id: currentCard.deck_id,

@@ -6,48 +6,6 @@ const TABLES = {
   C: "card_c_progress",
 };
 
-// export const updateProgress = createAsyncThunk(
-//   "progress/updateProgress",
-//   async ({ updates, study_mode, user_id }, { rejectWithValue }) => {
-//     console.log("updateProgress", updates);
-//     if (!updates?.length || !user_id || !study_mode) {
-//       return rejectWithValue(
-//         "Missing required fields: updates, user_id, or study_mode"
-//       );
-//     }
-
-//     const table = TABLES[study_mode];
-//     if (!table) {
-//       return rejectWithValue(`Invalid study mode: ${study_mode}`);
-//     }
-
-//     try {
-//       console.log("updates ", updates);
-//       // Map each card to the format expected by Supabase
-//       const payload = updates.map(({ card, update }) => ({
-//         card_id: card.id,
-//         user_id: user_id,
-//         deck_id: card.deck_id,
-
-//         ...update,
-//       }));
-
-//       const { error } = await supabase.from(table).upsert(payload, {
-//         onConflict: ["user_id", "card_id"],
-//       });
-
-//       if (error) throw error;
-
-//       return { study_mode, updates: payload };
-//     } catch (err) {
-//       console.error("updateProgress error:", err);
-//       return rejectWithValue(
-//         err.message || "Failed to batch update card progress"
-//       );
-//     }
-//   }
-// );
-
 export const updateProgress = createAsyncThunk(
   "progress/updateProgress",
   async ({ sessionUpdates, study_mode }, { rejectWithValue }) => {
