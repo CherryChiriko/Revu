@@ -6,7 +6,7 @@ export const ProgressBar = ({
 }) => {
   const masteredPct = cards_count ? (counts.mastered / cards_count) * 100 : 0;
   const suspendedPct = cards_count ? (counts.suspended / cards_count) * 100 : 0;
-  const learningPct = cards_count ? (counts.learning / cards_count) * 100 : 0;
+  const learningPct = cards_count ? (counts.waiting / cards_count) * 100 : 0;
   const duePct = cards_count ? (counts.due / cards_count) * 100 : 0;
   const newPct = cards_count ? (counts.new / cards_count) * 100 : 0;
 
@@ -45,7 +45,7 @@ export const ProgressBar = ({
           <div
             className={`${segmentBase} ${activeTheme.background.accent2}`}
             style={{ width: `${learningPct}%` }}
-            title={`Learning: ${counts.learning}`}
+            title={`Learning: ${counts.waiting}`}
           />
         )}
         {newPct > 0 && (
@@ -67,7 +67,7 @@ export const ProgressBar = ({
           </span>
           <span className={activeTheme.text.accent1}>{counts.due} due</span>
           <span className={activeTheme.text.accent2}>
-            {counts.learning} learning
+            {counts.waiting} learning
           </span>
           <span className={activeTheme.text.muted}>{counts.new} new</span>
         </div>
