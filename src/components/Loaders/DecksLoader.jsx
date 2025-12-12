@@ -1,6 +1,11 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchDecks, selectDeckStatus } from "../../slices/deckSlice";
+import {
+  fetchDecks,
+  selectDeckStatus,
+  fetchDeckCounts,
+} from "../../slices/deckSlice";
+// import { fetchDeckCounts } from "../../slices/cardSlice";
 import { supabase } from "../../utils/supabaseClient";
 
 export default function DecksLoader({ session, authLoading }) {
@@ -20,6 +25,7 @@ export default function DecksLoader({ session, authLoading }) {
 
       // 2. THEN fetch decks
       dispatch(fetchDecks());
+      dispatch(fetchDeckCounts({ user_id: session.user.id }));
     };
 
     run();

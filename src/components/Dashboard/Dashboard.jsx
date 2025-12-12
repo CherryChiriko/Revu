@@ -2,8 +2,7 @@ import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { selectActiveTheme } from "../../slices/themeSlice";
 import { selectGlobalStreak } from "../../slices/userSlice";
-import { selectDecks } from "../../slices/deckSlice";
-import { selectHeatmapData } from "../../slices/activitySlice";
+import { selectDecks, selectTotalDueCards } from "../../slices/deckSlice";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -29,7 +28,14 @@ const Dashboard = () => {
 
   const gradient = `bg-gradient-to-r ${activeTheme.gradients.from} ${activeTheme.gradients.to}`;
 
-  const cards_due_today = decks.reduce((t, d) => t + (d.due || 0), 0);
+  // 1. Select the map of due counts { deckId: count, ... }
+  const cards_due_today = useSelector(selectTotalDueCards);
+
+  console.log(cards_due_today);
+
+  // const cards_due_today = decks.reduce((t, d) => t + (d.due || 0), 0);
+  // const cards_due_today = useSelector(fetchDueCardCounts);
+  console.log(cards_due_today);
   const mastered_cards = decks.reduce((t, d) => t + (d.mastered || 0), 0);
   const currentStreak = useSelector(selectGlobalStreak);
 
@@ -38,17 +44,6 @@ const Dashboard = () => {
       Math.max(0, mastered_cards * 5 + currentStreak * 10 + cards_due_today),
     [mastered_cards, currentStreak, cards_due_today]
   );
-
-  // const heatmapData = useMemo(() => {
-  //   const arr = [];
-  //   for (let i = 0; i < 28; i++) {
-  //     const d = new Date();
-  //     d.setDate(d.getDate() - i);
-  //     const iso = d.toISOString().slice(0, 10);
-  //     arr.push({ date: iso, value: Math.floor(Math.random() * 8) });
-  //   }
-  //   return arr;
-  // }, []);
 
   return (
     <div

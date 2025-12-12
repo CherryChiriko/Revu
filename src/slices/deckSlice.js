@@ -47,11 +47,99 @@ export const fetchDecks = createAsyncThunk(
   }
 );
 
+const getStatus = (progress) => {
+  let actualStatus;
+
+  const now = Date.now();
+
+  if (progress.suspended) {
+    actualStatus = "suspended";
+  } else {
+    switch (progress.status) {
+      case "mastered":
+      case "new":
+        actualStatus = progress.status;
+        break;
+      case "waiting": {
+        const dueDate = progress.due_date
+          ? Date.parse(progress.due_date)
+          : null;
+        actualStatus = dueDate !== null && dueDate <= now ? "due" : "waiting";
+        break;
+      }
+      default:
+        actualStatus = "new";
+    }
+  }
+  return actualStatus;
+};
+
+/** Deck counters */
+/** Deck counters */
+export const fetchDeckCounts = createAsyncThunk(
+  "cards/fetchDeckCounts",
+  async ({ user_id }, { rejectWithValue }) => {
+    try {
+      // Fetch both progress tables
+      const { data: progressA, error: errorA } = await supabase
+        .from("card_a_progress")
+        .select("deck_id, status, suspended, due_date")
+        .eq("user_id", user_id);
+
+      if (errorA) throw errorA;
+
+      const { data: progressC, error: errorC } = await supabase
+        .from("card_c_progress")
+        .select("deck_id, status, suspended, due_date")
+        .eq("user_id", user_id);
+
+      if (errorC) throw errorC;
+
+      const allProgress = [...(progressA || []), ...(progressC || [])];
+
+      const deckCounts = {};
+
+      for (const record of allProgress) {
+        const deckId = record.deck_id;
+
+        if (!deckCounts[deckId]) {
+          deckCounts[deckId] = {
+            deckId,
+            new: 0,
+            mastered: 0,
+            suspended: 0,
+            waiting: 0,
+            due: 0,
+          };
+        }
+
+        const status = getStatus(record);
+        deckCounts[deckId][status]++;
+      }
+
+      return deckCounts;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const initialState = {
   decks: [],
+  deckCounts: {},
   activeDeckId: localStorage.getItem("activeDeckId") || null,
   status: "idle",
   error: null,
+};
+
+export const getTotalDueCards = (deckCounts) => {
+  if (!deckCounts || typeof deckCounts !== "object") return 0;
+
+  return Object.values(deckCounts).reduce((sum, deck) => {
+    // Safety: ensure deck.due exists and is numeric
+    const due = typeof deck.due === "number" ? deck.due : 0;
+    return sum + due;
+  }, 0);
 };
 
 const deckSlice = createSlice({
@@ -121,6 +209,17 @@ const deckSlice = createSlice({
       .addCase(fetchDecks.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload || "Failed to load decks";
+      })
+      .addCase(fetchDeckCounts.pending, (state) => {
+        state.countsLoading = true;
+      })
+      .addCase(fetchDeckCounts.fulfilled, (state, action) => {
+        state.deckCounts = action.payload;
+        state.countsLoading = false;
+      })
+      .addCase(fetchDeckCounts.rejected, (state, action) => {
+        state.countsError = action.payload;
+        state.countsLoading = false;
       });
   },
 });
@@ -132,6 +231,15 @@ export const selectActiveDeck = (state) => {
   return (
     state.decks.decks.find((d) => d.deck_id === state.decks.activeDeckId) ||
     null
+  );
+};
+
+export const selectDeckCounts = (state) => state.decks.deckCounts;
+export const selectTotalDueCards = (state) => {
+  const deckCounts = state.decks.deckCounts;
+  return Object.values(deckCounts).reduce(
+    (total, d) => total + (d.due || 0),
+    0
   );
 };
 export const selectDeckStatus = (state) => state.decks.status;

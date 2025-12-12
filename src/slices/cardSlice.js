@@ -1,5 +1,9 @@
 // src/slices/cardSlice.js
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import {
+  createSlice,
+  createSelector,
+  createAsyncThunk,
+} from "@reduxjs/toolkit";
 import { supabase } from "../utils/supabaseClient";
 import { getCardStatus } from "../utils/cardUtils";
 

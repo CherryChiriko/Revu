@@ -2,22 +2,18 @@ import { useEffect, useMemo, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { selectCards, fetchCards } from "../../../slices/cardSlice";
-// import { updateGlobalStreak } from "../../../slices/streakSlice";
 import { logStudySession } from "../../../slices/activitySlice";
 import { updateProgress } from "../../../slices/progressSlice";
 import { computeSM2 } from "../../../utils/srs";
-// import useAuth from "../../../hooks/useAuth";
 import { PHASES, LEARN_LIMIT, REVIEW_LIMIT } from "../constants/constants";
 
 export default function useStudySession({ deck, navMode }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  // const { session } = useAuth();
 
   const isReviewMode = navMode === "review";
   const modeLimit = isReviewMode ? REVIEW_LIMIT : LEARN_LIMIT;
 
-  // const userId = session?.user?.id;
   const [status, setStatus] = useState("idle");
 
   // --------------------------------------------------------------------------
@@ -87,15 +83,16 @@ export default function useStudySession({ deck, navMode }) {
   // --------------------------------------------------------------------------
   // Session State
   // --------------------------------------------------------------------------
+  console.log("cards", cards);
+  console.log("limit", limit);
   const [phaseIndex, setPhaseIndex] = useState(0);
   const [cardIndex, setCardIndex] = useState(0);
   const [sessionFinished, setSessionFinished] = useState(false);
 
-  // const [sessionReviewed, setSessionReviewed] = useState(0);
-  // const [sessionLearned, setSessionLearned] = useState(0);
-
   const currentPhase = phases[phaseIndex];
   const currentCard = cards[cardIndex];
+
+  console.log("current", currentCard);
 
   const [sessionUpdates, setSessionUpdates] = useState([]);
 
@@ -106,8 +103,6 @@ export default function useStudySession({ deck, navMode }) {
     setSessionFinished(false);
     setPhaseIndex(0);
     setCardIndex(0);
-    // setSessionLearned(0);
-    // setSessionReviewed(0);
     setSessionUpdates([]);
   }, []);
 
@@ -234,53 +229,15 @@ export default function useStudySession({ deck, navMode }) {
   // --------------------------------------------------------------------------
   // Pass (no rating)
   // --------------------------------------------------------------------------
-  const handlePass = useCallback(() => {
-    advanceCard();
-  }, [advanceCard]);
-
-  // --------------------------------------------------------------------------
-  // Update streaks when session finishes
-  // --------------------------------------------------------------------------
-  // useEffect(() => {
-  //   if (!sessionFinished) return;
-  //   if (!userId || !deck?.id) return;
-
-  //   console.log("Log ", {
-  //     cardsReviewed: sessionReviewed,
-  //     cardsLearned: sessionLearned,
-  //   });
-
-  //   dispatch(
-  //     logStudySession({
-  //       cardsReviewed: sessionReviewed,
-  //       cardsLearned: sessionLearned,
-  //       // timeStudiedSeconds: session.totalSeconds,  TODO: implement later
-  //       // xpEarned: session.xp,                      TODO: implement later
-  //     })
-  //   );
-
-  // // Update global streak
-  // dispatch(
-  //   updateGlobalStreak({
-  //     userId,
-  //     reviewedCount: sessionReviewed,
-  //     learnedCount: sessionLearned,
-  //   })
-  // );
-  // }, [
-  //   sessionFinished,
-  //   sessionReviewed,
-  //   sessionLearned,
-  //   userId,
-  //   deck?.id,
-  //   dispatch,
-  // ]);
+  // const handlePass = useCallback(() => {
+  //   advanceCard();
+  // }, [advanceCard]);
 
   // --------------------------------------------------------------------------
   // Progress counters
   // --------------------------------------------------------------------------
   const totalSteps = totalPhases * limit || 1;
-  const currentStep = phaseIndex * limit + cardIndex + 1;
+  const currentStep = phaseIndex * limit + cardIndex;
   const progressPercentage = (currentStep / totalSteps) * 100;
 
   // --------------------------------------------------------------------------
@@ -293,16 +250,14 @@ export default function useStudySession({ deck, navMode }) {
     currentPhase,
     sessionFinished,
     progressPercentage,
-    progress: { current: currentStep - 1, total: totalSteps }, // For Bar component
+    progress: { current: currentStep, total: totalSteps }, // For Bar component
     currentStep,
     totalSteps,
-    // sessionReviewed,
-    // sessionLearned,
 
     // API
     handleRate,
-    handlePass,
-    handlePassComplete: handlePass, // alias for SessionMode
+    // handlePass,
+    // handlePassComplete: handlePass, // alias for SessionMode
     restartSession,
     resetSession: restartSession, // alias for SessionMode
     exitStudy,
