@@ -1,4 +1,4 @@
-export const LEARN_LIMIT = 2;
+export const LEARN_LIMIT = 1;
 export const REVIEW_LIMIT = 10;
 
 export const PHASES = {

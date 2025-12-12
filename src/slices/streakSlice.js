@@ -4,90 +4,90 @@ import { supabase } from "../utils/supabaseClient";
 import { getLocalISODate, getLocalISODateOffset } from "../utils/localDate";
 import { updateProfileFromStreak } from "./userSlice";
 
-export const updateDeckStreak = createAsyncThunk(
-  "streak/updateDeckStreak",
-  async ({ userId, deckId, studiedCount }, { rejectWithValue }) => {
-    if (!userId || !deckId) {
-      return rejectWithValue("Missing userId or deckId");
-    }
+// export const updateDeckStreak = createAsyncThunk(
+//   "streak/updateDeckStreak",
+//   async ({ userId, deckId, studiedCount }, { rejectWithValue }) => {
+//     if (!userId || !deckId) {
+//       return rejectWithValue("Missing userId or deckId");
+//     }
 
-    const today = getLocalISODate();
-    const yesterday = getLocalISODateOffset(-1);
+//     const today = getLocalISODate();
+//     const yesterday = getLocalISODateOffset(-1);
 
-    try {
-      const { data: existing, error: selErr } = await supabase
-        .from("deck_stats")
-        .select("*")
-        .eq("user_id", userId)
-        .eq("deck_id", deckId)
-        .single();
+//     try {
+//       const { data: existing, error: selErr } = await supabase
+//         .from("deck_stats")
+//         .select("*")
+//         .eq("user_id", userId)
+//         .eq("deck_id", deckId)
+//         .single();
 
-      if (selErr && selErr.code !== "PGRST116") {
-        throw selErr;
-      }
+//       if (selErr && selErr.code !== "PGRST116") {
+//         throw selErr;
+//       }
 
-      if (!existing) {
-        const initialStreak = studiedCount > 0 ? 1 : 0;
-        const row = {
-          user_id: userId,
-          deck_id: deckId,
-          streak: initialStreak,
-          max_streak: initialStreak,
-          last_active: studiedCount > 0 ? today : null,
-          daily_cards: studiedCount,
-        };
+//       if (!existing) {
+//         const initialStreak = studiedCount > 0 ? 1 : 0;
+//         const row = {
+//           user_id: userId,
+//           deck_id: deckId,
+//           streak: initialStreak,
+//           max_streak: initialStreak,
+//           last_active: studiedCount > 0 ? today : null,
+//           daily_cards: studiedCount,
+//         };
 
-        const { data: inserted, error: insertErr } = await supabase
-          .from("deck_stats")
-          .insert([row])
-          .select()
-          .single();
+//         const { data: inserted, error: insertErr } = await supabase
+//           .from("deck_stats")
+//           .insert([row])
+//           .select()
+//           .single();
 
-        if (insertErr) throw insertErr;
-        return inserted;
-      }
+//         if (insertErr) throw insertErr;
+//         return inserted;
+//       }
 
-      let newStreak = existing.streak ?? 0;
-      let newMax = existing.max_streak ?? 0;
-      let newLastActive = existing.last_active;
+//       let newStreak = existing.streak ?? 0;
+//       let newMax = existing.max_streak ?? 0;
+//       let newLastActive = existing.last_active;
 
-      if (studiedCount > 0) {
-        if (existing.last_active === today) {
-          newLastActive = today;
-        } else if (existing.last_active === yesterday) {
-          newStreak = (existing.streak ?? 0) + 1;
-          newLastActive = today;
-        } else {
-          newStreak = 1;
-          newLastActive = today;
-        }
+//       if (studiedCount > 0) {
+//         if (existing.last_active === today) {
+//           newLastActive = today;
+//         } else if (existing.last_active === yesterday) {
+//           newStreak = (existing.streak ?? 0) + 1;
+//           newLastActive = today;
+//         } else {
+//           newStreak = 1;
+//           newLastActive = today;
+//         }
 
-        if (newStreak > newMax) newMax = newStreak;
-      }
+//         if (newStreak > newMax) newMax = newStreak;
+//       }
 
-      const updates = {
-        streak: newStreak,
-        max_streak: newMax,
-        last_active: newLastActive,
-        daily_cards: studiedCount,
-      };
+//       const updates = {
+//         streak: newStreak,
+//         max_streak: newMax,
+//         last_active: newLastActive,
+//         daily_cards: studiedCount,
+//       };
 
-      const { data: updated, error: updateErr } = await supabase
-        .from("deck_stats")
-        .update(updates)
-        .eq("user_id", userId)
-        .eq("deck_id", deckId)
-        .select()
-        .single();
+//       const { data: updated, error: updateErr } = await supabase
+//         .from("deck_stats")
+//         .update(updates)
+//         .eq("user_id", userId)
+//         .eq("deck_id", deckId)
+//         .select()
+//         .single();
 
-      if (updateErr) throw updateErr;
-      return updated;
-    } catch (err) {
-      console.error("updateDeckStreak error:", err);
-      return rejectWithValue(err.message || "Failed to update deck streak");
-    }
-  }
-);
+//       if (updateErr) throw updateErr;
+//       return updated;
+//     } catch (err) {
+//       console.error("updateDeckStreak error:", err);
+//       return rejectWithValue(err.message || "Failed to update deck streak");
+//     }
+//   }
+// );
 
 /**
  * updateGlobalStreak:
@@ -196,22 +196,22 @@ const streakSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(updateDeckStreak.pending, (state) => {
-        state.status = "loading";
-        state.error = null;
-      })
-      .addCase(updateDeckStreak.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.error = null;
-        state.lastDeckUpdate = action.payload;
-        if (action.payload?.deck_id) {
-          state.deckStatsCache[action.payload.deck_id] = action.payload;
-        }
-      })
-      .addCase(updateDeckStreak.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload || "Failed to update deck streak";
-      })
+      // .addCase(updateDeckStreak.pending, (state) => {
+      //   state.status = "loading";
+      //   state.error = null;
+      // })
+      // .addCase(updateDeckStreak.fulfilled, (state, action) => {
+      //   state.status = "succeeded";
+      //   state.error = null;
+      //   state.lastDeckUpdate = action.payload;
+      //   if (action.payload?.deck_id) {
+      //     state.deckStatsCache[action.payload.deck_id] = action.payload;
+      //   }
+      // })
+      // .addCase(updateDeckStreak.rejected, (state, action) => {
+      //   state.status = "failed";
+      //   state.error = action.payload || "Failed to update deck streak";
+      // })
       .addCase(updateGlobalStreak.pending, (state) => {
         state.status = "loading";
         state.error = null;

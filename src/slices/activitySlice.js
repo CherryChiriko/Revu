@@ -1,5 +1,9 @@
 import { createSlice, createSelector } from "@reduxjs/toolkit";
 import startOfToday from "date-fns/startOfToday";
+import {
+  REVIEW_LIMIT,
+  LEARN_LIMIT,
+} from "../components/Study/constants/constants";
 
 const dateKey = () => {
   const d = startOfToday();
@@ -17,14 +21,25 @@ export const selectHeatmapData = createSelector(
   [selectActivityDays],
   (days) => {
     return Object.values(days)
-      .map((d) => ({
-        date: d.date,
-        value: d.cardsStudied || 0,
-      }))
+      .map((d) => {
+        const objective = Math.round(
+          Math.max(
+            d.cardsReviewed / REVIEW_LIMIT,
+            d.cardsLearned / LEARN_LIMIT
+          ) * 100
+        );
+        const percent = Math.min(100, objective);
+
+        return {
+          date: d.date,
+          value: percent,
+        };
+      })
       .sort((a, b) => a.date.localeCompare(b.date));
   }
 );
 
+// This function is to select different parameters for heatmap values, like time spent, XP earned or cards learned
 export const makeSelectHeatmapData =
   (metric = "cardsStudied") =>
   (state) => {
@@ -43,11 +58,10 @@ export const activitySlice = createSlice({
   reducers: {
     logStudySession: (state, action) => {
       const {
-        cardsStudied = 0,
         cardsReviewed = 0,
         cardsLearned = 0,
-        timeStudiedSeconds = 0,
-        xpEarned = 0,
+        // timeStudiedSeconds = 0,
+        // xpEarned = 0,
         forcedDateKey, // optional override (useful for debugging)
       } = action.payload;
 
@@ -56,19 +70,20 @@ export const activitySlice = createSlice({
       if (!state.days[key]) {
         state.days[key] = {
           date: key,
-          cardsStudied: 0,
           cardsReviewed: 0,
           cardsLearned: 0,
-          timeStudiedSeconds: 0,
-          xpEarned: 0,
+          // timeStudiedSeconds: 0,
+          // xpEarned: 0,
         };
       }
 
-      state.days[key].cardsStudied += cardsStudied;
+      const cardsStudied = cardsLearned + cardsReviewed;
+
+      state.days[key].cardsStudied += cardsStudied; // TODO : for another optional mode or stats
       state.days[key].cardsReviewed += cardsReviewed;
       state.days[key].cardsLearned += cardsLearned;
-      state.days[key].timeStudiedSeconds += timeStudiedSeconds;
-      state.days[key].xpEarned += xpEarned;
+      // state.days[key].timeStudiedSeconds += timeStudiedSeconds;
+      // state.days[key].xpEarned += xpEarned;
 
       state.lastUpdated = new Date().toISOString();
     },

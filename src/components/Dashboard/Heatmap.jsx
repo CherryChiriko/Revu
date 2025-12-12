@@ -59,7 +59,7 @@ export const Heatmap = ({ activeTheme }) => {
   const cells = generateCalendarGrid(dataMap, 4);
 
   const getColor = (value, isFuture) => {
-    const max_value = 10;
+    const max_value = 100;
     const nonzero_steps = COLORS.length - 1;
 
     if (isFuture) return "rgba(255,255,255,0)";

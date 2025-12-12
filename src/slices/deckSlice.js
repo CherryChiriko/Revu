@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { supabase } from "../utils/supabaseClient";
+import { getCardStatus } from "../utils/cardUtils";
 
 /** Priority ordering */
 const orderDecksByPriority = (decks) => {
@@ -64,10 +65,14 @@ const deckSlice = createSlice({
     },
     updateDeckFromRealtime(state, action) {
       const deck = action.payload;
-      const index = state.decks.findIndex((d) => d.id === deck.id);
+      const index = state.decks.findIndex((d) => d.deck_id === deck.id);
 
       if (index !== -1) {
-        state.decks[index] = { ...state.decks[index], ...deck };
+        state.decks[index] = {
+          ...state.decks[index],
+          ...deck,
+          deck_id: deck.id,
+        };
       }
     },
   },

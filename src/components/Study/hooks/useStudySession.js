@@ -2,25 +2,22 @@ import { useEffect, useMemo, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { selectCards, fetchCards } from "../../../slices/cardSlice";
-import {
-  updateGlobalStreak,
-  updateDeckStreak,
-} from "../../../slices/streakSlice";
+// import { updateGlobalStreak } from "../../../slices/streakSlice";
 import { logStudySession } from "../../../slices/activitySlice";
 import { updateProgress } from "../../../slices/progressSlice";
 import { computeSM2 } from "../../../utils/srs";
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 import { PHASES, LEARN_LIMIT, REVIEW_LIMIT } from "../constants/constants";
 
 export default function useStudySession({ deck, navMode }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { session } = useAuth();
+  // const { session } = useAuth();
 
   const isReviewMode = navMode === "review";
-  const limit = isReviewMode ? REVIEW_LIMIT : LEARN_LIMIT;
+  const modeLimit = isReviewMode ? REVIEW_LIMIT : LEARN_LIMIT;
 
-  const userId = session?.user?.id;
+  // const userId = session?.user?.id;
   const [status, setStatus] = useState("idle");
 
   // --------------------------------------------------------------------------
@@ -28,8 +25,8 @@ export default function useStudySession({ deck, navMode }) {
   // --------------------------------------------------------------------------
   const allCards = useSelector(selectCards);
 
-  const cards = useMemo(() => {
-    if (!deck?.id) return [];
+  const { cards, limit } = useMemo(() => {
+    if (!deck?.id) return { cards: [], limit: 0 };
 
     // If we have cards in the store, but they belong to a different deck,
     // treat the list as empty during the transition.
@@ -38,15 +35,20 @@ export default function useStudySession({ deck, navMode }) {
       console.warn(
         "Card list contains stale data for a different deck. Returning empty list temporarily."
       );
-      return [];
+      return { cards: [], limit: 0 };
     }
 
     const filteredCards = allCards.filter(
       (c) => c.status === (isReviewMode ? "due" : "new")
     );
 
-    return filteredCards.slice(0, limit);
-  }, [deck.id, allCards, limit, isReviewMode]); // deck?.id to re-memoize on deck switch
+    const sessionLimit = Math.min(modeLimit, filteredCards.length);
+
+    return {
+      cards: filteredCards.slice(0, sessionLimit),
+      limit: sessionLimit,
+    };
+  }, [deck.id, allCards, isReviewMode, modeLimit]); // deck?.id to re-memoize on deck switch
 
   // --------------------------------------------------------------------------
   // Detect loading / stale / success states (NEW)
@@ -58,7 +60,7 @@ export default function useStudySession({ deck, navMode }) {
     }
 
     // A. No cards at all → loading
-    if (allCards.length === 0) {
+    if (allCards.length === 0 || !cards) {
       setStatus("loading");
       return;
     }
@@ -89,8 +91,8 @@ export default function useStudySession({ deck, navMode }) {
   const [cardIndex, setCardIndex] = useState(0);
   const [sessionFinished, setSessionFinished] = useState(false);
 
-  const [sessionReviewed, setSessionReviewed] = useState(0);
-  const [sessionLearned, setSessionLearned] = useState(0);
+  // const [sessionReviewed, setSessionReviewed] = useState(0);
+  // const [sessionLearned, setSessionLearned] = useState(0);
 
   const currentPhase = phases[phaseIndex];
   const currentCard = cards[cardIndex];
@@ -104,8 +106,8 @@ export default function useStudySession({ deck, navMode }) {
     setSessionFinished(false);
     setPhaseIndex(0);
     setCardIndex(0);
-    setSessionLearned(0);
-    setSessionReviewed(0);
+    // setSessionLearned(0);
+    // setSessionReviewed(0);
     setSessionUpdates([]);
   }, []);
 
@@ -150,6 +152,7 @@ export default function useStudySession({ deck, navMode }) {
         );
 
         console.log("success");
+
         setSessionUpdates([]);
       } catch (err) {
         console.error("Failed batch update:", err);
@@ -158,6 +161,32 @@ export default function useStudySession({ deck, navMode }) {
 
     sendBatch();
   }, [sessionFinished, deck.study_mode, dispatch]);
+
+  // --------------------------------------------------------------------------
+  // Update daily stats after session
+  // --------------------------------------------------------------------------
+  useEffect(() => {
+    if (!sessionFinished || sessionUpdates.length === 0) return;
+
+    const cardsStudied = sessionUpdates.length;
+    isReviewMode
+      ? dispatch(
+          logStudySession({
+            cardsReviewed: cardsStudied,
+            cardsLearned: 0,
+            // timeStudiedSeconds: session.totalSeconds,  TODO: implement later
+            // xpEarned: session.xp,                      TODO: implement later
+          })
+        )
+      : dispatch(
+          logStudySession({
+            cardsReviewed: 0,
+            cardsLearned: cardsStudied,
+            // timeStudiedSeconds: session.totalSeconds,  TODO: implement later
+            // xpEarned: session.xp,                      TODO: implement later
+          })
+        );
+  }, [sessionFinished]); //LEAVE IT
 
   // --------------------------------------------------------------------------
   // Advance step
@@ -196,10 +225,10 @@ export default function useStudySession({ deck, navMode }) {
       };
 
       setSessionUpdates((prev) => [...prev, updatedCard]);
-      setSessionReviewed((c) => c + 1);
+
       advanceCard();
     },
-    [currentCard, currentPhase, advanceCard]
+    [currentCard, currentPhase.allowRating, advanceCard]
   );
 
   // --------------------------------------------------------------------------
@@ -212,47 +241,40 @@ export default function useStudySession({ deck, navMode }) {
   // --------------------------------------------------------------------------
   // Update streaks when session finishes
   // --------------------------------------------------------------------------
-  useEffect(() => {
-    if (!sessionFinished) return;
-    if (!userId || !deck?.id) return;
+  // useEffect(() => {
+  //   if (!sessionFinished) return;
+  //   if (!userId || !deck?.id) return;
 
-    const studiedCount = sessionReviewed + sessionLearned;
+  //   console.log("Log ", {
+  //     cardsReviewed: sessionReviewed,
+  //     cardsLearned: sessionLearned,
+  //   });
 
-    dispatch(
-      logStudySession({
-        cardsStudied: session.totalCards,
-        cardsReviewed: session.reviewCount,
-        cardsLearned: session.learnCount,
-        timeStudiedSeconds: session.totalSeconds,
-        xpEarned: session.xp,
-      })
-    );
+  //   dispatch(
+  //     logStudySession({
+  //       cardsReviewed: sessionReviewed,
+  //       cardsLearned: sessionLearned,
+  //       // timeStudiedSeconds: session.totalSeconds,  TODO: implement later
+  //       // xpEarned: session.xp,                      TODO: implement later
+  //     })
+  //   );
 
-    // Update deck streak
-    dispatch(
-      updateDeckStreak({
-        userId,
-        deckId: deck.id,
-        studiedCount,
-      })
-    );
-
-    // Update global streak
-    dispatch(
-      updateGlobalStreak({
-        userId,
-        reviewedCount: sessionReviewed,
-        learnedCount: sessionLearned,
-      })
-    );
-  }, [
-    sessionFinished,
-    sessionReviewed,
-    sessionLearned,
-    userId,
-    deck?.id,
-    dispatch,
-  ]);
+  // // Update global streak
+  // dispatch(
+  //   updateGlobalStreak({
+  //     userId,
+  //     reviewedCount: sessionReviewed,
+  //     learnedCount: sessionLearned,
+  //   })
+  // );
+  // }, [
+  //   sessionFinished,
+  //   sessionReviewed,
+  //   sessionLearned,
+  //   userId,
+  //   deck?.id,
+  //   dispatch,
+  // ]);
 
   // --------------------------------------------------------------------------
   // Progress counters
@@ -274,8 +296,8 @@ export default function useStudySession({ deck, navMode }) {
     progress: { current: currentStep - 1, total: totalSteps }, // For Bar component
     currentStep,
     totalSteps,
-    sessionReviewed,
-    sessionLearned,
+    // sessionReviewed,
+    // sessionLearned,
 
     // API
     handleRate,
