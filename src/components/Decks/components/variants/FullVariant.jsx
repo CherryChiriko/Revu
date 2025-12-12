@@ -2,13 +2,19 @@ import React, { memo } from "react";
 import { ProgressBar } from "../ProgressBar";
 import { DeckActions } from "../DeckActions";
 import { DeckBadges } from "../DeckBadges";
-// import { formatDate } from "../../General/utils/formatDate";
-import { useSelector } from "react-redux";
-import { selectDeckCountsById } from "../../../../slices/deckSlice";
+import { getStreak } from "../../../../slices/deckSlice";
 
 const FullVariant = ({ deck, activeTheme, logic }) => {
-  const { streak, showLearn, showReview, handleAction, isMastered } = logic;
-  const counts = useSelector(selectDeckCountsById(deck.id));
+  const {
+    showLearn,
+    showReview,
+    handleAction,
+    isMastered,
+    counts,
+    cards_count,
+  } = logic;
+
+  const [streak, isStreakActive] = getStreak(deck);
 
   return (
     <>
@@ -38,6 +44,7 @@ const FullVariant = ({ deck, activeTheme, logic }) => {
           streak={streak}
           activeTheme={activeTheme}
           isMastered={isMastered}
+          isStreakActive={isStreakActive}
         />
       </div>
 
@@ -46,6 +53,7 @@ const FullVariant = ({ deck, activeTheme, logic }) => {
         counts={counts}
         activeTheme={activeTheme}
         isMastered={isMastered}
+        cards_count={cards_count}
       />
 
       {/* Deck info */}

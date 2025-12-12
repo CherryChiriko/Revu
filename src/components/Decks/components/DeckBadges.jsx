@@ -4,9 +4,13 @@ import { faFire, faStar } from "@fortawesome/free-solid-svg-icons";
 export function DeckBadges({
   isMastered,
   streak,
+  isStreakActive,
   activeTheme,
   //   maxStreak = streak,
 }) {
+  const activeColor = "text-amber-500 bg-amber-500/10"; // active streak color
+  const inactiveColor = "text-gray-400 bg-gray-400/10"; // inactive streak color
+
   return (
     <>
       {isMastered && (
@@ -18,7 +22,11 @@ export function DeckBadges({
       )}
 
       {!isMastered && streak > 0 && (
-        <div className="flex items-center gap-1 text-amber-500 text-xs font-semibold bg-amber-500/10 px-2 py-1 rounded-full">
+        <div
+          className={`flex items-center gap-1 ${
+            isStreakActive ? activeColor : inactiveColor
+          } text-xs font-semibold px-2 py-1 rounded-full`}
+        >
           <FontAwesomeIcon icon={faFire} /> {streak}
         </div>
       )}

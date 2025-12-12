@@ -1,17 +1,30 @@
 import { useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { setActiveDeck } from "../../../slices/deckSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { setActiveDeck, selectDeckCountsById } from "../../../slices/deckSlice";
 
-export default function useDeckCardLogic(deck) {
+export default function useDeckCardLogic(id) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { id, mastered = 0, due = 0, cards_count = 0, streak = 0 } = deck || {};
 
-  const newCards = cards_count - mastered - due;
-  const showLearn = newCards > 0;
-  const showReview = Number(due) > 0;
-  const isMastered = cards_count === mastered;
+  const counts = useSelector(selectDeckCountsById(id)) || {
+    new: 0,
+    due: 0,
+    mastered: 0,
+    waiting: 0,
+  };
+
+  const cards_count = Object.values(counts).reduce((total, value) => {
+    if (typeof value === "number") {
+      //exclude id
+      return total + value;
+    }
+    return total;
+  }, 0);
+
+  const showLearn = counts.new > 0;
+  const showReview = counts.due > 0;
+  const isMastered = cards_count === counts.mastered;
 
   const handleCardClick = useCallback(() => {
     if (!isMastered) navigate(`/deck/${id}`);
@@ -29,20 +42,20 @@ export default function useDeckCardLogic(deck) {
 
   return useMemo(
     () => ({
-      newCards,
       showLearn,
       showReview,
       isMastered,
-      streak,
+      counts,
+      cards_count,
       handleCardClick,
       handleAction,
     }),
     [
-      newCards,
       showLearn,
       showReview,
       isMastered,
-      streak,
+      counts,
+      cards_count,
       handleCardClick,
       handleAction,
     ]

@@ -1,12 +1,9 @@
-export const ProgressBar = ({ counts, activeTheme, isMastered }) => {
-  const cards_count = Object.values(counts).reduce((total, value) => {
-    if (typeof value === "number") {
-      //exclude id
-      return total + value;
-    }
-    return total;
-  }, 0);
-
+export const ProgressBar = ({
+  counts,
+  cards_count,
+  activeTheme,
+  isMastered,
+}) => {
   const masteredPct = cards_count ? (counts.mastered / cards_count) * 100 : 0;
   const suspendedPct = cards_count ? (counts.suspended / cards_count) * 100 : 0;
   const learningPct = cards_count ? (counts.learning / cards_count) * 100 : 0;

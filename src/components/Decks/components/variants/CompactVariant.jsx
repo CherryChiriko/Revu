@@ -2,12 +2,19 @@ import React from "react";
 import { ProgressBar } from "../ProgressBar";
 import { DeckActions } from "../DeckActions";
 import { DeckBadges } from "../DeckBadges";
-import { useSelector } from "react-redux";
-import { selectDeckCountsById } from "../../../../slices/deckSlice";
+import { getStreak } from "../../../../slices/deckSlice";
 
 export default function CompactVariant({ deck, activeTheme, logic }) {
-  const { streak, showLearn, showReview, handleAction, isMastered } = logic;
-  const counts = useSelector(selectDeckCountsById(deck.id));
+  const {
+    showLearn,
+    showReview,
+    handleAction,
+    isMastered,
+    counts,
+    cards_count,
+  } = logic;
+
+  const [streak, isStreakActive] = getStreak(deck);
 
   return (
     <>
@@ -20,6 +27,7 @@ export default function CompactVariant({ deck, activeTheme, logic }) {
           streak={streak}
           activeTheme={activeTheme}
           isMastered={isMastered}
+          isStreakActive={isStreakActive}
         />
       </div>
 
@@ -27,6 +35,7 @@ export default function CompactVariant({ deck, activeTheme, logic }) {
         counts={counts}
         activeTheme={activeTheme}
         isMastered={isMastered}
+        cards_count={cards_count}
       />
 
       <div
