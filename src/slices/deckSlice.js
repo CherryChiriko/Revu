@@ -1,6 +1,10 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import {
+  createSlice,
+  createAsyncThunk,
+  createSelector,
+} from "@reduxjs/toolkit";
 import { supabase } from "../utils/supabaseClient";
-import { getCardStatus } from "../utils/cardUtils";
+// import { getCardStatus } from "../utils/cardUtils";
 
 /** Priority ordering */
 const orderDecksByPriority = (decks) => {
@@ -142,6 +146,16 @@ export const getTotalDueCards = (deckCounts) => {
   }, 0);
 };
 
+export const getTotalMasteredCards = (deckCounts) => {
+  if (!deckCounts || typeof deckCounts !== "object") return 0;
+
+  return Object.values(deckCounts).reduce((sum, deck) => {
+    // Safety: ensure deck.due exists and is numeric
+    const mastered = typeof deck.mastered === "number" ? deck.mastered : 0;
+    return sum + mastered;
+  }, 0);
+};
+
 const deckSlice = createSlice({
   name: "decks",
   initialState,
@@ -235,10 +249,22 @@ export const selectActiveDeck = (state) => {
 };
 
 export const selectDeckCounts = (state) => state.decks.deckCounts;
+export const selectDeckCountsById = (deckId) =>
+  createSelector(
+    (state) => state.decks.deckCounts,
+    (deckCounts) => deckCounts[deckId] || null
+  );
 export const selectTotalDueCards = (state) => {
   const deckCounts = state.decks.deckCounts;
   return Object.values(deckCounts).reduce(
     (total, d) => total + (d.due || 0),
+    0
+  );
+};
+export const selectTotalMasteredCards = (state) => {
+  const deckCounts = state.decks.deckCounts;
+  return Object.values(deckCounts).reduce(
+    (total, d) => total + (d.mastered || 0),
     0
   );
 };

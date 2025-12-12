@@ -2,9 +2,12 @@ import React from "react";
 import { ProgressBar } from "../ProgressBar";
 import { DeckActions } from "../DeckActions";
 import { DeckBadges } from "../DeckBadges";
+import { useSelector } from "react-redux";
+import { selectDeckCountsById } from "../../../../slices/deckSlice";
 
 export default function CompactVariant({ deck, activeTheme, logic }) {
   const { streak, showLearn, showReview, handleAction, isMastered } = logic;
+  const counts = useSelector(selectDeckCountsById(deck.id));
 
   return (
     <>
@@ -21,7 +24,7 @@ export default function CompactVariant({ deck, activeTheme, logic }) {
       </div>
 
       <ProgressBar
-        deck={deck}
+        counts={counts}
         activeTheme={activeTheme}
         isMastered={isMastered}
       />

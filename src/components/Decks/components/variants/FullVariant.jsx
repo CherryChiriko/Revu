@@ -3,9 +3,12 @@ import { ProgressBar } from "../ProgressBar";
 import { DeckActions } from "../DeckActions";
 import { DeckBadges } from "../DeckBadges";
 // import { formatDate } from "../../General/utils/formatDate";
+import { useSelector } from "react-redux";
+import { selectDeckCountsById } from "../../../../slices/deckSlice";
 
 const FullVariant = ({ deck, activeTheme, logic }) => {
   const { streak, showLearn, showReview, handleAction, isMastered } = logic;
+  const counts = useSelector(selectDeckCountsById(deck.id));
 
   return (
     <>
@@ -40,7 +43,7 @@ const FullVariant = ({ deck, activeTheme, logic }) => {
 
       {/* Progress bar */}
       <ProgressBar
-        deck={deck}
+        counts={counts}
         activeTheme={activeTheme}
         isMastered={isMastered}
       />

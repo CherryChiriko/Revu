@@ -2,7 +2,11 @@ import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { selectActiveTheme } from "../../slices/themeSlice";
 import { selectGlobalStreak } from "../../slices/userSlice";
-import { selectDecks, selectTotalDueCards } from "../../slices/deckSlice";
+import {
+  selectDecks,
+  selectTotalDueCards,
+  selectTotalMasteredCards,
+} from "../../slices/deckSlice";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -30,13 +34,7 @@ const Dashboard = () => {
 
   // 1. Select the map of due counts { deckId: count, ... }
   const cards_due_today = useSelector(selectTotalDueCards);
-
-  console.log(cards_due_today);
-
-  // const cards_due_today = decks.reduce((t, d) => t + (d.due || 0), 0);
-  // const cards_due_today = useSelector(fetchDueCardCounts);
-  console.log(cards_due_today);
-  const mastered_cards = decks.reduce((t, d) => t + (d.mastered || 0), 0);
+  const mastered_cards = useSelector(selectTotalMasteredCards);
   const currentStreak = useSelector(selectGlobalStreak);
 
   const totalXP = useMemo(

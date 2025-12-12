@@ -22,6 +22,7 @@ const themes = [
       activeButton: "text-white",
       accent1: "text-sky-500",
       accent2: "text-purple-500",
+      accent3: "text-indigo-500",
     },
 
     // New: Link/Navigation Item styling
@@ -74,6 +75,7 @@ const themes = [
       canvas: "bg-white",
       accent1: "bg-sky-500",
       accent2: "bg-purple-500",
+      accent3: "bg-purple-500",
     },
 
     text: {
@@ -83,6 +85,7 @@ const themes = [
       activeButton: "text-white",
       accent1: "text-sky-500",
       accent2: "text-purple-500",
+      accent3: "text-purple-500",
     },
 
     // New: Link/Navigation Item styling
