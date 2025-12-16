@@ -2,7 +2,7 @@ import React from "react";
 import { ProgressBar } from "../ProgressBar";
 import { DeckActions } from "../DeckActions";
 import { DeckBadges } from "../DeckBadges";
-import { getStreak } from "../../../../slices/deckSlice";
+// import { getStreak } from "../../../../slices/deckSlice";
 
 export default function CompactVariant({ deck, activeTheme, logic }) {
   const {
@@ -12,9 +12,11 @@ export default function CompactVariant({ deck, activeTheme, logic }) {
     isMastered,
     counts,
     cards_count,
+    streak,
+    isStreakActive,
   } = logic;
 
-  const [streak, isStreakActive] = getStreak(deck);
+  // const [streak, isStreakActive] = getStreak(deck);
 
   return (
     <>
@@ -50,7 +52,6 @@ export default function CompactVariant({ deck, activeTheme, logic }) {
           showLearn={showLearn}
           showReview={showReview}
           handleAction={handleAction}
-          deck={deck}
           large={false}
         />
       </div>

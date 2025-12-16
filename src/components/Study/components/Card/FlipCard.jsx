@@ -75,7 +75,6 @@ const FlipCard = ({
     onPassComplete?.();
   };
   const handleRate = (rating) => {
-    console.log(rating);
     setShowAnswer(false);
     onRate?.(rating);
   };

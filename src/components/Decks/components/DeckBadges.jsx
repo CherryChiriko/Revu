@@ -6,7 +6,6 @@ export function DeckBadges({
   streak,
   isStreakActive,
   activeTheme,
-  //   maxStreak = streak,
 }) {
   const activeColor = "text-amber-500 bg-amber-500/10"; // active streak color
   const inactiveColor = "text-gray-400 bg-gray-400/10"; // inactive streak color

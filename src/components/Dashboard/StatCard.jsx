@@ -1,16 +1,18 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useSelector } from "react-redux";
-import { selectGlobalStreakActive } from "../../slices/userSlice";
+import { selectGlobalStreakState } from "../../slices/streakSlice";
 
 export const StatCard = ({ icon, label, value, activeTheme }) => {
-  const isStreakActive = useSelector(selectGlobalStreakActive);
+  const streakState = useSelector(selectGlobalStreakState);
+  const isStreakActive = streakState === "active";
+
   return (
     <div
       className={`${activeTheme.background.secondary} rounded-2xl p-4 shadow-sm flex items-center gap-4`}
     >
       <div
-        className={`w-12 h-12 rounded-lg flex items-center justify-center bg-opacity-20 ${
-          isStreakActive && icon === "faFire" ? " text-amber-500" : ""
+        className={`w-12 h-12 rounded-lg flex items-center justify-center bg-opacity-20  ${
+          isStreakActive && icon.iconName === "fire" ? " text-amber-500" : ""
         }`}
       >
         <FontAwesomeIcon icon={icon} className="w-5 h-5" />

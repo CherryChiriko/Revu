@@ -9,7 +9,6 @@ const TABLES = {
 export const updateProgress = createAsyncThunk(
   "progress/updateProgress",
   async ({ sessionUpdates, study_mode }, { rejectWithValue }) => {
-    console.log("updateProgress", sessionUpdates);
     if (!sessionUpdates?.length || !study_mode) {
       return rejectWithValue("Missing required fields: updates or study_mode");
     }
@@ -20,8 +19,6 @@ export const updateProgress = createAsyncThunk(
     }
 
     try {
-      console.log("updates ", sessionUpdates);
-
       const { error } = await supabase.from(table).upsert(sessionUpdates, {
         onConflict: ["user_id", "card_id"],
       });

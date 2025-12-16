@@ -7,7 +7,7 @@ export function DeckActions({
   showReview,
   handleAction,
   activeTheme,
-  deck,
+  due = 0,
   large = false, // compact = false, full = true
 }) {
   if (isMastered) {
@@ -48,7 +48,7 @@ export function DeckActions({
           {large && (
             <>
               <FontAwesomeIcon icon={faRedo} className="mr-2" />
-              Review ({deck.due})
+              Review ({due})
             </>
           )}
           {!large && <FontAwesomeIcon icon={faRedo} className="h-3 w-3" />}

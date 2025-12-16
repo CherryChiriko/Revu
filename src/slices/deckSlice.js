@@ -136,29 +136,29 @@ const initialState = {
   error: null,
 };
 
-const getFormattedDate = (date) => {
-  // Note: Using UTC methods prevents local time zone issues from shifting the date
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
+// const getFormattedDate = (date) => {
+//   // Note: Using UTC methods prevents local time zone issues from shifting the date
+//   const year = date.getFullYear();
+//   const month = String(date.getMonth() + 1).padStart(2, "0");
+//   const day = String(date.getDate()).padStart(2, "0");
+//   return `${year}-${month}-${day}`;
+// };
 
-export const getStreak = (deck) => {
-  if (!deck || typeof deck.streak === "undefined" || !deck.last_reviewed) {
-    // Handle initial or missing data state gracefully
-    return [0, false];
-  }
+// export const getStreak = (deck) => {
+//   if (!deck || typeof deck.streak === "undefined" || !deck.last_reviewed) {
+//     // Handle initial or missing data state gracefully
+//     return [0, false];
+//   }
 
-  // Since deck.last_reviewed is already YYYY-MM-DD:
-  const lastReviewedDate = deck.last_reviewed;
-  const today = getFormattedDate(new Date());
+//   // Since deck.last_reviewed is already YYYY-MM-DD:
+//   const lastReviewedDate = deck.last_reviewed;
+//   const today = getFormattedDate(new Date());
 
-  const streak = deck.streak;
-  const isStreakActive = lastReviewedDate === today;
+//   const streak = deck.streak;
+//   const isStreakActive = lastReviewedDate === today;
 
-  return [streak, isStreakActive];
-};
+//   return [streak, isStreakActive];
+// };
 
 export const getTotalDueCards = (deckCounts) => {
   if (!deckCounts || typeof deckCounts !== "object") return 0;

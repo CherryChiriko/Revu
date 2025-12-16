@@ -2,7 +2,7 @@ import React, { memo } from "react";
 import { ProgressBar } from "../ProgressBar";
 import { DeckActions } from "../DeckActions";
 import { DeckBadges } from "../DeckBadges";
-import { getStreak } from "../../../../slices/deckSlice";
+// import { getStreak } from "../../../../slices/deckSlice";
 
 const FullVariant = ({ deck, activeTheme, logic }) => {
   const {
@@ -12,9 +12,12 @@ const FullVariant = ({ deck, activeTheme, logic }) => {
     isMastered,
     counts,
     cards_count,
+    streak,
+    maxStreak,
+    isStreakActive,
   } = logic;
 
-  const [streak, isStreakActive] = getStreak(deck);
+  // const [streak, isStreakActive] = getStreak(deck);
 
   return (
     <>
@@ -72,8 +75,8 @@ const FullVariant = ({ deck, activeTheme, logic }) => {
         showLearn={showLearn}
         showReview={showReview}
         handleAction={handleAction}
-        deck={deck}
         large={true}
+        due={counts.due}
       />
     </>
   );

@@ -4,7 +4,7 @@ import FullVariant from "./variants/FullVariant";
 import CompactVariant from "./variants/CompactVariant";
 
 function DeckCardItem({ deck, activeTheme, variant }) {
-  const logic = useDeckCardLogic(deck.id);
+  const logic = useDeckCardLogic(deck.id, deck.cards_count);
 
   if (!deck || !logic) return null;
 

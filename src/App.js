@@ -20,6 +20,7 @@ import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import ScrollToTop from "./components/General/routing/ScrollToTop";
 import DecksLoader from "./components/Loaders/DecksLoader";
 import CardsLoader from "./components/Loaders/CardsLoader";
+import StatsLoader from "./components/Loaders/StatsLoader";
 import ResetPasswordPage from "./components/ResetPasswordPage";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -61,6 +62,7 @@ function App() {
     return (
       <>
         <DecksLoader session={session} authLoading={authLoading} />
+        <StatsLoader session={session} authLoading={authLoading} />
         <div
           className={`${activeTheme.background.app} min-h-screen flex items-center justify-center`}
         >

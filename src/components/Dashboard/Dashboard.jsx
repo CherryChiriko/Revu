@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { selectActiveTheme } from "../../slices/themeSlice";
-import { selectGlobalStreak } from "../../slices/userSlice";
+import { selectGlobalStreak } from "../../slices/streakSlice";
 import {
   selectDecks,
   selectTotalDueCards,
@@ -35,12 +35,11 @@ const Dashboard = () => {
   // 1. Select the map of due counts { deckId: count, ... }
   const cards_due_today = useSelector(selectTotalDueCards);
   const mastered_cards = useSelector(selectTotalMasteredCards);
-  const currentStreak = useSelector(selectGlobalStreak);
+  const globalStreak = useSelector(selectGlobalStreak);
 
   const totalXP = useMemo(
-    () =>
-      Math.max(0, mastered_cards * 5 + currentStreak * 10 + cards_due_today),
-    [mastered_cards, currentStreak, cards_due_today]
+    () => Math.max(0, mastered_cards * 5 + globalStreak * 10 + cards_due_today),
+    [mastered_cards, globalStreak, cards_due_today]
   );
 
   return (
@@ -80,7 +79,7 @@ const Dashboard = () => {
           <StatCard
             icon={faFire}
             label="Current Streak"
-            value={`${currentStreak} days`}
+            value={`${globalStreak} day${globalStreak === 1 ? "" : "s"}`}
             activeTheme={activeTheme}
           />
           <StatCard

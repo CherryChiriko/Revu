@@ -2,8 +2,9 @@ import { useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setActiveDeck, selectDeckCountsById } from "../../../slices/deckSlice";
+import { selectDeckStreakById } from "../../../slices/streakSlice";
 
-export default function useDeckCardLogic(id) {
+export default function useDeckCardLogic(id, cards_count) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -14,13 +15,9 @@ export default function useDeckCardLogic(id) {
     waiting: 0,
   };
 
-  const cards_count = Object.values(counts).reduce((total, value) => {
-    if (typeof value === "number") {
-      //exclude id
-      return total + value;
-    }
-    return total;
-  }, 0);
+  const { streak, maxStreak, isStreakActive } = useSelector(
+    selectDeckStreakById(id)
+  );
 
   const showLearn = counts.new > 0;
   const showReview = counts.due > 0;
@@ -49,6 +46,9 @@ export default function useDeckCardLogic(id) {
       cards_count,
       handleCardClick,
       handleAction,
+      streak,
+      maxStreak,
+      isStreakActive,
     }),
     [
       showLearn,
@@ -58,6 +58,9 @@ export default function useDeckCardLogic(id) {
       cards_count,
       handleCardClick,
       handleAction,
+      streak,
+      maxStreak,
+      isStreakActive,
     ]
   );
 }
