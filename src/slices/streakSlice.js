@@ -1,4 +1,8 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import {
+  createSlice,
+  createAsyncThunk,
+  createSelector,
+} from "@reduxjs/toolkit";
 import { supabase } from "../utils/supabaseClient";
 
 /* -------------------------------------------
@@ -30,7 +34,7 @@ export const fetchDailyStreakStats = createAsyncThunk(
           .select("global_streak, max_global_streak, streak_state")
           .eq("user_id", userId)
           .eq("date", today)
-          .maybeSingle(), // IMPORTANT
+          .maybeSingle(),
       ]);
 
       if (deckRes.error) throw deckRes.error;
@@ -50,6 +54,15 @@ export const fetchDailyStreakStats = createAsyncThunk(
   }
 );
 
+export function updateGlobalStreakFromRealtime(state, action) {
+  const row = action.payload;
+  state.global = {
+    streak: row.global_streak,
+    maxStreak: row.max_global_streak,
+    streakState: row.streak_state,
+  };
+}
+
 /* -------------------------------------------
    Slice
 -------------------------------------------- */
@@ -58,10 +71,8 @@ const streakSlice = createSlice({
   initialState: {
     status: "idle",
     error: null,
-
     // deck_id -> streak info
     deckStatsCache: {},
-
     global: {
       streak: 0,
       maxStreak: 0,
@@ -80,6 +91,7 @@ const streakSlice = createSlice({
       state.status = "idle";
       state.error = null;
     },
+
     updateDeckStreakFromRealtime(state, action) {
       const row = action.payload;
       state.deckStatsCache[row.deck_id] = {
@@ -88,6 +100,15 @@ const streakSlice = createSlice({
         streakState: row.streak_state,
       };
     },
+
+    // updateGlobalStreakFromRealtime(state, action) {
+    //   const row = action.payload;
+    //   state.global = {
+    //     streak: row.global_streak,
+    //     maxStreak: row.max_global_streak,
+    //     streakState: row.streak_state,
+    //   };
+    // },
   },
 
   extraReducers: (builder) => {
@@ -127,40 +148,100 @@ const streakSlice = createSlice({
 });
 
 /* -------------------------------------------
-   Selectors
+   Base Selectors (select raw state)
+-------------------------------------------- */
+const selectStreakState = (state) => state.streak;
+const selectDeckStatsCache = (state) => state.streak.deckStatsCache;
+const selectGlobalState = (state) => state.streak.global;
+
+/* -------------------------------------------
+   Memoized Selectors
 -------------------------------------------- */
 
-// Raw
-export const selectGlobalStreak = (state) => state.streak.global.streak;
-export const selectGlobalStreakState = (state) =>
-  state.streak.global.streakState;
+// Global streak selectors
+export const selectGlobalStreak = createSelector(
+  [selectGlobalState],
+  (global) => global.streak
+);
 
-export const selectDeckStreakById = (deckId) => (state) => {
-  const deck = state.streak.deckStatsCache[deckId] || {
-    streak: 0,
-    maxStreak: 0,
-    streakState: "inactive",
-  };
+export const selectGlobalMaxStreak = createSelector(
+  [selectGlobalState],
+  (global) => global.maxStreak
+);
 
-  return {
-    streak: deck.streak,
-    maxStreak: deck.maxStreak,
-    isStreakActive: deck.streakState === "active",
-  };
-};
+export const selectGlobalStreakState = createSelector(
+  [selectGlobalState],
+  (global) => global.streakState
+);
 
-// // Derived (recommended for UI)
-// export const selectIsGlobalStreakActive = (state) =>
-//   state.streak.global.streakState === "active";
+// export const selectIsGlobalStreakActive = createSelector(
+//   [selectGlobalStreakState],
+//   (streakState) => streakState === "active"
+// );
 
-// export const selectIsGlobalStreakFrozen = (state) =>
-//   state.streak.global.streakState === "frozen";
+// export const selectIsGlobalStreakFrozen = createSelector(
+//   [selectGlobalStreakState],
+//   (streakState) => streakState === "frozen"
+// );
 
-// export const selectIsDeckStreakActive = (deckId) => (state) =>
-//   state.streak.deckStatsCache[deckId]?.streakState === "active";
+// Returns the entire global object (memoized)
+export const selectGlobalStreakData = createSelector(
+  [selectGlobalState],
+  (global) => global
+);
 
-// export const selectIsDeckStreakFrozen = (deckId) => (state) =>
-//   state.streak.deckStatsCache[deckId]?.streakState === "frozen";
+// Deck streak selectors
+export const selectDeckStreakById = (deckId) =>
+  createSelector([selectDeckStatsCache], (deckStatsCache) => {
+    const deck = deckStatsCache[deckId] || {
+      streak: 0,
+      maxStreak: 0,
+      streakState: "inactive",
+    };
 
-export const { clearStreak } = streakSlice.actions;
+    return {
+      streak: deck.streak,
+      maxStreak: deck.maxStreak,
+      isStreakActive: deck.streakState === "active",
+      streakState: deck.streakState,
+    };
+  });
+
+// export const selectIsDeckStreakActive = (deckId) =>
+//   createSelector(
+//     [selectDeckStatsCache],
+//     (deckStatsCache) => deckStatsCache[deckId]?.streakState === "active"
+//   );
+
+// export const selectIsDeckStreakFrozen = (deckId) =>
+//   createSelector(
+//     [selectDeckStatsCache],
+//     (deckStatsCache) => deckStatsCache[deckId]?.streakState === "frozen"
+//   );
+
+// Status selectors
+export const selectStreakStatus = createSelector(
+  [selectStreakState],
+  (streak) => streak.status
+);
+
+export const selectStreakError = createSelector(
+  [selectStreakState],
+  (streak) => streak.error
+);
+
+export const selectIsStreakLoading = createSelector(
+  [selectStreakStatus],
+  (status) => status === "loading"
+);
+
+/* -------------------------------------------
+   Actions
+-------------------------------------------- */
+export const {
+  clearStreak,
+  updateDeckStreakFromRealtime,
+  // updateGlobalStreakFromRealtime,
+} = streakSlice.actions;
+
 export default streakSlice.reducer;

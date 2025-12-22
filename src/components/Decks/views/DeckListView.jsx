@@ -1,5 +1,5 @@
-import React from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { selectActiveTheme } from "../../../slices/themeSlice";
 import useListController from "../hooks/useListController";
 import DeckCard from "../components/DeckCard";
@@ -31,7 +31,6 @@ export default function DeckListView() {
     uniqueLanguages,
     currentDecks,
     totalPages,
-    allFilteredCount,
   } = controller;
 
   // grid classes depending on view mode
@@ -41,6 +40,12 @@ export default function DeckListView() {
       : "grid grid-cols-1 md:grid-cols-4 gap-3";
 
   const variant = viewMode === "grid" ? "full" : "compact";
+
+  const navigate = useNavigate();
+
+  const handleImportClick = () => {
+    navigate("import");
+  };
 
   return (
     <div
@@ -125,6 +130,7 @@ export default function DeckListView() {
             <button
               className={`flex items-center ${activeTheme.button.accent2} ${activeTheme.text.secondary} font-semibold py-2 px-3 rounded-lg`}
               title="Import"
+              onClick={handleImportClick}
             >
               {" "}
               <FontAwesomeIcon icon={faUpload} className="h-5 w-5 mr-2" />

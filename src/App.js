@@ -1,22 +1,27 @@
 import React from "react";
 import { useSelector } from "react-redux";
+import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { selectActiveTheme } from "./slices/themeSlice";
 import {
   selectActiveDeck,
   selectDeckStatus,
   selectDeckError,
 } from "./slices/deckSlice";
+
 import useAuth from "./hooks/useAuth";
 import useDeckLiveSync from "./hooks/useDeckLiveSync";
+import useGlobalStatsLiveSync from "./hooks/useGlobalStatsLiveSync";
+import useAppBoot from "./hooks/useAppBoot";
 
 import Navbar from "./components/Navbar/Navbar";
 import Dashboard from "./components/Dashboard/Dashboard";
 import DeckManager from "./components/Decks/views/DeckManager";
 import DeckListView from "./components/Decks/views/DeckListView";
+import Import from "./components/Decks/views/Import";
 import StudySession from "./components/Study/views/StudySession";
 import LoginPage from "./components/LoginPage";
 import NotFound404 from "./components/404";
-import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
+
 import ScrollToTop from "./components/General/routing/ScrollToTop";
 import DecksLoader from "./components/Loaders/DecksLoader";
 import CardsLoader from "./components/Loaders/CardsLoader";
@@ -39,6 +44,8 @@ function App() {
   const isPublicPath = publicPaths.includes(location.pathname);
 
   useDeckLiveSync(session && status === "succeeded");
+  useGlobalStatsLiveSync(!!session);
+  useAppBoot(session);
 
   // Auth check
   if (authLoading) {
@@ -119,6 +126,7 @@ function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/decks" element={<DeckManager />}>
             <Route index element={<DeckListView />} />
+            <Route path="import" element={<Import />} />
           </Route>
           <Route path="/study" element={<StudySession />} />
           <Route

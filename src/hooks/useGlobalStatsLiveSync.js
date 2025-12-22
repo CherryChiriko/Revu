@@ -1,25 +1,25 @@
 import { useEffect } from "react";
 import { supabase } from "../utils/supabaseClient";
 import { useDispatch } from "react-redux";
-import { updateDeckStatsFromRealtime } from "../slices/deckSlice";
+import { updateGlobalStreakFromRealtime } from "../slices/streakSlice";
 
-export default function useDeckLiveSync(enabled = true) {
+export default function useGlobalStatsLiveSync(enabled = true) {
   const dispatch = useDispatch();
 
   useEffect(() => {
     if (!enabled) return;
 
     const channel = supabase
-      .channel("realtime-daily-deck-stats")
+      .channel("realtime-daily-user-stats")
       .on(
         "postgres_changes",
         {
           event: "*",
           schema: "public",
-          table: "daily_deck_stats",
+          table: "daily_user_stats",
         },
         (payload) => {
-          dispatch(updateDeckStatsFromRealtime(payload.new));
+          dispatch(updateGlobalStreakFromRealtime(payload.new));
         }
       )
       .subscribe();

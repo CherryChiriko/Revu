@@ -136,6 +136,18 @@ const initialState = {
   error: null,
 };
 
+export function updateDeckStatsFromRealtime(state, action) {
+  const row = action.payload;
+
+  const deck = state.entities[row.deck_id];
+  if (!deck) return;
+
+  deck.due_count = row.due_count;
+  deck.new_count = row.new_count;
+  deck.streak = row.deck_streak;
+  deck.streak_state = row.streak_state;
+}
+
 // const getFormattedDate = (date) => {
 //   // Note: Using UTC methods prevents local time zone issues from shifting the date
 //   const year = date.getFullYear();
@@ -160,25 +172,25 @@ const initialState = {
 //   return [streak, isStreakActive];
 // };
 
-export const getTotalDueCards = (deckCounts) => {
-  if (!deckCounts || typeof deckCounts !== "object") return 0;
+// export const getTotalDueCards = (deckCounts) => {
+//   if (!deckCounts || typeof deckCounts !== "object") return 0;
 
-  return Object.values(deckCounts).reduce((sum, deck) => {
-    // Safety: ensure deck.due exists and is numeric
-    const due = typeof deck.due === "number" ? deck.due : 0;
-    return sum + due;
-  }, 0);
-};
+//   return Object.values(deckCounts).reduce((sum, deck) => {
+//     // Safety: ensure deck.due exists and is numeric
+//     const due = typeof deck.due === "number" ? deck.due : 0;
+//     return sum + due;
+//   }, 0);
+// };
 
-export const getTotalMasteredCards = (deckCounts) => {
-  if (!deckCounts || typeof deckCounts !== "object") return 0;
+// export const getTotalMasteredCards = (deckCounts) => {
+//   if (!deckCounts || typeof deckCounts !== "object") return 0;
 
-  return Object.values(deckCounts).reduce((sum, deck) => {
-    // Safety: ensure deck.due exists and is numeric
-    const mastered = typeof deck.mastered === "number" ? deck.mastered : 0;
-    return sum + mastered;
-  }, 0);
-};
+//   return Object.values(deckCounts).reduce((sum, deck) => {
+//     // Safety: ensure deck.due exists and is numeric
+//     const mastered = typeof deck.mastered === "number" ? deck.mastered : 0;
+//     return sum + mastered;
+//   }, 0);
+// };
 
 const deckSlice = createSlice({
   name: "decks",

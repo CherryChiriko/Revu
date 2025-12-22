@@ -38,15 +38,6 @@ const userSlice = createSlice({
       state.status = "idle";
       state.error = null;
     },
-    // Update profile when streak is updated
-    updateProfileFromStreak(state, action) {
-      if (state.profile) {
-        state.profile = {
-          ...state.profile,
-          ...action.payload,
-        };
-      }
-    },
   },
   extraReducers: (builder) => {
     builder
@@ -66,22 +57,12 @@ const userSlice = createSlice({
   },
 });
 
-export const { clearUser, updateProfileFromStreak } = userSlice.actions;
+export const { clearUser } = userSlice.actions;
 
 // Selectors
 export const selectUserProfile = (state) => state.user?.profile;
 export const selectUsername = (state) => state.user?.profile?.username;
-export const selectGlobalStreak = (state) =>
-  state.user?.profile?.global_streak ?? 0;
-export const selectGlobalMaxStreak = (state) =>
-  state.user?.profile?.global_max_streak ?? 0;
-export const selectGlobalStreakActive = (state) => {
-  const profile = state.user?.profile;
-  if (!profile?.global_last_active) return false;
 
-  const today = new Date().toISOString().split("T")[0];
-  return profile.global_last_active === today;
-};
 export const selectUserStatus = (state) => state.user?.status;
 export const selectUserError = (state) => state.user?.error;
 

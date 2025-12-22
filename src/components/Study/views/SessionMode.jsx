@@ -24,6 +24,22 @@ const SessionMode = ({ mode, activeTheme, activeDeck }) => {
     exitSession,
   } = useStudySession({ deck: activeDeck, navMode: mode });
 
+  if (sessionFinished) {
+    return (
+      <div
+        className={`h-screen flex flex-col items-center justify-center ${activeTheme.background.app} text-center`}
+      >
+        <SessionComplete
+          learnedCount={limit}
+          isOpen={true}
+          onGoBack={exitSession}
+          onLearnMore={resetSession}
+          activeTheme={activeTheme}
+        />
+      </div>
+    );
+  }
+
   if (!cards.length) {
     return (
       <div
@@ -40,22 +56,6 @@ const SessionMode = ({ mode, activeTheme, activeDeck }) => {
         >
           Return to decks
         </button>
-      </div>
-    );
-  }
-
-  if (sessionFinished) {
-    return (
-      <div
-        className={`h-screen flex flex-col items-center justify-center ${activeTheme.background.app} text-center`}
-      >
-        <SessionComplete
-          learnedCount={limit}
-          isOpen={true}
-          onGoBack={exitSession}
-          onLearnMore={resetSession}
-          activeTheme={activeTheme}
-        />
       </div>
     );
   }

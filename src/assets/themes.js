@@ -47,7 +47,6 @@ const themes = [
     },
     border: {
       card: "border-gray-700",
-      accent: "border-indigo-500",
       muted: "border-gray-700",
     },
     gradients: {
@@ -55,11 +54,11 @@ const themes = [
       to: "to-purple-500",
       colors: [
         "#111827",
-        "#1a2347",
-        "#2d2d67",
-        "#4b3284",
-        "#71329d",
-        "#9c27b0",
+        "#0a2554",
+        "#0c2f83",
+        "#2e33b1",
+        "#5d2edb",
+        "#9400ff",
       ],
     },
   },
@@ -111,8 +110,6 @@ const themes = [
     },
     border: {
       card: "border-gray-200",
-      dashed: "border-dashed border-gray-300",
-      accent: "border-indigo-500",
       muted: "border-gray-700",
     },
     gradients: {

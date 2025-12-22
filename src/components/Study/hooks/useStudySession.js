@@ -2,7 +2,10 @@ import { useEffect, useMemo, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { selectCards, fetchCards } from "../../../slices/cardSlice";
-import { logStudySession } from "../../../slices/activitySlice";
+import {
+  logStudySession,
+  fetchDailyActivity,
+} from "../../../slices/activitySlice";
 import { updateProgress } from "../../../slices/progressSlice";
 import { fetchDailyStreakStats } from "../../../slices/streakSlice";
 import { computeSM2 } from "../../../utils/srs";
@@ -155,6 +158,8 @@ export default function useStudySession({ deck, navMode }) {
           p_review_limit: REVIEW_LIMIT,
           p_learn_limit: LEARN_LIMIT,
         });
+
+        dispatch(fetchDailyActivity());
 
         // 3. Refresh cards & streaks in Redux
         await Promise.all([

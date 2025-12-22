@@ -1,8 +1,6 @@
-import React from "react";
 import { ProgressBar } from "../ProgressBar";
 import { DeckActions } from "../DeckActions";
 import { DeckBadges } from "../DeckBadges";
-// import { getStreak } from "../../../../slices/deckSlice";
 
 export default function CompactVariant({ deck, activeTheme, logic }) {
   const {
@@ -15,8 +13,6 @@ export default function CompactVariant({ deck, activeTheme, logic }) {
     streak,
     isStreakActive,
   } = logic;
-
-  // const [streak, isStreakActive] = getStreak(deck);
 
   return (
     <>
