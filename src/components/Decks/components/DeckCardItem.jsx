@@ -8,13 +8,10 @@ function DeckCardItem({ deck, activeTheme, variant }) {
 
   if (!deck || !logic) return null;
 
-  const base = `rounded-xl border shadow-md transition-all duration-300
-  ${activeTheme.background.secondary} rounded-xl p-6 shadow-xl 
+  const base = `rounded-xl border shadow-md transition-all duration-300 p-6 shadow-xl 
       hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-1 
-      cursor-pointer border ${activeTheme.border.card}
-     ${activeTheme.background.secondary} ${activeTheme.text.primary} ${
-    activeTheme.border.card
-  }
+      cursor-pointer ${activeTheme.border.card}
+     ${activeTheme.background.secondary} ${activeTheme.text.primary}
      ${
        logic.isMastered ? "opacity-60" : "hover:shadow-xl hover:-translate-y-1"
      }`;

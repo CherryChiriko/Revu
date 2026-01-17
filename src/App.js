@@ -17,7 +17,7 @@ import Navbar from "./components/Navbar/Navbar";
 import Dashboard from "./components/Dashboard/Dashboard";
 import DeckManager from "./components/Decks/views/DeckManager";
 import DeckListView from "./components/Decks/views/DeckListView";
-import Import from "./components/Decks/views/Import";
+import ImportView from "./components/Import/ImportView";
 import StudySession from "./components/Study/views/StudySession";
 import LoginPage from "./components/LoginPage";
 import NotFound404 from "./components/404";
@@ -126,8 +126,8 @@ function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/decks" element={<DeckManager />}>
             <Route index element={<DeckListView />} />
-            <Route path="import" element={<Import />} />
           </Route>
+          <Route path="import" element={<ImportView />} />
           <Route path="/study" element={<StudySession />} />
           <Route
             path="/reset-password"

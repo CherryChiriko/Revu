@@ -33,6 +33,7 @@ export default function useStudySession({ deck, navMode }) {
   const [cardIndex, setCardIndex] = useState(0);
   const [sessionFinished, setSessionFinished] = useState(false);
   const [sessionUpdates, setSessionUpdates] = useState([]);
+  const [sessionSummary, setSessionSummary] = useState(null);
 
   // ----------------------
   // Cards
@@ -89,7 +90,7 @@ export default function useStudySession({ deck, navMode }) {
 
   useEffect(() => {
     restartSession();
-  }, [deck?.id, restartSession]);
+  }, [deck?.id]);
 
   const exitStudy = useCallback(() => {
     navigate("/decks");
@@ -144,6 +145,14 @@ export default function useStudySession({ deck, navMode }) {
         const cardsStudied = sessionUpdates.length;
         const cardsReviewed = isReviewMode ? cardsStudied : 0;
         const cardsLearned = isReviewMode ? 0 : cardsStudied;
+
+        if (!sessionSummary) {
+          setSessionSummary({
+            learned: cardsLearned,
+            reviewed: cardsReviewed,
+          });
+        }
+
         // 1. Update progress in Redux + DB
         await dispatch(
           updateProgress({ sessionUpdates, study_mode: deck.study_mode })
@@ -201,6 +210,7 @@ export default function useStudySession({ deck, navMode }) {
     currentCard,
     currentPhase,
     sessionFinished,
+    sessionSummary,
     progressPercentage,
     progress: { current: currentStep, total: totalSteps },
     currentStep,

@@ -1,8 +1,6 @@
 import { useEffect, useRef } from "react";
 
 const WRITER_CONFIG = {
-  width: 250,
-  height: 250,
   padding: 5,
   strokeAnimationSpeed: 2,
   delayBetweenStrokes: 100,
@@ -17,6 +15,8 @@ export function useHanziWriter({
   activeTheme,
   strokeColor,
   revealed,
+  width,
+  height,
 }) {
   const outlineColor = activeTheme.isDark
     ? "rgb(212,212,212)"
@@ -43,6 +43,8 @@ export function useHanziWriter({
           strokeColor,
           outlineColor,
           highlightColor: strokeColor,
+          width,
+          height,
         }
       );
 
@@ -50,7 +52,7 @@ export function useHanziWriter({
     } catch (err) {
       console.error("[HanziWriter] Failed to init:", err);
     }
-  }, [character, outlineColor, strokeColor]);
+  }, [character, outlineColor, strokeColor, width, height]);
 
   // Apply mode-specific behavior
   useEffect(() => {

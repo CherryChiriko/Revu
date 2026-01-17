@@ -16,6 +16,7 @@ const SessionMode = ({ mode, activeTheme, activeDeck }) => {
     progress,
     cards,
     sessionFinished,
+    sessionSummary,
     limit,
     onReveal,
     handleRate,
@@ -31,7 +32,7 @@ const SessionMode = ({ mode, activeTheme, activeDeck }) => {
       >
         <SessionComplete
           learnedCount={limit}
-          isOpen={true}
+          isOpen={!!sessionSummary}
           onGoBack={exitSession}
           onLearnMore={resetSession}
           activeTheme={activeTheme}

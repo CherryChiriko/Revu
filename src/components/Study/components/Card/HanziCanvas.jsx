@@ -16,6 +16,8 @@ const HanziCanvas = ({
     activeTheme,
     strokeColor,
     revealed,
+    width: 250,
+    height: 250,
   });
 
   const bgColor = activeTheme?.background?.canvas ?? "bg-white";

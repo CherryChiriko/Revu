@@ -12,8 +12,13 @@ import {
   faArrowRight,
   faFileExcel, // Used for FileSpreadsheet
 } from "@fortawesome/free-solid-svg-icons";
+import { supabase } from "../../../utils/supabaseClient";
+import { generateMetadata } from "../../../utils/generateMetadata";
 
 import { selectActiveTheme } from "../../../slices/themeSlice";
+import Header from "../../General/ui/Header";
+
+const PROGRESS_STEPS = [1, 2, 3];
 
 const Import = () => {
   const activeTheme = useSelector(selectActiveTheme);
@@ -31,7 +36,7 @@ const Import = () => {
   const [deckSettings, setDeckSettings] = useState({
     name: "",
     description: "",
-    language: "japanese",
+    language: "",
     tags: "",
   });
   const [isProcessing, setIsProcessing] = useState(false);
@@ -101,57 +106,82 @@ const Import = () => {
   };
 
   const handleImport = async () => {
-    if (!deckSettings.name.trim()) {
-      showNotification(
-        "Deck Name Required",
-        "Please enter a name for your deck.",
-        "destructive"
-      );
-      return;
-    }
-
     setIsProcessing(true);
-    setProcessingProgress(0);
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-    // Mock processing with progress
-    const processCards = async () => {
-      for (let i = 0; i <= 100; i += 10) {
-        setProcessingProgress(i);
-        await new Promise((resolve) => setTimeout(resolve, 200));
-      }
-    };
+      // 1. Create Deck
+      const { data: deck, error: deckErr } = await supabase
+        .from("decks")
+        .insert([
+          {
+            name: deckSettings.name,
+            description: deckSettings.description,
+            language: deckSettings.language,
+            study_mode: deckSettings.language === "chinese" ? "C" : "A", // Type C for Chinese
+            user_id: user.id,
+          },
+        ])
+        .select()
+        .single();
 
-    await processCards();
+      if (deckErr) throw deckErr;
 
-    // Create mock deck
-    const newDeck = {
-      id: `imported_${Date.now()}`,
-      name: deckSettings.name,
-      description: deckSettings.description,
-      language: deckSettings.language,
-      cardCount: fileContent.length,
-      dueCount: fileContent.length, // All new cards are due
-      masteredCount: 0,
-      learningCount: 0,
-      createdAt: new Date().toISOString(),
-      lastStudied: null,
-      tags: deckSettings.tags
-        .split(",")
-        .map((tag) => tag.trim())
-        .filter(Boolean),
-      color: "#4ECDC4", // Consider making this dynamic from theme as well
-    };
+      // 2. Prepare and Generate Card Data
+      const table = deck.study_mode === "C" ? "cards_c" : "cards_a";
+      const cardsToInsert = fileContent.map((row) => {
+        const frontText = row[columnMappings.word];
+        const meta = generateMetadata(frontText, deckSettings.language);
 
-    setIsProcessing(false);
+        const baseCard = {
+          deck_id: deck.id,
+          front: frontText,
+          back: row[columnMappings.meaning],
+          audioUrl: row[columnMappings.audioUrl] || null,
+        };
 
-    showNotification(
-      "Import Successful!",
-      `Created deck "${newDeck.name}" with ${fileContent.length} cards.`
-    );
+        return deck.study_mode === "C"
+          ? {
+              ...baseCard,
+              reading: meta.reading,
+              tones: meta.tones,
+              strokeColors: meta.strokeColors,
+            }
+          : {
+              ...baseCard,
+              reading: row[columnMappings.reading] || meta.reading,
+            };
+      });
 
-    navigate("/decks");
+      // 3. Batch Insert Cards
+      const { data: newCards, error: cardErr } = await supabase
+        .from(table)
+        .insert(cardsToInsert)
+        .select();
+
+      if (cardErr) throw cardErr;
+
+      // 4. Initialize Progress (Critical for your SRS logic)
+      const progressTable =
+        deck.study_mode === "C" ? "card_c_progress" : "card_a_progress";
+      const progressEntries = newCards.map((card) => ({
+        card_id: card.id,
+        user_id: user.id,
+        deck_id: deck.id,
+        status: "new",
+      }));
+
+      await supabase.from(progressTable).insert(progressEntries);
+
+      navigate("/decks");
+    } catch (error) {
+      console.error("Import Error:", error);
+    } finally {
+      setIsProcessing(false);
+    }
   };
-
   const downloadTemplate = () => {
     const csvContent =
       "word,reading,meaning,audio_url\nあ,a,vowel sound a,\nか,ka,consonant-vowel ka,\n你,nǐ,you,\n好,hǎo,good,";
@@ -177,36 +207,27 @@ const Import = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       {/* Header */}
-      <div className="text-center space-y-4">
-        <h1
-          className={`text-4xl font-bold flex items-center justify-center gap-3 ${activeTheme.text.primary}`}
-        >
-          <FontAwesomeIcon icon={faUpload} className="w-8 h-8" />
-          Import Flashcards
-        </h1>
-        <p className={`${activeTheme.text.muted}`}>
-          Import your flashcards from CSV or Excel files
-        </p>
-      </div>
+      <Header
+        title="Import Deck"
+        description="Import your flashcards from CSV or Excel files"
+      />
 
       {/* Progress Steps */}
       <div className="flex items-center justify-center space-x-8 mb-8">
-        {[1, 2, 3].map((step) => (
+        {PROGRESS_STEPS.map((step) => (
           <div key={step} className="flex items-center">
             <div
               className={`rounded-full w-10 h-10 flex items-center justify-center border-2 transition-all duration-300
                 ${
                   currentStep >= step
-                    ? `${
-                        activeTheme.button.default
-                      } border-${activeTheme.button.default.replace("bg-", "")}`
-                    : `bg-white ${activeTheme.border.dashed} ${activeTheme.text.secondary}` // Adjusted for inactive step circle
+                    ? `${activeTheme.button.primary} `
+                    : `${activeTheme.button.disabled}  ${activeTheme.border.secondary} ${activeTheme.text.secondary}`
                 }`}
             >
               {currentStep > step ? (
                 <FontAwesomeIcon
                   icon={faCheckCircle}
-                  className={`w-5 h-5 ${activeTheme.text.activeButton}`}
+                  className={`w-5 h-5 ${activeTheme.text.primary}`}
                 />
               ) : (
                 step
@@ -217,8 +238,8 @@ const Import = () => {
                 icon={faArrowRight}
                 className={`w-6 h-6 mx-4 transition-colors duration-300 ${
                   currentStep > step
-                    ? activeTheme.icon.stepActive
-                    : activeTheme.icon.stepInactive
+                    ? activeTheme.text.primary
+                    : activeTheme.text.muted
                 }`}
               />
             )}
@@ -228,7 +249,7 @@ const Import = () => {
 
       {/* Step Content Card */}
       <div
-        className={`${activeTheme.card.bg} rounded-lg shadow-xl p-6 w-full max-w-3xl mx-auto`}
+        className={`${activeTheme.background.app} rounded-lg shadow-xl p-6 w-full max-w-3xl mx-auto`}
       >
         {currentStep === 1 && (
           <>
@@ -246,12 +267,12 @@ const Import = () => {
             <div className="space-y-6">
               {/* File Upload Area */}
               <div
-                className={`border-2 border-dashed ${activeTheme.border.dashed} rounded-lg p-8 text-center hover:border-blue-400 transition-colors duration-300`}
+                className={`border-2 border-dashed ${activeTheme.border.muted} rounded-lg p-8 text-center hover:border-blue-400 transition-colors duration-300`}
               >
                 <div className="space-y-4">
                   <FontAwesomeIcon
                     icon={faUpload}
-                    className={`w-16 h-16 mx-auto ${activeTheme.icon.default}`}
+                    className={`w-16 h-16 mx-auto ${activeTheme.text.primary}`}
                   />
                   <div>
                     <h3
@@ -268,14 +289,14 @@ const Import = () => {
                     type="file"
                     accept=".csv,.xlsx,.xls"
                     onChange={handleFileUpload}
-                    className={`block w-full max-w-sm mx-auto text-sm ${activeTheme.input.text} file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold ${activeTheme.button.primaryBg} file:${activeTheme.text.activeButton} hover:file:${activeTheme.button.primaryHover} cursor-pointer focus:outline-none focus:ring-2 ${activeTheme.ring.input}`}
+                    className={`block w-full max-w-sm mx-auto text-sm ${activeTheme.text.secondary} file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold ${activeTheme.button.primaryBg} file:${activeTheme.text.activeButton} hover:file:${activeTheme.button.primaryHover} cursor-pointer focus:outline-none focus:ring-2 ${activeTheme.ring.input}`}
                   />
                 </div>
               </div>
 
               {/* Template Download Alert */}
               <div
-                className={`${activeTheme.alert.infoBg} ${activeTheme.alert.infoText} p-4 rounded-lg flex items-center space-x-3`}
+                className={`${activeTheme.text.accent1} p-4 rounded-lg flex items-center space-x-3`}
               >
                 <FontAwesomeIcon
                   icon={faExclamationCircle}
@@ -300,7 +321,7 @@ const Import = () => {
 
               {/* Expected Format */}
               <div
-                className={`${activeTheme.card.bg} rounded-lg p-4 border ${activeTheme.border.bottom}`}
+                className={`${activeTheme.background.secondary} rounded-lg p-4 border ${activeTheme.border.bottom}`}
               >
                 <h4
                   className={`font-semibold mb-2 ${activeTheme.text.primary}`}
@@ -357,7 +378,7 @@ const Import = () => {
                   File Preview ({fileContent.length} rows)
                 </h4>
                 <div
-                  className={`${activeTheme.card.bg} rounded-lg p-4 overflow-x-auto border ${activeTheme.border.bottom}`}
+                  className={`${activeTheme.background.secondary} rounded-lg p-4 overflow-x-auto border ${activeTheme.border.bottom}`}
                 >
                   <table
                     className={`w-full text-sm ${activeTheme.text.primary}`}
@@ -422,7 +443,7 @@ const Import = () => {
                             [field.key]: e.target.value,
                           })
                         }
-                        className={`block w-full ${activeTheme.input.bg} ${activeTheme.input.text} rounded-lg py-2.5 px-3 pr-10 focus:outline-none focus:ring-2 ${activeTheme.ring.input} appearance-none`}
+                        className={`block w-full ${activeTheme.background.canvas} ${activeTheme.text.secondary} rounded-lg py-2.5 px-3 pr-10 focus:outline-none focus:ring-2 ${activeTheme.ring.input} appearance-none`}
                       >
                         <option value="">Select column</option>
                         {getAvailableColumns().map((col) => (
@@ -432,7 +453,7 @@ const Import = () => {
                         ))}
                       </select>
                       <div
-                        className={`pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 ${activeTheme.icon.default}`}
+                        className={`pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 ${activeTheme.text.primary}`}
                       >
                         <svg
                           className="fill-current h-4 w-4"
@@ -501,7 +522,7 @@ const Import = () => {
                           })
                         }
                         placeholder="Enter deck name"
-                        className={`block w-full ${activeTheme.input.bg} ${activeTheme.input.text} rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 ${activeTheme.ring.input} ${activeTheme.input.placeholder}`}
+                        className={`block w-full ${activeTheme.background.canvas} ${activeTheme.text.secondary} rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 ${activeTheme.ring.input} ${activeTheme.text.muted}`}
                       />
                     </div>
 
@@ -522,7 +543,7 @@ const Import = () => {
                               language: e.target.value,
                             })
                           }
-                          className={`block w-full ${activeTheme.input.bg} ${activeTheme.input.text} rounded-lg py-2.5 px-3 pr-10 focus:outline-none focus:ring-2 ${activeTheme.ring.input} appearance-none`}
+                          className={`block w-full ${activeTheme.background.canvas} ${activeTheme.text.secondary} rounded-lg py-2.5 px-3 pr-10 focus:outline-none focus:ring-2 ${activeTheme.ring.input} appearance-none`}
                         >
                           <option value="japanese">Japanese</option>
                           <option value="chinese">Chinese</option>
@@ -532,7 +553,7 @@ const Import = () => {
                           <option value="german">German</option>
                         </select>
                         <div
-                          className={`pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 ${activeTheme.icon.default}`}
+                          className={`pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 ${activeTheme.text.primary}`}
                         >
                           <svg
                             className="fill-current h-4 w-4"
@@ -564,7 +585,7 @@ const Import = () => {
                       }
                       placeholder="Describe your deck"
                       rows="3"
-                      className={`block w-full ${activeTheme.input.bg} ${activeTheme.input.text} rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 ${activeTheme.ring.input} ${activeTheme.input.placeholder}`}
+                      className={`block w-full ${activeTheme.background.canvas} ${activeTheme.text.secondary} rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 ${activeTheme.ring.input} ${activeTheme.text.muted}`}
                     ></textarea>
                   </div>
 
@@ -586,12 +607,12 @@ const Import = () => {
                         })
                       }
                       placeholder="Enter tags separated by commas"
-                      className={`block w-full ${activeTheme.input.bg} ${activeTheme.input.text} rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 ${activeTheme.ring.input} ${activeTheme.input.placeholder}`}
+                      className={`block w-full ${activeTheme.background.canvas} ${activeTheme.text.secondary} rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 ${activeTheme.ring.input} ${activeTheme.text.muted}`}
                     />
                   </div>
 
                   {/* Import Summary */}
-                  <div className={`${activeTheme.alert.infoBg} rounded-lg p-4`}>
+                  <div className={`text-red-500  rounded-lg p-4`}>
                     <h4
                       className={`font-semibold mb-2 ${activeTheme.text.primary}`}
                     >
@@ -635,14 +656,11 @@ const Import = () => {
               ) : (
                 <div className="text-center space-y-4 py-8">
                   <div
-                    className={`w-16 h-16 mx-auto ${activeTheme.alert.infoBg.replace(
-                      "bg-",
-                      "bg-"
-                    )} rounded-full flex items-center justify-center`}
+                    className={`w-16 h-16 mx-auto text-red-500 rounded-full flex items-center justify-center`}
                   >
                     <FontAwesomeIcon
                       icon={faUpload}
-                      className={`w-8 h-8 ${activeTheme.icon.stepActive} animate-pulse`}
+                      className={`w-8 h-8 ${activeTheme.text.primary} animate-pulse`}
                     />
                   </div>
                   <h3
