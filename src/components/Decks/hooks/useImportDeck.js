@@ -1,7 +1,7 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import * as XLSX from "xlsx";
 import { supabase } from "../../../utils/supabaseClient";
-import { generateMetadata } from "../../../utils/generateMetadata";
+import { generateMetadata } from "../../../utils/excel/generateMetadata";
 import { detectColumns } from "../utils/detectColumns";
 import { validateRows } from "../utils/importSchemas";
 

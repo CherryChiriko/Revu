@@ -7,7 +7,6 @@ import {
   faSquarePlus,
 } from "@fortawesome/free-solid-svg-icons";
 
-import { useImportLogic } from "./useImportLogic";
 import { useHanziWriter } from "../Study/hooks/useHanziWriter";
 
 const CharacterSample = ({ activeTheme }) => {
@@ -37,8 +36,7 @@ const CharacterSample = ({ activeTheme }) => {
   );
 };
 
-const Step1 = ({ activeTheme, onNext }) => {
-  const logic = useImportLogic();
+const Step1 = ({ activeTheme, logic, onNext }) => {
   const CARD_TYPES = [
     {
       id: 1,
@@ -195,9 +193,9 @@ const Step1 = ({ activeTheme, onNext }) => {
         <button
           onClick={onNext}
           disabled={!logic.selectedType}
-          className={`px-4 py-2 rounded-lg font-semibold ${activeTheme.button.default} disabled:opacity-50 disabled:cursor-not-allowed`}
+          className={`px-4 py-2 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed`}
         >
-          Next: Upload file
+          Next: Upload File
           <FontAwesomeIcon icon={faArrowRight} className="ml-2" />
         </button>
       </div>

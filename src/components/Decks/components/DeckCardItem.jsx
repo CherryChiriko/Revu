@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React from "react";
 import useDeckCardLogic from "../hooks/useDeckCardLogic";
 import FullVariant from "./variants/FullVariant";
 import CompactVariant from "./variants/CompactVariant";

@@ -4,7 +4,6 @@ import {
   createSelector,
 } from "@reduxjs/toolkit";
 import { supabase } from "../utils/supabaseClient";
-// import { getCardStatus } from "../utils/cardUtils";
 
 /** Priority ordering */
 const orderDecksByPriority = (decks) => {
