@@ -7,6 +7,7 @@ const themes = [
     background: {
       app: "bg-gray-900",
       secondary: "bg-gray-800",
+      light: "bg-gray-400",
       track: "bg-gray-700",
       navbar: "bg-gray-800",
       canvas: "bg-gray-900",

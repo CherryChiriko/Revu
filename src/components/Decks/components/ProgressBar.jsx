@@ -11,11 +11,26 @@ export const ProgressBar = ({
   const newPct = cards_count ? (counts.new / cards_count) * 100 : 0;
 
   // Base classes for the container and segments
-  const baseBar = `w-full h-2.5 rounded-full overflow-hidden flex`;
-  const segmentBase = `h-2.5 transition-all`;
+  const baseBar = `w-full h-2 rounded-full overflow-hidden flex`;
+  const segmentBase = `h-2 transition-all`;
 
   // Track background
   const trackClass = activeTheme.isDark ? "bg-gray-700" : "bg-gray-200";
+
+  // Reusable Stat Item Component
+  const StatItem = ({ label, count, colorClass }) => {
+    if (count === 0) return null; // Clean up UI by hiding zeros
+    return (
+      <div className="flex items-center gap-1.5">
+        <div className={`w-1.5 h-1.5 rounded-full ${colorClass}`} />
+        <span
+          className={`${activeTheme.text.muted} text-[11px] font-medium leading-none`}
+        >
+          <span>{count}</span> {label}
+        </span>
+      </div>
+    );
+  };
 
   return (
     <div>
@@ -58,18 +73,32 @@ export const ProgressBar = ({
       </div>
 
       {!isMastered && (
-        <div className="flex justify-between text-xs mt-2">
-          <span className={activeTheme.text.muted}>
-            {counts.suspended} suspended
-          </span>
-          <span className={activeTheme.text.accent3}>
-            {counts.mastered} mastered
-          </span>
-          <span className={activeTheme.text.accent1}>{counts.due} due</span>
-          <span className={activeTheme.text.accent2}>
-            {counts.waiting} learning
-          </span>
-          <span className={activeTheme.text.muted}>{counts.new} new</span>
+        <div className="flex flex-wrap gap-x-4 gap-y-2 mt-3 px-0.5">
+          <StatItem
+            label="due"
+            count={counts.due}
+            colorClass={activeTheme.background.accent1}
+          />
+          <StatItem
+            label="learning"
+            count={counts.waiting}
+            colorClass={activeTheme.background.accent2}
+          />
+          <StatItem
+            label="new"
+            count={counts.new}
+            colorClass={activeTheme.background.light}
+          />
+          <StatItem
+            label="mastered"
+            count={counts.mastered}
+            colorClass={activeTheme.background.accent3}
+          />
+          <StatItem
+            label="suspended"
+            count={counts.suspended}
+            colorClass={activeTheme.background.muted}
+          />
         </div>
       )}
     </div>

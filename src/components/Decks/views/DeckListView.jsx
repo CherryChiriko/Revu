@@ -142,7 +142,7 @@ export default function DeckListView() {
               title="Create deck"
             >
               <FontAwesomeIcon icon={faPlus} className="h-5 w-5 mr-2" />
-              Create Deck
+              Quick Create
             </button>
           </div>
         </div>
