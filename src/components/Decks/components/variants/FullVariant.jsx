@@ -43,13 +43,6 @@ const FullVariant = ({ deck, activeTheme, logic }) => {
             )}
           </div>
 
-          <ProgressBar
-            counts={counts}
-            activeTheme={activeTheme}
-            isMastered={isMastered}
-            cards_count={cards_count}
-          />
-
           <div className="absolute top-0 right-0 flex items-center gap-2">
             <DeckBadges
               streak={streak}
@@ -64,15 +57,14 @@ const FullVariant = ({ deck, activeTheme, logic }) => {
             />
           </div>
         </div>
-
-        <div className="absolute top-0 right-0">
-          <DeckMenu
-            activeTheme={activeTheme}
-            onEdit={() => console.log("Edit")}
-            onDelete={() => handleAction("delete", deck)}
-          />
-        </div>
       </div>
+
+      <ProgressBar
+        counts={counts}
+        activeTheme={activeTheme}
+        isMastered={isMastered}
+        cards_count={cards_count}
+      />
 
       {/* Tags Section: Fixed height to prevent shifting if empty */}
       <div className="flex flex-wrap gap-2 mt-3 mb-2 items-center h-7 overflow-hidden">
