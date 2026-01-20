@@ -17,7 +17,12 @@ export const useImportLogic = () => {
   const [fileContent, setFileContent] = useState([]);
 
   const [mappedColumns, setMappedColumns] = useState({});
-  const [deckSettings, setDeckSettings] = useState({});
+  const [deckSettings, setDeckSettings] = useState({
+    name: "",
+    description: null,
+    language: null,
+    tags: null,
+  });
 
   const [existingLanguages, setExistingLanguages] = useState([]);
   const [isAddingLanguage, setIsAddingLanguage] = useState(false);
@@ -115,13 +120,27 @@ export const useImportLogic = () => {
     Papa.parse(file, {
       header: hasHeaders,
       skipEmptyLines: true,
+      encoding: "UTF-8",
       delimiter: "", // AUTO-DETECT
       delimitersToGuess: [",", ";", "\t", "|"],
       complete: (results) => {
+        if (results.errors.length > 0) {
+          console.warn("PapaParse Errors:", results.errors);
+        }
+
         if (!hasHeaders) {
-          const normalized = results.data.map((row) => ({ ...row }));
+          const normalized = results.data.map((row) => {
+            return Object.fromEntries(
+              Object.entries(row).filter(
+                ([_, value]) =>
+                  value !== "" && value !== null && value !== undefined
+              )
+            );
+          });
+          console.log(normalized);
           setFileContent(normalized);
         } else {
+          console.log(results.data);
           setFileContent(results.data);
         }
       },
@@ -264,136 +283,169 @@ export const useImportLogic = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingProgress, setProcessingProgress] = useState(0);
 
-  const prepareCardsForInsert = (fileContent, column, deckId) => {
-    return fileContent
-      .map((row) => ({
-        front: row[column.word],
-        back: row[column.meaning],
-        audioUrl: row[column.audioUrl] || null,
-        deck_id: deckId,
-      }))
-      .filter((card) => card.front); // Safety check: don't insert rows with no front text
+  const getStudyMode = () => {
+    switch (selectedType) {
+      case 1:
+        return "A";
+      case 2:
+        return "C";
+      default:
+        return "A";
+    }
   };
 
-  // const handleFileUpload = (event) => {
+  const study_mode = getStudyMode();
+  const table = "cards_" + study_mode.toLowerCase();
 
-  //   setSelectedFile(file);
+  const prepareCardsForInsert = (row) => {
+    switch (selectedType) {
+      case 1:
+        return {
+          front: row[mappedColumns.front],
+          back: row[mappedColumns.back],
+          audioUrl: row[mappedColumns.audioUrl] || null,
+          createdAt: new Date(),
+        };
+      case 2:
+        return {
+          // const front = row[column.word];
+          // const meta = generateMetadata(front, deckSettings.language);
+        };
+      default:
+        return {};
+    }
+  };
 
-  //   // Mock file parsing (in real implementation, use xlsx or csv parser)
-  //   const mockData = [
-  //     { col1: "あ", col2: "a", col3: "a", col4: "vowel sound a" },
-  //     { col1: "か", col2: "ka", col3: "ka", col4: "consonant-vowel ka" },
-  //     { col1: "さ", col2: "sa", col3: "sa", col4: "consonant-vowel sa" },
-  //     { col1: "你", col2: "nǐ", col3: "ni3", col4: "you" },
-  //     { col1: "好", col2: "hǎo", col3: "hao3", col4: "good" },
-  //   ];
+  const allCards = fileContent
+    .map((row) => prepareCardsForInsert(row))
+    .filter(
+      (card) =>
+        card.front &&
+        card.back &&
+        card.front.trim() !== "" &&
+        card.back.trim() !== ""
+    );
 
-  //   setFileContent(mockData);
-  //   setCurrentStep(2);
+  const uploadCards = async (deckId) => {
+    try {
+      // 1. Prepare all cards first
+      allCards.forEach((card) => {
+        card.deck_id = deckId;
+      });
 
-  //   // showNotification(
-  //   //   "File Uploaded",
-  //   //   `Successfully loaded ${mockData.length} rows from ${file.name}`
-  //   // );
-  // };
+      const CHUNK_SIZE = 400;
 
-  // const [columnMappings, setColumnMappings] = useState({
-  //   word: "",
-  //   meaning: "",
-  //   reading: "",
-  //   audioUrl: "",
-  // });
+      for (let i = 0; i < allCards.length; i += CHUNK_SIZE) {
+        const chunk = allCards.slice(i, i + CHUNK_SIZE);
 
-  // const [deckSettings, setDeckSettings] = useState({
-  //   name: "",
-  //   description: "",
-  //   language: "japanese",
-  //   tags: "",
-  // });
+        let retryCount = 0;
+        const maxRetries = 3;
+        let success = false;
 
-  // const handleImport = async () => {
-  //   setIsProcessing(true);
-  //   try {
-  //     const {
-  //       data: { user },
-  //     } = await supabase.auth.getUser();
+        while (!success && retryCount < maxRetries) {
+          const { error } = await supabase.from(table).insert(chunk);
 
-  //     // 1. Create Deck
-  //     const { data: deck, error: deckErr } = await supabase
-  //       .from("decks")
-  //       .insert([
-  //         {
-  //           name: deckSettings.name,
-  //           description: deckSettings.description,
-  //           language: deckSettings.language,
-  //           study_mode: deckSettings.language === "chinese" ? "C" : "A",
-  //           user_id: user.id,
-  //         },
-  //       ])
-  //       .select()
-  //       .single();
+          if (!error) {
+            success = true;
+          } else {
+            retryCount++;
+            console.warn(
+              `Chunk failed (attempt ${retryCount}). Retrying in ${
+                retryCount * 2
+              }s...`
+            );
+            // Wait longer each time it fails (Exponential Backoff)
+            await new Promise((res) => setTimeout(res, retryCount * 2000));
+          }
+        }
 
-  //     if (deckErr) throw deckErr;
+        if (!success)
+          throw new Error(
+            "Server is unresponsive after multiple attempts. Please try again later."
+          );
 
-  //     // 2. Prepare Cards
-  //     const table = deck.study_mode === "C" ? "cards_c" : "cards_a";
-  //     const cardsToInsert = fileContent.map((row) => {
-  //       const frontText = row[columnMappings.word];
-  //       const meta = generateMetadata(frontText, deckSettings.language);
-  //       const baseCard = {
-  //         deck_id: deck.id,
-  //         front: frontText,
-  //         back: row[columnMappings.meaning],
-  //         audioUrl: row[columnMappings.audioUrl] || null,
-  //       };
+        const total = allCards.length;
+        // Calculate the progress locally
+        const newProgress = Math.min(i + CHUNK_SIZE, total);
 
-  //       return deck.study_mode === "C"
-  //         ? {
-  //             ...baseCard,
-  //             reading: meta.reading,
-  //             tones: meta.tones,
-  //             strokeColors: meta.strokeColors,
-  //           }
-  //         : {
-  //             ...baseCard,
-  //             reading: row[columnMappings.reading] || meta.reading,
-  //           };
-  //     });
+        // Update UI state
+        setProcessingProgress(newProgress);
 
-  //     // 3. Batch Insert & Progress Initialization
-  //     const { data: newCards, error: cardErr } = await supabase
-  //       .from(table)
-  //       .insert(cardsToInsert)
-  //       .select();
-  //     if (cardErr) throw cardErr;
+        // Log the local variable so you see real numbers in console
+        console.log(`Successfully uploaded ${newProgress} / ${total}`);
 
-  //     const progressTable =
-  //       deck.study_mode === "C" ? "card_c_progress" : "card_a_progress";
-  //     const progressEntries = newCards.map((card) => ({
-  //       card_id: card.id,
-  //       user_id: user.id,
-  //       deck_id: deck.id,
-  //       status: "new",
-  //     }));
+        // Yield to event loop to keep UI responsive
+        await new Promise((res) => setTimeout(res, 50));
+      }
 
-  //     await supabase.from(progressTable).insert(progressEntries);
-  //     navigate("/decks");
-  //   } catch (error) {
-  //     console.error("Import Error:", error);
-  //   } finally {
-  //     setIsProcessing(false);
-  //   }
-  // };
+      // Success!
+    } catch (err) {
+      console.error("Batch upload failed:", err);
 
-  // Inside your import function
-  // const cardsToInsert = fileContent.map(row => ({
-  //   // The data keys match the public.cards_a schema
-  //   front: row[columnMappings.word],        // Required
-  //   back: row[columnMappings.meaning],      // Required
-  //   audioUrl: row[columnMappings.audioUrl] || null,
-  //   deck_id: newDeckId,
-  //   // createdAt is default now() in DB
-  // })).filter(card => card.front && card.front.trim() !== "");
+      await supabase.from("decks").delete().eq("id", deckId);
+      await supabase.from(table).delete().eq("deck_id", deckId);
+
+      setUploadError(
+        "Error during upload. The deck and cards were removed to prevent data corruption."
+      );
+    }
+  };
+
+  const createDeck = async () => {
+    if (isProcessing) return;
+    setIsProcessing(true);
+    setUploadError(null);
+
+    try {
+      // 1. Get the current user
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+      if (userError || !user) throw new Error("User not authenticated");
+
+      const language = deckSettings.language.trim().toLowerCase();
+      const formattedLanguage =
+        language.charAt(0).toUpperCase() + language.slice(1);
+
+      // 2. Insert the deck and select the new record back
+      const { data: newDeck, error: deckError } = await supabase
+        .from("decks")
+        .insert([
+          {
+            user_id: user.id,
+            name: deckSettings.name,
+            description: deckSettings.description || null,
+            language: formattedLanguage,
+            study_mode: study_mode,
+            tags: deckSettings.tags
+              ? deckSettings.tags.split(",").map((t) => t.trim())
+              : [],
+            cards_count: allCards.length,
+            mastered: 0,
+            learning: 0,
+            new: allCards.length,
+            last_reviewed: null,
+            created_at: new Date(),
+          },
+        ])
+        .select() // This is critical: it returns the inserted row
+        .single(); // Since we only inserted one deck, get it as an object
+
+      if (deckError) throw deckError;
+
+      const deckId = newDeck.id;
+      console.log("New Deck Created with ID:", deckId);
+
+      // 3. Now proceed to upload the cards
+      await uploadCards(deckId);
+    } catch (err) {
+      console.error("Import failed:", err);
+      setUploadError(err.message);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   return {
     currentStep,
@@ -421,6 +473,6 @@ export const useImportLogic = () => {
     mappedColumns,
     setMappedColumns,
     isProcessing,
-    processingProgress,
+    createDeck,
   };
 };

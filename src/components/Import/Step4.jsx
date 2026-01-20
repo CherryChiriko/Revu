@@ -46,15 +46,15 @@ const Step4 = ({ activeTheme, logic, onNext, onBack }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label
-                htmlFor="deckName"
+                htmlFor="name"
                 className={`block ${activeTheme.text.primary} text-sm font-medium`}
               >
                 Deck Name *
               </label>
               <input
-                id="deckName"
+                id="name"
                 type="text"
-                value={logic.deckSettings.name}
+                value={logic.deckSettings.name || ""}
                 onChange={(e) =>
                   logic.setDeckSettings({
                     ...logic.deckSettings,
@@ -62,7 +62,7 @@ const Step4 = ({ activeTheme, logic, onNext, onBack }) => {
                   })
                 }
                 placeholder="Enter deck name"
-                className={`block w-full ${activeTheme.background.canvas} ${activeTheme.text.secondary} rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 ${activeTheme.ring.input} ${activeTheme.text.muted}`}
+                className={`block w-full ${activeTheme.background.canvas} ${activeTheme.text.secondary} rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 ${activeTheme.ring.input}`}
               />
             </div>
 
@@ -78,9 +78,8 @@ const Step4 = ({ activeTheme, logic, onNext, onBack }) => {
                 <div className="relative">
                   <input
                     id="language"
-                    autoFocus // Focus automatically when it appears
                     type="text"
-                    value={logic.deckSettings.language}
+                    value={logic.deckSettings.language || ""}
                     onChange={(e) =>
                       logic.setDeckSettings({
                         ...logic.deckSettings,
@@ -100,7 +99,7 @@ const Step4 = ({ activeTheme, logic, onNext, onBack }) => {
                 </div>
               ) : (
                 <select
-                  value={logic.deckSettings.language}
+                  value={logic.deckSettings.language || ""}
                   onChange={(e) => {
                     const val = e.target.value;
                     if (val === "Add new language...") {
@@ -138,7 +137,7 @@ const Step4 = ({ activeTheme, logic, onNext, onBack }) => {
             </label>
             <textarea
               id="description"
-              value={logic.deckSettings.description}
+              value={logic.deckSettings.description || ""}
               onChange={(e) =>
                 logic.setDeckSettings({
                   ...logic.deckSettings,
@@ -147,8 +146,8 @@ const Step4 = ({ activeTheme, logic, onNext, onBack }) => {
               }
               placeholder="Describe your deck"
               rows="3"
-              className={`block w-full ${activeTheme.background.canvas} ${activeTheme.text.secondary} rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 ${activeTheme.ring.input} ${activeTheme.text.muted}`}
-            ></textarea>
+              className={`block w-full ${activeTheme.background.canvas} ${activeTheme.text.secondary} rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 ${activeTheme.ring.input}`}
+            />
           </div>
 
           <div className="space-y-2">
@@ -161,15 +160,15 @@ const Step4 = ({ activeTheme, logic, onNext, onBack }) => {
             <input
               id="tags"
               type="text"
-              value={logic.deckSettings.tags}
+              value={logic.deckSettings.tags || ""}
               onChange={(e) =>
                 logic.setDeckSettings({
                   ...logic.deckSettings,
                   tags: e.target.value,
                 })
               }
-              placeholder="Enter tags separated by commas"
-              className={`block w-full ${activeTheme.background.canvas} ${activeTheme.text.secondary} rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 ${activeTheme.ring.input} ${activeTheme.text.muted}`}
+              placeholder="Enter tags separated by comma"
+              className={`block w-full ${activeTheme.background.canvas} ${activeTheme.text.secondary} rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 ${activeTheme.ring.input}`}
             />
           </div>
           {/* Import Summary */}
@@ -181,7 +180,7 @@ const Step4 = ({ activeTheme, logic, onNext, onBack }) => {
               <p>• File: {logic.selectedFile?.name}</p>
               <p>
                 • Cards to import:{" "}
-                {logic.fileContent.length - logic.hasHeaders ? 1 : 0}
+                {logic.fileContent.length - (logic.hasHeaders ? 1 : 0)}
               </p>
             </div>
           </div>
@@ -197,7 +196,7 @@ const Step4 = ({ activeTheme, logic, onNext, onBack }) => {
             </button>
             <button
               onClick={onNext}
-              // disabled={!isReady}
+              disabled={!logic.deckSettings.name}
               className={`px-4 py-2 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               Confirm and continue

@@ -44,7 +44,7 @@ export default function DeckListView() {
   const navigate = useNavigate();
 
   const handleImportClick = () => {
-    navigate("import");
+    navigate("/import");
   };
 
   return (

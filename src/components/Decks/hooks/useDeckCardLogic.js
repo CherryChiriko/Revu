@@ -24,7 +24,7 @@ export default function useDeckCardLogic(id, cards_count) {
   const isMastered = cards_count === counts.mastered;
 
   const handleCardClick = useCallback(() => {
-    if (!isMastered) navigate(`/deck/${id}`);
+    if (!isMastered) navigate(`/decks/${id}`);
   }, [isMastered, id, navigate]);
 
   const handleAction = useCallback(

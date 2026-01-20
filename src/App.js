@@ -17,6 +17,7 @@ import Navbar from "./components/Navbar/Navbar";
 import Dashboard from "./components/Dashboard/Dashboard";
 import DeckManager from "./components/Decks/views/DeckManager";
 import DeckListView from "./components/Decks/views/DeckListView";
+import DeckDetails from "./components/Decks/views/DeckDetails";
 import ImportView from "./components/Import/ImportView";
 import StudySession from "./components/Study/views/StudySession";
 import LoginPage from "./components/LoginPage";
@@ -126,6 +127,7 @@ function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/decks" element={<DeckManager />}>
             <Route index element={<DeckListView />} />
+            <Route path="/decks/:deckId" element={<DeckDetails />} />
           </Route>
           <Route path="import" element={<ImportView />} />
           <Route path="/study" element={<StudySession />} />

@@ -25,7 +25,13 @@ const ImportView = () => {
   const logic = useImportLogic();
   const navigate = useNavigate();
 
-  const Step = () => {
+  React.useEffect(() => {
+    if (logic.currentStep === 5) {
+      logic.createDeck();
+    }
+  }, [logic.currentStep]);
+
+  const renderStep = () => {
     switch (logic.currentStep) {
       case 1:
         return (
@@ -74,18 +80,21 @@ const ImportView = () => {
       className={`min-h-screen ${activeTheme.background.app} ${activeTheme.text.primary} w-full`}
     >
       <div className="max-w-screen-xl mx-auto px-4 md:px-8 py-8 ">
-        <button
-          onClick={() => navigate("/decks")}
-          className={`px-4 py-2 rounded-lg font-semibold ${activeTheme.text.muted}`}
-        >
-          <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
-          Back to Decks
-        </button>
-
-        <Header
-          title="Import Deck"
-          description="Import flashcards from CSV/Excel files"
-        />
+        <div className="flex items-start gap-4 mb-6">
+          {/* Back Button */}
+          <button
+            onClick={() => navigate("/decks")}
+            className={`px-4 py-2 rounded-lg font-semibold ${activeTheme.text.muted}`}
+          >
+            <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
+            Back to Decks
+          </button>
+          {/* Header */}
+          <Header
+            title="Import Deck"
+            description="Import flashcards from CSV/Excel files"
+          />
+        </div>
       </div>
 
       {/* Progress Steps */}
@@ -128,7 +137,7 @@ const ImportView = () => {
       <div
         className={`${activeTheme.background.secondary} max-w-4xl mx-auto space-y-8 rounded-lg shadow-xl p-12`}
       >
-        <Step />
+        {renderStep()}
       </div>
     </div>
   );
