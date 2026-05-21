@@ -39,7 +39,7 @@ const Dashboard = () => {
 
   const totalXP = useMemo(
     () => Math.max(0, mastered_cards * 5 + globalStreak * 10 + cards_due_today),
-    [mastered_cards, globalStreak, cards_due_today]
+    [mastered_cards, globalStreak, cards_due_today],
   );
 
   return (
@@ -153,7 +153,7 @@ const Dashboard = () => {
             className={`${activeTheme.background.secondary} p-6 rounded-2xl shadow-lg flex flex-col space-y-6`}
           >
             <Heatmap activeTheme={activeTheme} />
-            <Achievements activeTheme={activeTheme} />
+            {/* <Achievements activeTheme={activeTheme} /> */}
           </div>
         </div>
       </div>

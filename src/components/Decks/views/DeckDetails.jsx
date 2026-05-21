@@ -8,11 +8,15 @@ import {
   selectCardsError,
   clearCards,
 } from "../../../slices/cardSlice";
+import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import selectDeckNameById from "../../../slices/deckSlice";
 
 // --- CUSTOM TAILWIND COMPONENTS ---
-const Card = ({ children, className = "" }) => (
+const Card = ({ children, activeTheme, className = "" }) => (
   <div
-    className={`bg-white border border-gray-200 shadow-sm rounded-2xl overflow-hidden ${className}`}
+    className={`${activeTheme.background.card} border ${activeTheme.border.secondary} shadow-sm rounded-2xl overflow-hidden ${className}`}
   >
     {children}
   </div>
@@ -22,13 +26,20 @@ const CardContent = ({ children, className = "" }) => (
   <div className={`p-4 ${className}`}>{children}</div>
 );
 
-const Button = ({ children, onClick, variant = "outline", className = "" }) => {
+const Button = ({
+  children,
+  onClick,
+  variant = "outline",
+  activeTheme,
+  className = "",
+}) => {
   const base =
     "px-4 py-2 rounded-lg text-sm font-medium transition-all active:scale-95";
   const styles =
     variant === "default"
-      ? "bg-blue-600 text-white hover:bg-blue-700"
-      : "border border-gray-300 text-gray-700 hover:bg-gray-50";
+      ? `${activeTheme.button.accent2} ${activeTheme.text.primary}`
+      : `border ${activeTheme.border.secondary} ${activeTheme.text.secondary} hover:${activeTheme.background.canvas}`;
+
   return (
     <button onClick={onClick} className={`${base} ${styles} ${className}`}>
       {children}
@@ -81,9 +92,12 @@ const STATUS_COLORS = {
 
 const CHUNK_SIZE = 50;
 
-export default function DeckDetails({ deckName }) {
+export default function DeckDetails({ activeTheme }) {
   const { deckId } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const deckName = useSelector(selectDeckNameById(deckId));
 
   // Redux State
   const cards = useSelector(selectCards);
@@ -140,132 +154,145 @@ export default function DeckDetails({ deckName }) {
     return <div className="p-10 text-center text-red-500">Error: {error}</div>;
 
   return (
-    <div className="relative max-w-6xl mx-auto p-4 space-y-6">
-      <header>
-        <h1 className="text-3xl font-bold text-gray-900">{deckName}</h1>
-        <p className="text-gray-500">{cards.length} Total Cards</p>
-      </header>
-
-      {/* Filter Bar */}
-      <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0">
-        {["new", "learning", "review", "mastered"].map((s) => (
-          <Button
-            key={s}
-            variant={filter === s ? "default" : "outline"}
-            onClick={() => {
-              setFilter(filter === s ? null : s);
-              setVisibleChunks(1);
-            }}
-            className="capitalize"
-          >
-            {s}
-          </Button>
-        ))}
-      </div>
-
-      {/* Card Groups */}
-      <div className="space-y-4">
-        {chunks.slice(0, visibleChunks).map((chunk, idx) => (
-          <Card key={idx}>
-            <CardContent>
-              <button
-                onClick={() => toggleGroup(idx)}
-                className="flex items-center gap-3 w-full text-left font-bold text-gray-700"
-              >
-                <IconChevron isOpen={expanded[idx]} />
-                Cards {idx * CHUNK_SIZE + 1}–{idx * CHUNK_SIZE + chunk.length}
-              </button>
-
-              {expanded[idx] && (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 mt-4">
-                  {chunk.map((card) => (
-                    <button
-                      key={card.card_id}
-                      onClick={() => setSelectedCard(card)}
-                      className={`px-3 py-2 text-xs font-semibold rounded-lg truncate text-left transition-all hover:shadow-md active:scale-95 ${
-                        STATUS_COLORS[card.status] || STATUS_COLORS.new
-                      }`}
-                    >
-                      {card.front}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Load More */}
-      {visibleChunks < chunks.length && (
-        <div className="flex justify-center pt-4">
-          <Button
-            onClick={() => setVisibleChunks((v) => v + 1)}
-            variant="outline"
-          >
-            Load More Cards
-          </Button>
-        </div>
-      )}
-
-      {/* Side Panel Overlay */}
-      {selectedCard && (
-        <>
-          <div
-            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
-            onClick={() => setSelectedCard(null)}
-          />
-          <div className="fixed inset-y-0 right-0 w-full sm:w-[400px] bg-white shadow-2xl z-50 p-6 flex flex-col transform transition-transform border-l border-gray-100">
+    <div
+      className={`min-h-screen ${activeTheme.background.app} ${activeTheme.text.primary} w-full`}
+    >
+      <div
+        className={`${activeTheme.background.app} relative max-w-6xl mx-auto p-4 space-y-6`}
+      >
+        {/* 1. Header Area */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/5 pb-6">
+          <div className="flex items-center gap-4">
             <button
-              onClick={() => setSelectedCard(null)}
-              className="self-end p-2 hover:bg-gray-100 rounded-full"
+              onClick={() => navigate(-1)} // Use -1 to keep list scroll position
+              className={`p-2 rounded-full hover:${activeTheme.background.canvas} transition-colors ${activeTheme.text.muted}`}
             >
-              <IconX />
+              <FontAwesomeIcon icon={faArrowLeft} className="text-lg" />
             </button>
-
-            <div className="mt-4 space-y-6">
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
-                  Front
-                </span>
-                <p className="text-2xl font-semibold text-gray-900">
-                  {selectedCard.front}
-                </p>
-              </div>
-
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
-                  Back / Meaning
-                </span>
-                <p className="text-lg text-gray-700">
-                  {selectedCard.back || "No definition provided."}
-                </p>
-              </div>
-
-              {selectedCard.reading && (
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
-                    Reading
-                  </span>
-                  <p className="text-lg text-blue-600">
-                    {selectedCard.reading}
-                  </p>
-                </div>
-              )}
-
-              <div className="pt-6 border-t border-gray-100">
-                <span
-                  className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
-                    STATUS_COLORS[selectedCard.status]
-                  }`}
-                >
-                  {selectedCard.status}
-                </span>
-              </div>
+            <div>
+              <h1 className={`text-2xl font-bold ${activeTheme.text.primary}`}>
+                Deck Details
+              </h1>
+              <p className={`${activeTheme.text.secondary} text-sm`}>
+                Reviewing cards for {deckId}
+              </p>
             </div>
           </div>
-        </>
-      )}
+        </div>
+
+        {/* 2. Filter Bar */}
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          {["new", "learning", "review", "mastered"].map((s) => (
+            <Button
+              key={s}
+              activeTheme={activeTheme}
+              variant={filter === s ? "default" : "outline"}
+              onClick={() => {
+                setFilter(filter === s ? null : s);
+                setVisibleChunks(1);
+              }}
+              className="capitalize whitespace-nowrap"
+            >
+              {s}
+            </Button>
+          ))}
+        </div>
+
+        {/* 3. Card Groups */}
+        <div className="space-y-4">
+          {chunks.slice(0, visibleChunks).map((chunk, idx) => (
+            <Card key={idx} activeTheme={activeTheme}>
+              <CardContent>
+                <button
+                  onClick={() => toggleGroup(idx)}
+                  className={`flex items-center gap-3 w-full text-left font-bold ${activeTheme.text.primary}`}
+                >
+                  <IconChevron isOpen={expanded[idx]} />
+                  <span className="opacity-90">
+                    Chunk {idx + 1}{" "}
+                    <span
+                      className={`font-normal text-xs ml-2 ${activeTheme.text.muted}`}
+                    >
+                      ({chunk.length} cards)
+                    </span>
+                  </span>
+                </button>
+
+                {expanded[idx] && (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 mt-4">
+                    {chunk.map((card) => (
+                      <button
+                        key={card.card_id}
+                        onClick={() => setSelectedCard(card)}
+                        className={`px-3 py-2 text-xs font-semibold rounded-lg truncate text-left transition-all border border-transparent hover:border-white/10 ${activeTheme.background.canvas} ${activeTheme.text.secondary} hover:shadow-lg`}
+                      >
+                        {card.front}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* 4. Side Panel (Drawer) Overlay */}
+        {selectedCard && (
+          <>
+            <div
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+              onClick={() => setSelectedCard(null)}
+            />
+            <div
+              className={`fixed inset-y-0 right-0 w-full sm:w-[450px] ${activeTheme.background.card} shadow-2xl z-50 p-8 flex flex-col border-l ${activeTheme.border.secondary}`}
+            >
+              <button
+                onClick={() => setSelectedCard(null)}
+                className={`self-end p-2 rounded-full hover:${activeTheme.background.canvas} ${activeTheme.text.secondary}`}
+              >
+                <IconX />
+              </button>
+
+              <div className="mt-8 space-y-8">
+                <section>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-2 block">
+                    Front
+                  </label>
+                  <p
+                    className={`text-3xl font-bold ${activeTheme.text.primary}`}
+                  >
+                    {selectedCard.front}
+                  </p>
+                </section>
+
+                <section>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-2 block">
+                    Back / Meaning
+                  </label>
+                  <p
+                    className={`text-xl leading-relaxed ${activeTheme.text.secondary}`}
+                  >
+                    {selectedCard.back || "No definition provided."}
+                  </p>
+                </section>
+
+                <div className="pt-8 border-t border-white/5 flex justify-between items-center">
+                  <span
+                    className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tighter ${
+                      STATUS_COLORS[selectedCard.status]
+                    }`}
+                  >
+                    {selectedCard.status}
+                  </span>
+                  <span className={`text-[11px] ${activeTheme.text.muted}`}>
+                    ID: {selectedCard.card_id}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }

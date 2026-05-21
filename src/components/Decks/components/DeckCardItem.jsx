@@ -1,10 +1,10 @@
 import React from "react";
-import useDeckCardLogic from "../hooks/useDeckCardLogic";
+import useDeckLogic from "../hooks/useDeckLogic";
 import FullVariant from "./variants/FullVariant";
 import CompactVariant from "./variants/CompactVariant";
 
-function DeckCardItem({ deck, activeTheme, variant }) {
-  const logic = useDeckCardLogic(deck.id, deck.cards_count);
+function DeckCardItem({ deck, activeTheme, variant, toast }) {
+  const logic = useDeckLogic(deck.id, deck.cards_count, { toast });
 
   if (!deck || !logic) return null;
 

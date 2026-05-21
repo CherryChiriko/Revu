@@ -79,65 +79,70 @@ const ImportView = () => {
     <div
       className={`min-h-screen ${activeTheme.background.app} ${activeTheme.text.primary} w-full`}
     >
-      <div className="max-w-screen-xl mx-auto px-4 md:px-8 py-8 ">
-        <div className="flex items-start gap-4 mb-6">
-          {/* Back Button */}
-          <button
-            onClick={() => navigate("/decks")}
-            className={`px-4 py-2 rounded-lg font-semibold ${activeTheme.text.muted}`}
-          >
-            <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
-            Back to Decks
-          </button>
-          {/* Header */}
-          <Header
-            title="Import Deck"
-            description="Import flashcards from CSV/Excel files"
-          />
+      <div
+        className={`${activeTheme.background.app} relative max-w-6xl mx-auto p-4 space-y-6`}
+      >
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/5 pb-6">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate(-1)} // Use -1 to keep list scroll position
+              className={`p-2 rounded-full hover:${activeTheme.background.canvas} transition-colors ${activeTheme.text.muted}`}
+            >
+              <FontAwesomeIcon icon={faArrowLeft} className="text-lg" />
+            </button>
+            <div>
+              <h1 className={`text-2xl font-bold ${activeTheme.text.primary}`}>
+                Import Deck
+              </h1>
+              <p className={`${activeTheme.text.secondary} text-sm`}>
+                Import flashcards from CSV/Excel files
+              </p>
+            </div>
+          </div>
         </div>
-      </div>
 
-      {/* Progress Steps */}
-      <div className="flex items-center justify-center space-x-8 mb-8">
-        {PROGRESS_STEPS.map((step) => (
-          <div key={step} className="flex items-center">
-            {step !== 5 && (
-              <div
-                className={`rounded-full w-10 h-10 flex items-center justify-center border-2 transition-all duration-300
+        {/* Progress Steps */}
+        <div className="flex items-center justify-center space-x-8 mb-8">
+          {PROGRESS_STEPS.map((step) => (
+            <div key={step} className="flex items-center">
+              {step !== 5 && (
+                <div
+                  className={`rounded-full w-10 h-10 flex items-center justify-center border-2 transition-all duration-300
                 ${
                   logic.currentStep >= step
                     ? `${activeTheme.button.primary} `
                     : `${activeTheme.button.disabled}  ${activeTheme.border.secondary} ${activeTheme.text.secondary}`
                 }`}
-              >
-                {logic.currentStep > step ? (
-                  <FontAwesomeIcon
-                    icon={faCheckCircle}
-                    className={`w-5 h-5 ${activeTheme.text.primary}`}
-                  />
-                ) : (
-                  step
-                )}
-              </div>
-            )}
-            {step < PROGRESS_STEPS.length - 1 && (
-              <FontAwesomeIcon
-                icon={faArrowRight}
-                className={`w-6 h-6 mx-4 transition-colors duration-300 ${
-                  logic.currentStep > step
-                    ? activeTheme.text.primary
-                    : activeTheme.text.muted
-                }`}
-              />
-            )}
-          </div>
-        ))}
-      </div>
+                >
+                  {logic.currentStep > step ? (
+                    <FontAwesomeIcon
+                      icon={faCheckCircle}
+                      className={`w-5 h-5 ${activeTheme.text.primary}`}
+                    />
+                  ) : (
+                    step
+                  )}
+                </div>
+              )}
+              {step < PROGRESS_STEPS.length - 1 && (
+                <FontAwesomeIcon
+                  icon={faArrowRight}
+                  className={`w-6 h-6 mx-4 transition-colors duration-300 ${
+                    logic.currentStep > step
+                      ? activeTheme.text.primary
+                      : activeTheme.text.muted
+                  }`}
+                />
+              )}
+            </div>
+          ))}
+        </div>
 
-      <div
-        className={`${activeTheme.background.secondary} max-w-4xl mx-auto space-y-8 rounded-lg shadow-xl p-12`}
-      >
-        {renderStep()}
+        <div
+          className={`${activeTheme.background.secondary} max-w-4xl mx-auto space-y-8 rounded-lg shadow-xl p-12`}
+        >
+          {renderStep()}
+        </div>
       </div>
     </div>
   );

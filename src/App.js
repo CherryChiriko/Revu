@@ -15,7 +15,6 @@ import useAppBoot from "./hooks/useAppBoot";
 
 import Navbar from "./components/Navbar/Navbar";
 import Dashboard from "./components/Dashboard/Dashboard";
-import DeckManager from "./components/Decks/views/DeckManager";
 import DeckListView from "./components/Decks/views/DeckListView";
 import DeckDetails from "./components/Decks/views/DeckDetails";
 import ImportView from "./components/Import/ImportView";
@@ -47,6 +46,20 @@ function App() {
   useDeckLiveSync(session && status === "succeeded");
   useGlobalStatsLiveSync(!!session);
   useAppBoot(session);
+
+  function setPrimeTheme(isDark) {
+    const themeLink = document.getElementById("primereact-theme");
+    if (!themeLink) return;
+
+    themeLink.href = isDark
+      ? "/themes/lara-dark-indigo/theme.css"
+      : "/themes/lara-light-blue/theme.css";
+  }
+
+  React.useEffect(() => {
+    setPrimeTheme(activeTheme.isDark);
+    document.documentElement.classList.toggle("dark", activeTheme.isDark);
+  }, [activeTheme.isDark]);
 
   // Auth check
   if (authLoading) {
@@ -125,11 +138,15 @@ function App() {
         <ScrollToTop />
         <Routes>
           <Route path="/" element={<Dashboard />} />
-          <Route path="/decks" element={<DeckManager />}>
-            <Route index element={<DeckListView />} />
-            <Route path="/decks/:deckId" element={<DeckDetails />} />
-          </Route>
-          <Route path="import" element={<ImportView />} />
+          <Route path="/decks" element={<DeckListView />} />
+          <Route
+            path="/decks/import"
+            element={<ImportView activeTheme={activeTheme} />}
+          />
+          <Route
+            path="/decks/:deckId"
+            element={<DeckDetails activeTheme={activeTheme} />}
+          />
           <Route path="/study" element={<StudySession />} />
           <Route
             path="/reset-password"

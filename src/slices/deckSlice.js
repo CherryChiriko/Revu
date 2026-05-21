@@ -11,10 +11,10 @@ const orderDecksByPriority = (decks) => {
 
   const dueDecks = decks.filter((d) => d.due > 0).sort((a, b) => b.due - a.due);
   const newDecks = decks.filter(
-    (d) => !dueDecks.includes(d) && d.cards_count - d.mastered - d.due > 0
+    (d) => !dueDecks.includes(d) && d.cards_count - d.mastered - d.due > 0,
   );
   const masteredDecks = decks.filter(
-    (d) => !dueDecks.includes(d) && !newDecks.includes(d)
+    (d) => !dueDecks.includes(d) && !newDecks.includes(d),
   );
 
   return [...dueDecks, ...newDecks, ...masteredDecks];
@@ -47,7 +47,7 @@ export const fetchDecks = createAsyncThunk(
     } catch (err) {
       return rejectWithValue(err.message);
     }
-  }
+  },
 );
 
 const getStatus = (progress) => {
@@ -124,7 +124,7 @@ export const fetchDeckCounts = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.message);
     }
-  }
+  },
 );
 
 const initialState = {
@@ -146,50 +146,6 @@ export function updateDeckStatsFromRealtime(state, action) {
   deck.streak = row.deck_streak;
   deck.streak_state = row.streak_state;
 }
-
-// const getFormattedDate = (date) => {
-//   // Note: Using UTC methods prevents local time zone issues from shifting the date
-//   const year = date.getFullYear();
-//   const month = String(date.getMonth() + 1).padStart(2, "0");
-//   const day = String(date.getDate()).padStart(2, "0");
-//   return `${year}-${month}-${day}`;
-// };
-
-// export const getStreak = (deck) => {
-//   if (!deck || typeof deck.streak === "undefined" || !deck.last_reviewed) {
-//     // Handle initial or missing data state gracefully
-//     return [0, false];
-//   }
-
-//   // Since deck.last_reviewed is already YYYY-MM-DD:
-//   const lastReviewedDate = deck.last_reviewed;
-//   const today = getFormattedDate(new Date());
-
-//   const streak = deck.streak;
-//   const isStreakActive = lastReviewedDate === today;
-
-//   return [streak, isStreakActive];
-// };
-
-// export const getTotalDueCards = (deckCounts) => {
-//   if (!deckCounts || typeof deckCounts !== "object") return 0;
-
-//   return Object.values(deckCounts).reduce((sum, deck) => {
-//     // Safety: ensure deck.due exists and is numeric
-//     const due = typeof deck.due === "number" ? deck.due : 0;
-//     return sum + due;
-//   }, 0);
-// };
-
-// export const getTotalMasteredCards = (deckCounts) => {
-//   if (!deckCounts || typeof deckCounts !== "object") return 0;
-
-//   return Object.values(deckCounts).reduce((sum, deck) => {
-//     // Safety: ensure deck.due exists and is numeric
-//     const mastered = typeof deck.mastered === "number" ? deck.mastered : 0;
-//     return sum + mastered;
-//   }, 0);
-// };
 
 const deckSlice = createSlice({
   name: "decks",
@@ -282,25 +238,33 @@ export const selectActiveDeck = (state) => {
     null
   );
 };
+export const selectDeckNameById = (deckId) =>
+  createSelector(
+    (state) => state.decks.decks,
+    (decks) => {
+      const deck = decks.find((d) => d.deck_id === deckId);
+      return deck ? deck.name : null;
+    },
+  );
 
 export const selectDeckCounts = (state) => state.decks.deckCounts;
 export const selectDeckCountsById = (deckId) =>
   createSelector(
     (state) => state.decks.deckCounts,
-    (deckCounts) => deckCounts[deckId] || null
+    (deckCounts) => deckCounts[deckId] || null,
   );
 export const selectTotalDueCards = (state) => {
   const deckCounts = state.decks.deckCounts;
   return Object.values(deckCounts).reduce(
     (total, d) => total + (d.due || 0),
-    0
+    0,
   );
 };
 export const selectTotalMasteredCards = (state) => {
   const deckCounts = state.decks.deckCounts;
   return Object.values(deckCounts).reduce(
     (total, d) => total + (d.mastered || 0),
-    0
+    0,
   );
 };
 export const selectDeckStatus = (state) => state.decks.status;

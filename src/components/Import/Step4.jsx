@@ -12,6 +12,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 const Step4 = ({ activeTheme, logic, onNext, onBack }) => {
+  console.log("FILE CONTENT", logic.fileContent);
   const getLanguageOptions = () => {
     switch (logic.selectedType) {
       case 1:
@@ -49,8 +50,9 @@ const Step4 = ({ activeTheme, logic, onNext, onBack }) => {
                 htmlFor="name"
                 className={`block ${activeTheme.text.primary} text-sm font-medium`}
               >
-                Deck Name *
+                Deck Name <span className="text-red-500">*</span>
               </label>
+
               <input
                 id="name"
                 type="text"
@@ -61,17 +63,27 @@ const Step4 = ({ activeTheme, logic, onNext, onBack }) => {
                     name: e.target.value,
                   })
                 }
+                onBlur={logic.checkDeckNameExists}
                 placeholder="Enter deck name"
                 className={`block w-full ${activeTheme.background.canvas} ${activeTheme.text.secondary} rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 ${activeTheme.ring.input}`}
               />
             </div>
+            {logic.isNameTaken && (
+              <div className="flex items-center gap-2 text-red-500 text-sm">
+                <FontAwesomeIcon icon={faExclamationCircle} />
+                <span>{logic.uploadError}</span>
+              </div>
+            )}
 
             <div className="space-y-2">
               <label
                 htmlFor="language"
                 className={`block ${activeTheme.text.primary} text-sm font-medium`}
               >
-                Language
+                Language{" "}
+                {logic.selectedType === 2 && (
+                  <span className="text-red-500">*</span>
+                )}
               </label>
 
               {logic.isAddingLanguage ? (
@@ -178,10 +190,7 @@ const Step4 = ({ activeTheme, logic, onNext, onBack }) => {
             </h4>
             <div className={`text-sm ${activeTheme.text.secondary} space-y-1`}>
               <p>• File: {logic.selectedFile?.name}</p>
-              <p>
-                • Cards to import:{" "}
-                {logic.fileContent.length - (logic.hasHeaders ? 1 : 0)}
-              </p>
+              <p>• Cards to import: {logic.fileContent.length}</p>
             </div>
           </div>
 
@@ -196,7 +205,11 @@ const Step4 = ({ activeTheme, logic, onNext, onBack }) => {
             </button>
             <button
               onClick={onNext}
-              disabled={!logic.deckSettings.name}
+              disabled={
+                logic.isCheckingName ||
+                logic.isNameTaken ||
+                !logic.deckSettings.name
+              }
               className={`px-4 py-2 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               Confirm and continue

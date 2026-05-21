@@ -10,7 +10,6 @@ import {
 const Step3 = ({ activeTheme, logic, onNext, onBack }) => {
   const rows = logic.fileContent || [];
   const firstRow = rows[0] || {};
-  console.log(firstRow);
 
   const fields = logic.getFields();
 
@@ -20,7 +19,7 @@ const Step3 = ({ activeTheme, logic, onNext, onBack }) => {
     const label = logic.hasHeaders ? key : `Column ${Number(key) + 1}`;
 
     return {
-      value: key, // STRING — this is critical
+      value: key,
       label: `${label} (e.g. "${sample}")`,
     };
   });
@@ -94,37 +93,51 @@ const Step3 = ({ activeTheme, logic, onNext, onBack }) => {
 
       {/* Preview */}
       {isReady && (
-        <div className={`rounded-lg border ${activeTheme.border.default}`}>
+        <div
+          className={`rounded-xl border ${activeTheme.border.default} overflow-hidden`}
+        >
+          {/* Header */}
           <div
-            className={`px-4 py-2 text-xs font-bold uppercase ${activeTheme.background.secondary} ${activeTheme.text.muted}`}
+            className={`px-4 py-2 text-xs font-bold uppercase tracking-wider ${activeTheme.background.secondary} ${activeTheme.text.muted}`}
           >
-            Preview (first 3 rows)
+            Preview · First 3 cards
           </div>
 
-          {rows.slice(0, 3).map((row, i) => (
-            <div
-              key={i}
-              className="grid grid-cols-2 gap-4 p-4 text-sm border-t"
-            >
-              <div>
-                <div className="text-xs font-bold uppercase text-gray-400">
-                  Front
+          {/* Cards */}
+          <div className="divide-y">
+            {rows.slice(0, 3).map((row, i) => (
+              <div
+                key={i}
+                className={`p-4 grid grid-cols-1 md:grid-cols-2 gap-4 ${activeTheme.background.canvas}`}
+              >
+                {/* Front */}
+                <div
+                  className={`rounded-lg p-3 border ${activeTheme.border.default}`}
+                >
+                  <div className="text-[10px] font-bold uppercase tracking-wide text-gray-400 mb-1">
+                    Front
+                  </div>
+                  <div
+                    className={`text-base font-semibold ${activeTheme.text.primary}`}
+                  >
+                    {row[logic.mappedColumns.front]}
+                  </div>
                 </div>
-                <div className={activeTheme.text.primary}>
-                  {row[logic.mappedColumns.front || logic.mappedColumns.word]}
-                </div>
-              </div>
 
-              <div>
-                <div className="text-xs font-bold uppercase text-gray-400">
-                  Back
-                </div>
-                <div className={activeTheme.text.primary}>
-                  {row[logic.mappedColumns.back || logic.mappedColumns.meaning]}
+                {/* Back */}
+                <div
+                  className={`rounded-lg p-3 border ${activeTheme.border.default}`}
+                >
+                  <div className="text-[10px] font-bold uppercase tracking-wide text-gray-400 mb-1">
+                    Back
+                  </div>
+                  <div className={`text-sm ${activeTheme.text.primary}`}>
+                    {row[logic.mappedColumns.back]}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
 

@@ -52,8 +52,8 @@ const FullVariant = ({ deck, activeTheme, logic }) => {
             />
             <DeckMenu
               activeTheme={activeTheme}
-              onEdit={() => console.log("Edit")}
-              onDelete={() => handleAction("delete", deck)}
+              onEdit={(e) => handleAction(e, "edit", deck)}
+              onDelete={(e) => handleAction(e, "delete", deck)}
             />
           </div>
         </div>

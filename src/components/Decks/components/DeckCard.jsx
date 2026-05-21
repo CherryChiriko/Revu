@@ -1,7 +1,13 @@
 import React from "react";
 import DeckCardItem from "./DeckCardItem";
 
-export default function DeckCard({ decks, activeTheme, variant, gridClasses }) {
+export default function DeckCard({
+  decks,
+  activeTheme,
+  variant,
+  gridClasses,
+  toast,
+}) {
   return (
     <div className={gridClasses}>
       {decks.map((deck) => (
@@ -10,6 +16,7 @@ export default function DeckCard({ decks, activeTheme, variant, gridClasses }) {
           deck={deck}
           activeTheme={activeTheme}
           variant={variant}
+          toast={toast}
         />
       ))}
     </div>

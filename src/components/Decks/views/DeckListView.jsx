@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { selectActiveTheme } from "../../../slices/themeSlice";
@@ -12,6 +13,13 @@ import {
   faThLarge,
   faList,
 } from "@fortawesome/free-solid-svg-icons";
+import Header from "../../General/ui/Header";
+
+import { confirmDialog } from "primereact/confirmdialog";
+
+import { ConfirmDialog } from "primereact/confirmdialog"; // For <ConfirmDialog /> component
+import { Toast } from "primereact/toast";
+import { Button } from "primereact/button";
 
 export default function DeckListView() {
   const activeTheme = useSelector(selectActiveTheme);
@@ -44,13 +52,21 @@ export default function DeckListView() {
   const navigate = useNavigate();
 
   const handleImportClick = () => {
-    navigate("/import");
+    navigate("import");
   };
+
+  const toast = useRef(null);
 
   return (
     <div
       className={`min-h-screen ${activeTheme.background.app} ${activeTheme.text.primary} w-full`}
     >
+      <div className="max-w-screen-xl mx-auto px-4 md:px-8 py-8">
+        <Header
+          title="Deck Manager"
+          description="Create, edit, and manage your flashcard decks"
+        />
+      </div>
       <div className="max-w-screen-xl mx-auto px-4 md:px-8 py-8">
         {/* header area */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 space-y-4 md:space-y-0 md:space-x-4">
@@ -63,7 +79,7 @@ export default function DeckListView() {
               <input
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className={`w-full ${activeTheme.background.canvas} ${activeTheme.text.secondary} rounded-lg py-2 px-5 pl-12`}
+                className={`w-full border ${activeTheme.background.canvas} ${activeTheme.text.secondary} rounded-lg py-2 px-5 pl-12`}
                 placeholder="Search deck..."
               />
             </div>
@@ -71,7 +87,7 @@ export default function DeckListView() {
             <select
               value={selectedLanguage}
               onChange={(e) => setSelectedLanguage(e.target.value)}
-              className={`${activeTheme.background.canvas} ${activeTheme.text.secondary} rounded-lg py-2 px-4 pr-8 w-40`}
+              className={`border ${activeTheme.background.canvas} ${activeTheme.text.secondary} rounded-lg py-2 px-4 pr-8 w-40`}
             >
               {uniqueLanguages.map((lang) => (
                 <option key={lang} value={lang}>
@@ -88,7 +104,7 @@ export default function DeckListView() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className={`no-arrow ${activeTheme.background.canvas} ${activeTheme.text.secondary} rounded-lg py-2 px-4 pr-8 w-40`}
+                className={`border no-arrow ${activeTheme.background.canvas} ${activeTheme.text.secondary} rounded-lg py-2 px-4 pr-8 w-40`}
               >
                 <option value="lastStudied-desc">Last Studied</option>
                 <option value="name-asc">Name (A-Z)</option>
@@ -101,14 +117,14 @@ export default function DeckListView() {
 
           <div className="flex space-x-4 w-full md:w-auto justify-end">
             <div
-              className={`flex rounded-lg p-1 ${activeTheme.background.canvas}`}
+              className={`border flex rounded-xl p-1 ${activeTheme.background.canvas}`}
             >
               <button
                 onClick={() => toggleViewMode("grid")}
                 className={`p-2 rounded-lg ${
                   viewMode === "grid"
                     ? activeTheme.button.secondary
-                    : activeTheme.background.canvas
+                    : activeTheme.background.card
                 } ${activeTheme.text.secondary}`}
                 title="Large Card View"
               >
@@ -154,6 +170,7 @@ export default function DeckListView() {
             activeTheme={activeTheme}
             variant={variant}
             gridClasses={gridClasses}
+            toast={toast}
           />
         ) : (
           <div
@@ -186,6 +203,11 @@ export default function DeckListView() {
             )}
           </div>
         )}
+
+        <div>
+          <Toast ref={toast} />
+          <ConfirmDialog />
+        </div>
 
         {/* pagination */}
         {totalPages > 1 && (

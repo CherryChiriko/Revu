@@ -6,6 +6,11 @@ import App from "./App";
 import { store } from "./app/store";
 import "./index.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+// import "primereact/resources/themes/lara-light-blue/theme.css";
+// import "primereact/resources/themes/lara-dark-indigo/theme.css";
+import "primereact/resources/primereact.min.css";
+import "primeicons/primeicons.css";
+
 import HanziWriter from "hanzi-writer";
 window.HanziWriter = HanziWriter;
 
@@ -18,5 +23,5 @@ root.render(
         <App />
       </BrowserRouter>
     </Provider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

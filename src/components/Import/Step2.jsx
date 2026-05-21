@@ -31,13 +31,13 @@ const Step2 = ({ activeTheme, logic, onNext, onBack }) => {
         return (
           <div className={`text-sm ${activeTheme.text.muted}`}>
             <p>
-              • <strong>Word/Character</strong>: The character or word to learn
+              • <strong>Character</strong>: The character to learn
             </p>
             <p>
-              • <strong>Reading</strong>: Pronunciation (hiragana/pinyin)
+              • <strong>Meaning</strong>: The definition or translation
             </p>
             <p>
-              • <strong>Meaning</strong>: English translation
+              • <strong>(optional) Reading</strong>: Pronunciation (pinyin)
             </p>
           </div>
         );

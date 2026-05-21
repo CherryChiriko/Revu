@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { supabase } from "../../utils/supabaseClient";
-import { generateMetadata } from "../../utils/excel/generateMetadata";
+import { generateReading } from "./generateReading";
 import Papa from "papaparse";
 import * as XLSX from "xlsx";
 
@@ -133,8 +133,8 @@ export const useImportLogic = () => {
             return Object.fromEntries(
               Object.entries(row).filter(
                 ([_, value]) =>
-                  value !== "" && value !== null && value !== undefined
-              )
+                  value !== "" && value !== null && value !== undefined,
+              ),
             );
           });
           console.log(normalized);
@@ -187,7 +187,7 @@ export const useImportLogic = () => {
                 acc[key] = cell;
               }
               return acc;
-            }, {})
+            }, {}),
           );
         } else {
           // Logic for no headers (numeric keys)
@@ -197,7 +197,7 @@ export const useImportLogic = () => {
                 acc[index] = cell;
               }
               return acc;
-            }, {})
+            }, {}),
           );
         }
 
@@ -259,9 +259,9 @@ export const useImportLogic = () => {
         ];
       case 2: // Chinese writing
         return [
-          { key: "word", label: "Character/Word", required: true },
-          { key: "reading", label: "Reading (Pinyin/Kana)", required: true },
-          { key: "meaning", label: "Meaning", required: true },
+          { key: "front", label: "Character", required: true },
+          { key: "back", label: "Meaning", required: true },
+          { key: "reading", label: "Reading (Pinyin/Kana)", required: false },
           { key: "audioUrl", label: "Audio URL", required: false },
         ];
       default:
@@ -276,6 +276,49 @@ export const useImportLogic = () => {
       front: mappedColumns.back,
       back: mappedColumns.front,
     });
+  };
+
+  //  -------------- Check -------------- //
+  const [isCheckingName, setIsCheckingName] = useState(false);
+  const [isNameTaken, setIsNameTaken] = useState(false);
+
+  const checkDeckNameExists = async () => {
+    const name = deckSettings.name?.trim();
+
+    if (!name) {
+      setIsNameTaken(false);
+      return false;
+    }
+
+    setIsCheckingName(true);
+    setUploadError(null);
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    const { data, error } = await supabase
+      .from("decks")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("name", name)
+      .maybeSingle();
+
+    setIsCheckingName(false);
+
+    if (error) {
+      console.error(error);
+      return false;
+    }
+
+    if (data) {
+      setIsNameTaken(true);
+      setUploadError("Deck name already in use. Please choose another.");
+      return true;
+    }
+
+    setIsNameTaken(false);
+    return false;
   };
 
   //  -------------- Send out result -------------- //
@@ -307,24 +350,57 @@ export const useImportLogic = () => {
           createdAt: new Date(),
         };
       case 2:
+        console.log(
+          "row",
+          mappedColumns.reading,
+          row[mappedColumns.reading] || null,
+          row[mappedColumns.reading],
+        );
+        const card = {
+          front: row[mappedColumns.front],
+          back: row[mappedColumns.back],
+          audioUrl: row[mappedColumns.audioUrl] || null,
+          created_at: new Date(),
+          reading: row[mappedColumns.reading] || null,
+        };
+        const { reading, strokeColors, tones } = generateReading(
+          card.front,
+          "Chinese",
+          card.reading,
+        );
+
+        console.log("result here", reading, strokeColors, tones);
         return {
-          // const front = row[column.word];
-          // const meta = generateMetadata(front, deckSettings.language);
+          ...card,
+          reading: reading,
+          strokeColors: strokeColors,
+          tones: tones,
         };
       default:
         return {};
     }
   };
 
-  const allCards = fileContent
-    .map((row) => prepareCardsForInsert(row))
-    .filter(
-      (card) =>
-        card.front &&
-        card.back &&
-        card.front.trim() !== "" &&
-        card.back.trim() !== ""
-    );
+  const allCards = useMemo(() => {
+    // Guard: If front or back mapping is missing, don't process yet
+    if (
+      !mappedColumns.front ||
+      !mappedColumns.back ||
+      fileContent.length === 0
+    ) {
+      return [];
+    }
+
+    return fileContent
+      .map((row) => prepareCardsForInsert(row))
+      .filter(
+        (card) =>
+          card.front &&
+          card.back &&
+          card.front.trim() !== "" &&
+          card.back.trim() !== "",
+      );
+  }, [fileContent, mappedColumns, selectedType]); // Only re-run when these change
 
   const uploadCards = async (deckId) => {
     try {
@@ -352,7 +428,7 @@ export const useImportLogic = () => {
             console.warn(
               `Chunk failed (attempt ${retryCount}). Retrying in ${
                 retryCount * 2
-              }s...`
+              }s...`,
             );
             // Wait longer each time it fails (Exponential Backoff)
             await new Promise((res) => setTimeout(res, retryCount * 2000));
@@ -361,7 +437,7 @@ export const useImportLogic = () => {
 
         if (!success)
           throw new Error(
-            "Server is unresponsive after multiple attempts. Please try again later."
+            "Server is unresponsive after multiple attempts. Please try again later.",
           );
 
         const total = allCards.length;
@@ -386,7 +462,7 @@ export const useImportLogic = () => {
       await supabase.from(table).delete().eq("deck_id", deckId);
 
       setUploadError(
-        "Error during upload. The deck and cards were removed to prevent data corruption."
+        "Error during upload. The deck and cards were removed to prevent data corruption.",
       );
     }
   };
@@ -432,8 +508,6 @@ export const useImportLogic = () => {
         .select() // This is critical: it returns the inserted row
         .single(); // Since we only inserted one deck, get it as an object
 
-      if (deckError) throw deckError;
-
       const deckId = newDeck.id;
       console.log("New Deck Created with ID:", deckId);
 
@@ -474,5 +548,8 @@ export const useImportLogic = () => {
     setMappedColumns,
     isProcessing,
     createDeck,
+    isCheckingName,
+    isNameTaken,
+    processingProgress,
   };
 };
