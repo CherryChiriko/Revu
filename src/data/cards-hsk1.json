@@ -1,0 +1,2850 @@
+[
+  {
+    "deck_id": 1,
+    "front": "爱",
+    "reading": "ài",
+    "back": "to love; to be fond of; to like",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4
+    ],
+    "strokeColors": [
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896412"
+  },
+  {
+    "deck_id": 1,
+    "front": "八",
+    "reading": "bā",
+    "back": "eight; 8",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1
+    ],
+    "strokeColors": [
+      "red"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896458"
+  },
+  {
+    "deck_id": 1,
+    "front": "爸爸",
+    "reading": "bà ba",
+    "back": "(coll.) father; dad",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4,
+      0
+    ],
+    "strokeColors": [
+      "purple",
+      "gray"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896464"
+  },
+  {
+    "deck_id": 1,
+    "front": "杯子",
+    "reading": "bēi zi",
+    "back": "cup",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1,
+      0
+    ],
+    "strokeColors": [
+      "red",
+      "gray"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896468"
+  },
+  {
+    "deck_id": 1,
+    "front": "北京",
+    "reading": "Běi jīng",
+    "back": "Beijing, capital of the People's Republic of China",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3,
+      1
+    ],
+    "strokeColors": [
+      "blue",
+      "red"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896472"
+  },
+  {
+    "deck_id": 1,
+    "front": "本",
+    "reading": "běn",
+    "back": "root",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3
+    ],
+    "strokeColors": [
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896475"
+  },
+  {
+    "deck_id": 1,
+    "front": "不",
+    "reading": "bù",
+    "back": "no; not so",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4
+    ],
+    "strokeColors": [
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896478"
+  },
+  {
+    "deck_id": 1,
+    "front": "不客气",
+    "reading": "bù kè qi",
+    "back": "you're welcome",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4,
+      4,
+      0
+    ],
+    "strokeColors": [
+      "purple",
+      "purple",
+      "gray"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896481"
+  },
+  {
+    "deck_id": 1,
+    "front": "菜",
+    "reading": "cài",
+    "back": "dish (type of food)",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4
+    ],
+    "strokeColors": [
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896486"
+  },
+  {
+     "deck_id": 1,
+    "front": "茶",
+    "reading": "chá",
+    "back": "tea",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      2
+    ],
+    "strokeColors": [
+      "green"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896489"
+  },
+  {
+     "deck_id": 1,
+    "front": "吃",
+    "reading": "chī",
+    "back": "to eat; to consume",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1
+    ],
+    "strokeColors": [
+      "red"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896492"
+  },
+  {
+     "deck_id": 1,
+    "front": "出租车",
+    "reading": "chū zū chē",
+    "back": "taxi",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1,
+      1,
+      1
+    ],
+    "strokeColors": [
+      "red",
+      "red",
+      "red"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896497"
+  },
+  {
+     "deck_id": 1,
+    "front": "打电话",
+    "reading": "dǎ diàn huà",
+    "back": "to make a telephone call",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3,
+      4,
+      4
+    ],
+    "strokeColors": [
+      "blue",
+      "purple",
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896500"
+  },
+  {
+     "deck_id": 1,
+    "front": "大",
+    "reading": "dà",
+    "back": "big; large; great",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4
+    ],
+    "strokeColors": [
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896502"
+  },
+  {
+     "deck_id": 1,
+    "front": "的",
+    "reading": "de",
+    "back": "of; ~'s (possessive particle)",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      0
+    ],
+    "strokeColors": [
+      "gray"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896505"
+  },
+  {
+     "deck_id": 1,
+    "front": "点",
+    "reading": "diǎn",
+    "back": "point",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3
+    ],
+    "strokeColors": [
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896507"
+  },
+  {
+     "deck_id": 1,
+    "front": "电脑",
+    "reading": "diàn nǎo",
+    "back": "computer",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4,
+      3
+    ],
+    "strokeColors": [
+      "purple",
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896510"
+  },
+  {
+     "deck_id": 1,
+    "front": "电视",
+    "reading": "diàn shì",
+    "back": "television; TV",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4,
+      4
+    ],
+    "strokeColors": [
+      "purple",
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896513"
+  },
+  {
+     "deck_id": 1,
+    "front": "电影",
+    "reading": "diàn yǐng",
+    "back": "movie; film",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4,
+      3
+    ],
+    "strokeColors": [
+      "purple",
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896519"
+  },
+  {
+     "deck_id": 1,
+    "front": "东西",
+    "reading": "dōng xī",
+    "back": "east and west",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1,
+      1
+    ],
+    "strokeColors": [
+      "red",
+      "red"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896522"
+  },
+  {
+     "deck_id": 1,
+    "front": "都",
+    "reading": "Dū",
+    "back": "surname Du",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1
+    ],
+    "strokeColors": [
+      "red"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896525"
+  },
+  {
+     "deck_id": 1,
+    "front": "读",
+    "reading": "dòu",
+    "back": "comma",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4
+    ],
+    "strokeColors": [
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896527"
+  },
+  {
+     "deck_id": 1,
+    "front": "对不起",
+    "reading": "duì bu qǐ",
+    "back": "I'm sorry; excuse me; I beg your pardon",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4,
+      0,
+      3
+    ],
+    "strokeColors": [
+      "purple",
+      "gray",
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896530"
+  },
+  {
+     "deck_id": 1,
+    "front": "多",
+    "reading": "duō",
+    "back": "many; much",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1
+    ],
+    "strokeColors": [
+      "red"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896532"
+  },
+  {
+     "deck_id": 1,
+    "front": "多少",
+    "reading": "duō shǎo",
+    "back": "number",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1,
+      3
+    ],
+    "strokeColors": [
+      "red",
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896535"
+  },
+  {
+     "deck_id": 1,
+    "front": "儿子",
+    "reading": "ér zi",
+    "back": "son",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      2,
+      0
+    ],
+    "strokeColors": [
+      "green",
+      "gray"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896538"
+  },
+  {
+     "deck_id": 1,
+    "front": "二",
+    "reading": "èr",
+    "back": "two",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4
+    ],
+    "strokeColors": [
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896540"
+  },
+  {
+     "deck_id": 1,
+    "front": "饭馆",
+    "reading": "fàn guǎn",
+    "back": "restaurant",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4,
+      3
+    ],
+    "strokeColors": [
+      "purple",
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896543"
+  },
+  {
+     "deck_id": 1,
+    "front": "飞机",
+    "reading": "fēi jī",
+    "back": "airplane",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1,
+      1
+    ],
+    "strokeColors": [
+      "red",
+      "red"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896547"
+  },
+  {
+     "deck_id": 1,
+    "front": "分钟",
+    "reading": "fēn zhōng",
+    "back": "minute",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1,
+      1
+    ],
+    "strokeColors": [
+      "red",
+      "red"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896550"
+  },
+  {
+     "deck_id": 1,
+    "front": "高兴",
+    "reading": "gāo xìng",
+    "back": "happy",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1,
+      4
+    ],
+    "strokeColors": [
+      "red",
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896553"
+  },
+  {
+     "deck_id": 1,
+    "front": "个",
+    "reading": "gě",
+    "back": "used in 自个儿",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3
+    ],
+    "strokeColors": [
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896555"
+  },
+  {
+     "deck_id": 1,
+    "front": "工作",
+    "reading": "gōng zuò",
+    "back": "to work",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1,
+      4
+    ],
+    "strokeColors": [
+      "red",
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896558"
+  },
+  {
+     "deck_id": 1,
+    "front": "狗",
+    "reading": "gǒu",
+    "back": "dog",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3
+    ],
+    "strokeColors": [
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896560"
+  },
+  {
+     "deck_id": 1,
+    "front": "汉语",
+    "reading": "Hàn yǔ",
+    "back": "Chinese language",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4,
+      3
+    ],
+    "strokeColors": [
+      "purple",
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896563"
+  },
+  {
+     "deck_id": 1,
+    "front": "好",
+    "reading": "hǎo",
+    "back": "good",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3
+    ],
+    "strokeColors": [
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896565"
+  },
+  {
+     "deck_id": 1,
+    "front": "喝",
+    "reading": "hē",
+    "back": "to drink",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1
+    ],
+    "strokeColors": [
+      "red"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896568"
+  },
+  {
+     "deck_id": 1,
+    "front": "和",
+    "reading": "hé",
+    "back": "old variant of 和",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      2
+    ],
+    "strokeColors": [
+      "green"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896570"
+  },
+  {
+     "deck_id": 1,
+    "front": "很",
+    "reading": "hěn",
+    "back": "(adverb of degree)",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3
+    ],
+    "strokeColors": [
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896575"
+  },
+  {
+     "deck_id": 1,
+    "front": "后面",
+    "reading": "hòu mian",
+    "back": "the back; the rear; the last bit",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4,
+      0
+    ],
+    "strokeColors": [
+      "purple",
+      "gray"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896578"
+  },
+  {
+     "deck_id": 1,
+    "front": "回",
+    "reading": "huí",
+    "back": "to circle",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      2
+    ],
+    "strokeColors": [
+      "green"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896581"
+  },
+  {
+     "deck_id": 1,
+    "front": "会",
+    "reading": "huì",
+    "back": "can; to have the skill; to know how to",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4
+    ],
+    "strokeColors": [
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896583"
+  },
+  {
+     "deck_id": 1,
+    "front": "火车站",
+    "reading": "huǒ chē zhàn",
+    "back": "train station",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3,
+      1,
+      4
+    ],
+    "strokeColors": [
+      "blue",
+      "red",
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896586"
+  },
+  {
+     "deck_id": 1,
+    "front": "几",
+    "reading": "jī",
+    "back": "small table",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1
+    ],
+    "strokeColors": [
+      "red"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896591"
+  },
+  {
+     "deck_id": 1,
+    "front": "家",
+    "reading": "jiā",
+    "back": "used in 家伙 and 家俱",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1
+    ],
+    "strokeColors": [
+      "red"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896594"
+  },
+  {
+     "deck_id": 1,
+    "front": "叫",
+    "reading": "jiào",
+    "back": "to shout",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4
+    ],
+    "strokeColors": [
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896596"
+  },
+  {
+     "deck_id": 1,
+    "front": "今天",
+    "reading": "jīn tiān",
+    "back": "today",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1,
+      1
+    ],
+    "strokeColors": [
+      "red",
+      "red"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896598"
+  },
+  {
+     "deck_id": 1,
+    "front": "九",
+    "reading": "jiǔ",
+    "back": "nine",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3
+    ],
+    "strokeColors": [
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896601"
+  },
+  {
+     "deck_id": 1,
+    "front": "开",
+    "reading": "kāi",
+    "back": "to open (transitive or intransitive)",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1
+    ],
+    "strokeColors": [
+      "red"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896605"
+  },
+  {
+     "deck_id": 1,
+    "front": "看",
+    "reading": "kān",
+    "back": "to look after",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1
+    ],
+    "strokeColors": [
+      "red"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896608"
+  },
+  {
+     "deck_id": 1,
+    "front": "看见",
+    "reading": "kàn jiàn",
+    "back": "to see",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4,
+      4
+    ],
+    "strokeColors": [
+      "purple",
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896610"
+  },
+  {
+     "deck_id": 1,
+    "front": "块",
+    "reading": "kuài",
+    "back": "lump; chunk; piece",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4
+    ],
+    "strokeColors": [
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896613"
+  },
+  {
+     "deck_id": 1,
+    "front": "来",
+    "reading": "lái",
+    "back": "to come",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      2
+    ],
+    "strokeColors": [
+      "green"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896615"
+  },
+  {
+     "deck_id": 1,
+    "front": "老师",
+    "reading": "lǎo shī",
+    "back": "teacher",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3,
+      1
+    ],
+    "strokeColors": [
+      "blue",
+      "red"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896618"
+  },
+  {
+     "deck_id": 1,
+    "front": "了",
+    "reading": "le",
+    "back": "(completed action marker)",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      0
+    ],
+    "strokeColors": [
+      "gray"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896620"
+  },
+  {
+     "deck_id": 1,
+    "front": "冷",
+    "reading": "Lěng",
+    "back": "surname Leng",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3
+    ],
+    "strokeColors": [
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896622"
+  },
+  {
+     "deck_id": 1,
+    "front": "里",
+    "reading": "lǐ",
+    "back": "variant of 里",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3
+    ],
+    "strokeColors": [
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896625"
+  },
+  {
+     "deck_id": 1,
+    "front": "零",
+    "reading": "líng",
+    "back": "zero",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      2
+    ],
+    "strokeColors": [
+      "green"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896627"
+  },
+  {
+     "deck_id": 1,
+    "front": "六",
+    "reading": "liù",
+    "back": "six",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4
+    ],
+    "strokeColors": [
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896632"
+  },
+  {
+     "deck_id": 1,
+    "front": "妈妈",
+    "reading": "mā ma",
+    "back": "mama",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1,
+      0
+    ],
+    "strokeColors": [
+      "red",
+      "gray"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896634"
+  },
+  {
+     "deck_id": 1,
+    "front": "吗",
+    "reading": "má",
+    "back": "(coll.) what?",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      2
+    ],
+    "strokeColors": [
+      "green"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896637"
+  },
+  {
+     "deck_id": 1,
+    "front": "买",
+    "reading": "mǎi",
+    "back": "to buy",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3
+    ],
+    "strokeColors": [
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896639"
+  },
+  {
+     "deck_id": 1,
+    "front": "猫",
+    "reading": "māo",
+    "back": "cat",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1
+    ],
+    "strokeColors": [
+      "red"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896642"
+  },
+  {
+     "deck_id": 1,
+    "front": "没",
+    "reading": "méi",
+    "back": "(negative prefix for verbs) have not; not",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      2
+    ],
+    "strokeColors": [
+      "green"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896644"
+  },
+  {
+     "deck_id": 1,
+    "front": "没关系",
+    "reading": "méi guān xi",
+    "back": "it doesn't matter",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      2,
+      1,
+      0
+    ],
+    "strokeColors": [
+      "green",
+      "red",
+      "gray"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896647"
+  },
+  {
+     "deck_id": 1,
+    "front": "米饭",
+    "reading": "mǐ fàn",
+    "back": "(cooked) rice",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3,
+      4
+    ],
+    "strokeColors": [
+      "blue",
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896650"
+  },
+  {
+     "deck_id": 1,
+    "front": "名字",
+    "reading": "míng zi",
+    "back": "name (of a person or thing)",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      2,
+      0
+    ],
+    "strokeColors": [
+      "green",
+      "gray"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896653"
+  },
+  {
+     "deck_id": 1,
+    "front": "明天",
+    "reading": "míng tiān",
+    "back": "tomorrow",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      2,
+      1
+    ],
+    "strokeColors": [
+      "green",
+      "red"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896655"
+  },
+  {
+     "deck_id": 1,
+    "front": "哪",
+    "reading": "nǎ",
+    "back": "how",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3
+    ],
+    "strokeColors": [
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896661"
+  },
+  {
+     "deck_id": 1,
+    "front": "那",
+    "reading": "Nā",
+    "back": "surname Na",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1
+    ],
+    "strokeColors": [
+      "red"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896664"
+  },
+  {
+     "deck_id": 1,
+    "front": "呢",
+    "reading": "ne",
+    "back": "particle indicating that a previously asked question is to be applied to the preceding word (\"What about ...?\", \"And ...?\")",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      0
+    ],
+    "strokeColors": [
+      "gray"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896669"
+  },
+  {
+     "deck_id": 1,
+    "front": "能",
+    "reading": "Néng",
+    "back": "surname Neng",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      2
+    ],
+    "strokeColors": [
+      "green"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896671"
+  },
+  {
+     "deck_id": 1,
+    "front": "你",
+    "reading": "nǐ",
+    "back": "you (informal, as opposed to courteous 您)",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3
+    ],
+    "strokeColors": [
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896674"
+  },
+  {
+     "deck_id": 1,
+    "front": "年",
+    "reading": "Nián",
+    "back": "surname Nian",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      2
+    ],
+    "strokeColors": [
+      "green"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896676"
+  },
+  {
+     "deck_id": 1,
+    "front": "女儿",
+    "reading": "nu:3 ér",
+    "back": "daughter",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3,
+      2
+    ],
+    "strokeColors": [
+      "blue",
+      "green"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896679"
+  },
+  {
+     "deck_id": 1,
+    "front": "朋友",
+    "reading": "péng you",
+    "back": "friend",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      2,
+      0
+    ],
+    "strokeColors": [
+      "green",
+      "gray"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896683"
+  },
+  {
+     "deck_id": 1,
+    "front": "漂亮",
+    "reading": "piào liang",
+    "back": "pretty",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4,
+      0
+    ],
+    "strokeColors": [
+      "purple",
+      "gray"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896686"
+  },
+  {
+     "deck_id": 1,
+    "front": "苹果",
+    "reading": "píng guǒ",
+    "back": "apple",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      2,
+      3
+    ],
+    "strokeColors": [
+      "green",
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896689"
+  },
+  {
+     "deck_id": 1,
+    "front": "七",
+    "reading": "qī",
+    "back": "seven",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1
+    ],
+    "strokeColors": [
+      "red"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896698"
+  },
+  {
+     "deck_id": 1,
+    "front": "前面",
+    "reading": "qián miàn",
+    "back": "ahead",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      2,
+      4
+    ],
+    "strokeColors": [
+      "green",
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896701"
+  },
+  {
+     "deck_id": 1,
+    "front": "钱",
+    "reading": "Qián",
+    "back": "surname Qian",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      2
+    ],
+    "strokeColors": [
+      "green"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896704"
+  },
+  {
+     "deck_id": 1,
+    "front": "请",
+    "reading": "qǐng",
+    "back": "to ask",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3
+    ],
+    "strokeColors": [
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896706"
+  },
+  {
+     "deck_id": 1,
+    "front": "去",
+    "reading": "qù",
+    "back": "to go",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4
+    ],
+    "strokeColors": [
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896709"
+  },
+  {
+     "deck_id": 1,
+    "front": "热",
+    "reading": "rè",
+    "back": "to warm up",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4
+    ],
+    "strokeColors": [
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896712"
+  },
+  {
+     "deck_id": 1,
+    "front": "人",
+    "reading": "rén",
+    "back": "person; people",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      2
+    ],
+    "strokeColors": [
+      "green"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896714"
+  },
+  {
+     "deck_id": 1,
+    "front": "认识",
+    "reading": "rèn shi",
+    "back": "to know",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4,
+      0
+    ],
+    "strokeColors": [
+      "purple",
+      "gray"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896717"
+  },
+  {
+     "deck_id": 1,
+    "front": "日",
+    "reading": "Rì",
+    "back": "abbr. for 本, Japan",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4
+    ],
+    "strokeColors": [
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896719"
+  },
+  {
+     "deck_id": 1,
+    "front": "三",
+    "reading": "Sān",
+    "back": "surname San",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1
+    ],
+    "strokeColors": [
+      "red"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896722"
+  },
+  {
+     "deck_id": 1,
+    "front": "商店",
+    "reading": "shāng diàn",
+    "back": "store; shop",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1,
+      4
+    ],
+    "strokeColors": [
+      "red",
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896726"
+  },
+  {
+     "deck_id": 1,
+    "front": "上",
+    "reading": "shǎng",
+    "back": "used in 上声",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3
+    ],
+    "strokeColors": [
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896729"
+  },
+  {
+     "deck_id": 1,
+    "front": "上午",
+    "reading": "shàng wǔ",
+    "back": "morning",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4,
+      3
+    ],
+    "strokeColors": [
+      "purple",
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896731"
+  },
+  {
+     "deck_id": 1,
+    "front": "少",
+    "reading": "shǎo",
+    "back": "few",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3
+    ],
+    "strokeColors": [
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896734"
+  },
+  {
+     "deck_id": 1,
+    "front": "什么",
+    "reading": "shén me",
+    "back": "what?",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      2,
+      0
+    ],
+    "strokeColors": [
+      "green",
+      "gray"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896736"
+  },
+  {
+     "deck_id": 1,
+    "front": "十",
+    "reading": "shí",
+    "back": "ten",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      2
+    ],
+    "strokeColors": [
+      "green"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896739"
+  },
+  {
+     "deck_id": 1,
+    "front": "时候",
+    "reading": "shí hou",
+    "back": "time",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      2,
+      0
+    ],
+    "strokeColors": [
+      "green",
+      "gray"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896742"
+  },
+  {
+     "deck_id": 1,
+    "front": "是",
+    "reading": "shì",
+    "back": "to be (followed by substantives only)",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4
+    ],
+    "strokeColors": [
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896744"
+  },
+  {
+     "deck_id": 1,
+    "front": "书",
+    "reading": "Shū",
+    "back": "abbr. for 书经",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1
+    ],
+    "strokeColors": [
+      "red"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896746"
+  },
+  {
+     "deck_id": 1,
+    "front": "谁",
+    "reading": "shéi",
+    "back": "who",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      2
+    ],
+    "strokeColors": [
+      "green"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896749"
+  },
+  {
+     "deck_id": 1,
+    "front": "水",
+    "reading": "Shuǐ",
+    "back": "surname Shui",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3
+    ],
+    "strokeColors": [
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896753"
+  },
+  {
+      "deck_id": 1,
+    "front": "水果",
+    "reading": "shuǐ guǒ",
+    "back": "fruit",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3,
+      3
+    ],
+    "strokeColors": [
+      "blue",
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896756"
+  },
+  {
+      "deck_id": 1,
+    "front": "睡觉",
+    "reading": "shuì jiào",
+    "back": "to go to bed",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4,
+      4
+    ],
+    "strokeColors": [
+      "purple",
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896759"
+  },
+  {
+      "deck_id": 1,
+    "front": "说话",
+    "reading": "shuō huà",
+    "back": "to speak",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1,
+      4
+    ],
+    "strokeColors": [
+      "red",
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896761"
+  },
+  {
+      "deck_id": 1,
+    "front": "四",
+    "reading": "sì",
+    "back": "four",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4
+    ],
+    "strokeColors": [
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896763"
+  },
+  {
+      "deck_id": 1,
+    "front": "岁",
+    "reading": "suì",
+    "back": "variant of 岁, year",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4
+    ],
+    "strokeColors": [
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896766"
+  },
+  {
+      "deck_id": 1,
+    "front": "他",
+    "reading": "tā",
+    "back": "he; him (used for either sex when the sex is unknown or unimportant)",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1
+    ],
+    "strokeColors": [
+      "red"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896768"
+  },
+  {
+      "deck_id": 1,
+    "front": "她",
+    "reading": "tā",
+    "back": "she",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1
+    ],
+    "strokeColors": [
+      "red"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896770"
+  },
+  {
+      "deck_id": 1,
+    "front": "太",
+    "reading": "tài",
+    "back": "highest",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4
+    ],
+    "strokeColors": [
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896773"
+  },
+  {
+      "deck_id": 1,
+    "front": "天气",
+    "reading": "tiān qì",
+    "back": "weather",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1,
+      4
+    ],
+    "strokeColors": [
+      "red",
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896781"
+  },
+  {
+      "deck_id": 1,
+    "front": "听",
+    "reading": "yǐn",
+    "back": "smile (archaic)",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3
+    ],
+    "strokeColors": [
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896786"
+  },
+  {
+      "deck_id": 1,
+    "front": "同学",
+    "reading": "tóng xué",
+    "back": "to study at the same school",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      2,
+      2
+    ],
+    "strokeColors": [
+      "green",
+      "green"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896789"
+  },
+  {
+      "deck_id": 1,
+    "front": "喂",
+    "reading": "wéi",
+    "back": "hello (when answering the phone)",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      2
+    ],
+    "strokeColors": [
+      "green"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896791"
+  },
+  {
+      "deck_id": 1,
+    "front": "我",
+    "reading": "wǒ",
+    "back": "I; me; my",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3
+    ],
+    "strokeColors": [
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896794"
+  },
+  {
+      "deck_id": 1,
+    "front": "我们",
+    "reading": "wǒ men",
+    "back": "we",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3,
+      0
+    ],
+    "strokeColors": [
+      "blue",
+      "gray"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896796"
+  },
+  {
+      "deck_id": 1,
+    "front": "五",
+    "reading": "wǔ",
+    "back": "five",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3
+    ],
+    "strokeColors": [
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896799"
+  },
+  {
+      "deck_id": 1,
+    "front": "喜欢",
+    "reading": "xǐ huan",
+    "back": "to like; to be fond of",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3,
+      0
+    ],
+    "strokeColors": [
+      "blue",
+      "gray"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896801"
+  },
+  {
+      "deck_id": 1,
+    "front": "下",
+    "reading": "xià",
+    "back": "down",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4
+    ],
+    "strokeColors": [
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896804"
+  },
+  {
+      "deck_id": 1,
+    "front": "下午",
+    "reading": "xià wǔ",
+    "back": "afternoon",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4,
+      3
+    ],
+    "strokeColors": [
+      "purple",
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896806"
+  },
+  {
+      "deck_id": 1,
+    "front": "下雨",
+    "reading": "xià yǔ",
+    "back": "to rain",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4,
+      3
+    ],
+    "strokeColors": [
+      "purple",
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896809"
+  },
+  {
+      "deck_id": 1,
+    "front": "先生",
+    "reading": "xiān sheng",
+    "back": "teacher",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1,
+      0
+    ],
+    "strokeColors": [
+      "red",
+      "gray"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896821"
+  },
+  {
+      "deck_id": 1,
+    "front": "现在",
+    "reading": "xiàn zài",
+    "back": "now",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4,
+      4
+    ],
+    "strokeColors": [
+      "purple",
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896833"
+  },
+  {
+      "deck_id": 1,
+    "front": "想",
+    "reading": "xiǎng",
+    "back": "to think (about)",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3
+    ],
+    "strokeColors": [
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896836"
+  },
+  {
+      "deck_id": 1,
+    "front": "小",
+    "reading": "xiǎo",
+    "back": "small",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3
+    ],
+    "strokeColors": [
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896839"
+  },
+  {
+      "deck_id": 1,
+    "front": "小姐",
+    "reading": "xiǎo jie",
+    "back": "young lady",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3,
+      0
+    ],
+    "strokeColors": [
+      "blue",
+      "gray"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896841"
+  },
+  {
+      "deck_id": 1,
+    "front": "些",
+    "reading": "xiē",
+    "back": "classifier indicating a small amount or small number greater than 1: some, a few, several",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1
+    ],
+    "strokeColors": [
+      "red"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896844"
+  },
+  {
+      "deck_id": 1,
+    "front": "写",
+    "reading": "xiě",
+    "back": "to write",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3
+    ],
+    "strokeColors": [
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896846"
+  },
+  {
+      "deck_id": 1,
+    "front": "谢谢",
+    "reading": "xiè xie",
+    "back": "to thank",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4,
+      0
+    ],
+    "strokeColors": [
+      "purple",
+      "gray"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896848"
+  },
+  {
+      "deck_id": 1,
+    "front": "星期",
+    "reading": "xīng qī",
+    "back": "week",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1,
+      1
+    ],
+    "strokeColors": [
+      "red",
+      "red"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896851"
+  },
+  {
+      "deck_id": 1,
+    "front": "学生",
+    "reading": "xué sheng",
+    "back": "student",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      2,
+      0
+    ],
+    "strokeColors": [
+      "green",
+      "gray"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896854"
+  },
+  {
+      "deck_id": 1,
+    "front": "学习",
+    "reading": "xué xí",
+    "back": "to learn",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      2,
+      2
+    ],
+    "strokeColors": [
+      "green",
+      "green"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896859"
+  },
+  {
+      "deck_id": 1,
+    "front": "学校",
+    "reading": "xué xiào",
+    "back": "school",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      2,
+      4
+    ],
+    "strokeColors": [
+      "green",
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896864"
+  },
+  {
+      "deck_id": 1,
+    "front": "一",
+    "reading": "yī",
+    "back": "one",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1
+    ],
+    "strokeColors": [
+      "red"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896866"
+  },
+  {
+      "deck_id": 1,
+    "front": "衣服",
+    "reading": "yī fu",
+    "back": "clothes",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1,
+      0
+    ],
+    "strokeColors": [
+      "red",
+      "gray"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896869"
+  },
+  {
+      "deck_id": 1,
+    "front": "医生",
+    "reading": "yī shēng",
+    "back": "doctor",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1,
+      1
+    ],
+    "strokeColors": [
+      "red",
+      "red"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896871"
+  },
+  {
+      "deck_id": 1,
+    "front": "医院",
+    "reading": "yī yuàn",
+    "back": "hospital",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1,
+      4
+    ],
+    "strokeColors": [
+      "red",
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896874"
+  },
+  {
+      "deck_id": 1,
+    "front": "椅子",
+    "reading": "yǐ zi",
+    "back": "chair",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3,
+      0
+    ],
+    "strokeColors": [
+      "blue",
+      "gray"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896876"
+  },
+  {
+      "deck_id": 1,
+    "front": "有",
+    "reading": "yǒu",
+    "back": "to have; there is",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3
+    ],
+    "strokeColors": [
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896879"
+  },
+  {
+      "deck_id": 1,
+    "front": "月",
+    "reading": "yuè",
+    "back": "moon",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4
+    ],
+    "strokeColors": [
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896881"
+  },
+  {
+      "deck_id": 1,
+    "front": "再见",
+    "reading": "zài jiàn",
+    "back": "goodbye",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4,
+      4
+    ],
+    "strokeColors": [
+      "purple",
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896884"
+  },
+  {
+      "deck_id": 1,
+    "front": "在",
+    "reading": "zài",
+    "back": "to exist; to be alive",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4
+    ],
+    "strokeColors": [
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896888"
+  },
+  {
+      "deck_id": 1,
+    "front": "怎么",
+    "reading": "zěn me",
+    "back": "how?",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3,
+      0
+    ],
+    "strokeColors": [
+      "blue",
+      "gray"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896893"
+  },
+  {
+      "deck_id": 1,
+    "front": "怎么样",
+    "reading": "zěn me yàng",
+    "back": "how?",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      3,
+      0,
+      4
+    ],
+    "strokeColors": [
+      "blue",
+      "gray",
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896895"
+  },
+  {
+      "deck_id": 1,
+    "front": "这",
+    "reading": "zhè",
+    "back": "(pronoun) this; these",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4
+    ],
+    "strokeColors": [
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.896898"
+  },
+  {
+      "deck_id": 1,
+    "front": "中国",
+    "reading": "Zhōng guó",
+    "back": "China",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1,
+      2
+    ],
+    "strokeColors": [
+      "red",
+      "green"
+    ],
+    "createdAt": "2025-10-28T16:31:08.898620"
+  },
+  {
+      "deck_id": 1,
+    "front": "中午",
+    "reading": "zhōng wǔ",
+    "back": "noon",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1,
+      3
+    ],
+    "strokeColors": [
+      "red",
+      "blue"
+    ],
+    "createdAt": "2025-10-28T16:31:08.898659"
+  },
+  {
+      "deck_id": 1,
+    "front": "住",
+    "reading": "zhù",
+    "back": "to live",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4
+    ],
+    "strokeColors": [
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.898663"
+  },
+  {
+      "deck_id": 1,
+    "front": "桌子",
+    "reading": "zhuō zi",
+    "back": "table",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      1,
+      0
+    ],
+    "strokeColors": [
+      "red",
+      "gray"
+    ],
+    "createdAt": "2025-10-28T16:31:08.898667"
+  },
+  {
+      "deck_id": 1,
+    "front": "字",
+    "reading": "zì",
+    "back": "letter",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4
+    ],
+    "strokeColors": [
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.898669"
+  },
+  {
+      "deck_id": 1,
+    "front": "昨天",
+    "reading": "zuó tiān",
+    "back": "yesterday",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      2,
+      1
+    ],
+    "strokeColors": [
+      "green",
+      "red"
+    ],
+    "createdAt": "2025-10-28T16:31:08.898672"
+  },
+  {
+      "deck_id": 1,
+    "front": "坐",
+    "reading": "Zuò",
+    "back": "surname Zuo",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4
+    ],
+    "strokeColors": [
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.898686"
+  },
+  {
+      "deck_id": 1,
+    "front": "做",
+    "reading": "zuò",
+    "back": "to make; to produce",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "tones": [
+      4
+    ],
+    "strokeColors": [
+      "purple"
+    ],
+    "createdAt": "2025-10-28T16:31:08.898697"
+  }
+]

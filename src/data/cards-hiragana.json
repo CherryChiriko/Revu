@@ -1,0 +1,167 @@
+[
+  {
+    "deck_id": 2,
+    "front": "あ",
+    "back": "a",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "createdAt": "2025-11-24T17:01:00.000000"
+  },
+  {
+    "deck_id": 2,
+    "front": "い",
+    "back": "i",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "createdAt": "2025-11-24T17:01:00.000000"
+  },
+  {
+    "deck_id": 2,
+    "front": "う",
+    "back": "u",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "createdAt": "2025-11-24T17:01:00.000000"
+  },
+  {
+    "deck_id": 2,
+    "front": "え",
+    "back": "e",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "createdAt": "2025-11-24T17:01:00.000000"
+  },
+  {
+    "deck_id": 2,
+    "front": "お",
+    "back": "o",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "createdAt": "2025-11-24T17:01:00.000000"
+  },
+  {
+    "deck_id": 2,
+    "front": "か",
+    "back": "ka",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "createdAt": "2025-11-24T17:01:00.000000"
+  },
+  {
+    "deck_id": 2,
+    "front": "き",
+    "back": "ki",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "createdAt": "2025-11-24T17:01:00.000000"
+  },
+  {
+    "deck_id": 2,
+    "front": "く",
+    "back": "ku",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "createdAt": "2025-11-24T17:01:00.000000"
+  },
+  {
+    "deck_id": 2,
+    "front": "け",
+    "back": "ke",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "createdAt": "2025-11-24T17:01:00.000000"
+  },
+  {
+    "deck_id": 2,
+    "front": "こ",
+    "back": "ko",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "createdAt": "2025-11-24T17:01:00.000000"
+  },
+  {
+    "deck_id": 2,
+    "front": "さ",
+    "back": "sa",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "createdAt": "2025-11-24T17:01:00.000000"
+  },
+  {
+    "deck_id": 2,
+    "front": "し",
+    "back": "shi",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "createdAt": "2025-11-24T17:01:00.000000"
+  },
+  {
+    "deck_id": 2,
+    "front": "す",
+    "back": "su",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "createdAt": "2025-11-24T17:01:00.000000"
+  },
+  {
+    "deck_id": 2,
+    "front": "せ",
+    "back": "se",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "createdAt": "2025-11-24T17:01:00.000000"
+  },
+  {
+    "deck_id": 2,
+    "front": "そ",
+    "back": "so",
+    "audioUrl": null,
+    "due": null,
+    "interval": 0,
+    "ease": 2.5,
+    "lapses": 0,
+    "createdAt": "2025-11-24T17:01:00.000000"
+  }
+]

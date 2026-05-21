@@ -1,10 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faHouse,
-  faGear,
-  faBook,
-  faBars,
-} from "@fortawesome/free-solid-svg-icons";
+import { faHouse, faGear, faBook } from "@fortawesome/free-solid-svg-icons";
 
 import { TbCardsFilled } from "react-icons/tb";
 

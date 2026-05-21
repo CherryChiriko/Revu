@@ -20,12 +20,10 @@ const Navbar = () => {
     <>
       {/* Desktop Navbar */}
       <nav
-        className={`hidden md:flex items-center justify-between p-4 border-b
-           ${activeTheme.background.navbar} backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full
-            ${activeTheme.border.bottom} shadow-md`}
-        style={{
-          boxShadow: `0 4px 6px ${activeTheme.shadow}`,
-        }}
+        className={`hidden md:flex items-center justify-between p-4 border-b 
+            ${activeTheme.background.navbar} backdrop-blur-sm 
+            sticky top-0 z-50 w-full
+            border-b ${activeTheme.border.muted} shadow-md`}
       >
         {/* Logo with gradient mask */}
         <Link to="/" className="flex items-center space-x-2">
@@ -56,7 +54,10 @@ const Navbar = () => {
 
       {/* Mobile Navbar */}
       <div
-        className={`md:hidden flex items-center justify-between p-4 border-b ${activeTheme.background.navbar} backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full ${activeTheme.border.bottom}`}
+        className={`md:hidden flex items-center justify-between p-4 border-b 
+            ${activeTheme.background.navbar} backdrop-blur-sm 
+            sticky top-0 z-50 w-full 
+            border-b ${activeTheme.border.muted}`}
       >
         <Link to="/" className="flex items-center space-x-2">
           <div className="w-8 h-8 relative">
@@ -77,8 +78,10 @@ const Navbar = () => {
         </Link>
 
         <button
-          className={`${activeTheme.text.primary} hover:text-white transition-colors duration-200`}
+          className={`${activeTheme.text.primary} transition-colors duration-200`}
           onClick={() => setIsMenuOpen(!isMenuOpen)}
+          aria-expanded={isMenuOpen}
+          aria-controls="mobile-menu"
         >
           <FontAwesomeIcon icon={faBars} className="h-6 w-6" />
         </button>
@@ -87,9 +90,13 @@ const Navbar = () => {
       {/* Mobile Dropdown */}
       {isMenuOpen && (
         <div
-          className={`md:hidden flex flex-col p-4 space-y-2 ${activeTheme.background.navbar} ${activeTheme.text.primary} border-b ${activeTheme.border.bottom}`}
+          id="mobile-menu"
+          className={`md:hidden flex flex-col p-4 space-y-2 
+            ${activeTheme.background.navbar} ${activeTheme.text.primary} 
+            border-b ${activeTheme.border.muted} shadow-md`}
         >
           {navigationItems.map((item) => (
+            // Assuming NavItem handles the mobile styles like full width links
             <NavItem key={item.id} item={item} isMobile />
           ))}
         </div>

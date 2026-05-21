@@ -1,0 +1,30 @@
+[
+      {
+      "id": "a1",
+      "title": "First Day",
+      "hint": "Study for 1 day",
+      "unlocked": true,
+      "icon": "/icons/icon-star-1.png"
+    },
+    {
+      "id": "a2",
+      "title": "Week Streak",
+      "hint": "7 day streak",
+      "unlocked": false,
+      "icon": "/icons/icon-star-2.png"
+    },
+    {
+      "id": "a3",
+      "title": "100 cards",
+      "hint": "Master 100 cards",
+      "unlocked": false,
+      "icon": "/icons/icon-achievement.png"
+    },
+    {
+      "id": "a4",
+      "title": "Consistent 30",
+      "hint": "30 day streak",
+      "unlocked": false,
+      "icon": "/icons/badge4.svg"
+    }
+]

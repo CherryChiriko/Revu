@@ -9,7 +9,6 @@ const themesMap = themesArray.reduce((acc, theme) => {
 
 const initialThemeId = localStorage.getItem("currentThemeName");
 const defaultThemeId = themesMap[initialThemeId] ? initialThemeId : "dark";
-console.log("Default Theme ID:", defaultThemeId);
 
 const themeSlice = createSlice({
   name: "theme",

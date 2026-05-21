@@ -1,0 +1,13 @@
+{
+  "users": [
+    { "id": "demo", "email": "demo@example.com" }
+  ],
+  "decks": [
+    { "id": "default", "title": "Japanese Basics", "description": "Introductory words", "userId": "demo" }
+  ],
+  "cards": [
+    { "id": "1", "front": "こんにちは", "back": "Hello", "ease": 2.5, "interval": 0, "lapses": 0, "due": "2025-10-22T00:00:00.000Z", "deck_id": "default", "userId": "demo" },
+    { "id": "2", "front": "犬", "back": "Dog", "ease": 2.5, "interval": 0, "lapses": 0, "due": "2025-10-22T00:00:00.000Z", "deck_id": "default", "userId": "demo" },
+    { "id": "3", "front": "水", "back": "Water", "ease": 2.5, "interval": 0, "lapses": 0, "due": "2025-10-22T00:00:00.000Z", "deck_id": "default", "userId": "demo" }
+  ]
+}

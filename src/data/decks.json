@@ -1,0 +1,87 @@
+[
+  {
+    "name": "HSK 1",
+    "description": "Beginner Chinese vocabulary (HSK 1)",
+    "language": "Chinese",
+    "study_mode": "C",
+    "tags": ["old-hsk", "beginner"],
+    "mastered": "0",
+    "due": 25,
+    "cardsCount": 150,
+    "lastStudied": "2025-10-28T16:31:08.896513",
+    "dailyLearned": 0,
+    "dailyReviewed": 0,
+    "streak": 1
+  },
+  {
+    "name": "Japanese Hiragana",
+    "description": "Learn hiragana characters",
+    "mastered": 20,
+    "due": 12,
+    "tags": ["hiragana", "beginner"],
+    "cardsCount": 46,
+    "language": "Japanese",
+    "lastStudied": "2025-10-28T16:31:08.896513",
+    "dailyLearned": 0,
+    "dailyReviewed": 0,
+    "streak": 0,
+    "study_mode": "A"
+  },
+  {
+    "name": "French Verbs",
+    "description": "Conjugate common French verbs",
+    "mastered": 15,
+    "due": 5,
+    "tags": ["french", "intermediate"],
+    "cardsCount": 28,
+    "language": "French",
+    "lastStudied": "2025-10-28T16:31:08.896513",
+    "dailyLearned": 0,
+    "dailyReviewed": 0,
+    "study_mode": "A",
+    "streak": 0
+  },
+  {
+     "name": "US History: Civil War",
+    "description": "Key figures and events of the Civil War",
+    "mastered": 30,
+    "due": 8,
+    "tags": ["history", "advanced"],
+    "cardsCount": 48,
+    "language": "English",
+    "lastStudied": "2025-10-28T16:31:08.896513",
+    "dailyLearned": 0,
+    "dailyReviewed": 0,
+    "streak": 0,
+    "study_mode": "A"
+  },
+  {
+    "name": "Hanzi characters practice",
+    "description": "Basic Chinese characters",
+    "mastered": 48,
+    "due": 0,
+    "tags": ["hanzi", "advanced"],
+    "cardsCount": 48,
+    "language": "Chinese",
+    "lastStudied": "2025-10-28T16:31:08.896513",
+    "dailyLearned": 0,
+    "dailyReviewed": 0,
+    "streak": 2,
+    "study_mode": "C"
+  },
+  {
+    "name": "French History: 1789",
+    "description": "Events of the revolution",
+    "mastered": 30,
+    "due": 0,
+    "tags": ["history", "advanced"],
+    "cardsCount": 48,
+    "language": "French",
+    "lastStudied": "2025-10-28T16:31:08.896513",
+    "dailyLearned": 0,
+    "dailyReviewed": 0,
+    "streak": 0,
+    "study_mode": "B"
+  }
+]
+
