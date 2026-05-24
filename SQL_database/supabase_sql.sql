@@ -6,17 +6,38 @@ alter table public.daily_deck_stats
   add column if not exists cards_reviewed integer not null default 0,
   add column if not exists cards_learned integer not null default 0,
   add column if not exists review_available_count integer not null default 0,
-  add column if not exists learn_available_count integer not null default 0;
+  add column if not exists learn_available_count integer not null default 0,
+  add column if not exists suspended_count integer not null default 0;
 
 alter table public.decks
   add column if not exists status text not null default 'learning',
-  add column if not exists mastered_at timestamp with time zone;
+  add column if not exists mastered_at timestamp with time zone,
+  add column if not exists due_count integer not null default 0,
+  add column if not exists waiting_count integer not null default 0,
+  add column if not exists new_count integer not null default 0,
+  add column if not exists mastered_count integer not null default 0,
+  add column if not exists suspended_count integer not null default 0,
+  add column if not exists active_cards_count integer not null default 0;
 
 alter table public.cards_a
-  alter column "createdAt" set default now();
+  add column if not exists created_at timestamp with time zone default now();
 
 alter table public.cards_c
   alter column created_at set default now();
+
+alter table public.card_a_progress
+  alter column ease_factor set default 2.5,
+  alter column review_interval set default 0,
+  alter column repetitions set default 0,
+  alter column status set default 'new',
+  alter column suspended set default false;
+
+alter table public.card_c_progress
+  alter column ease_factor set default 2.5,
+  alter column review_interval set default 0,
+  alter column repetitions set default 0,
+  alter column status set default 'new',
+  alter column suspended set default false;
 
 do $$
 begin
@@ -32,6 +53,40 @@ begin
   end if;
 end;
 $$;
+
+create index if not exists cards_a_deck_id_idx
+  on public.cards_a (deck_id);
+
+create index if not exists cards_c_deck_id_idx
+  on public.cards_c (deck_id);
+
+create index if not exists card_a_progress_user_card_idx
+  on public.card_a_progress (user_id, card_id);
+
+create index if not exists card_a_progress_user_deck_status_idx
+  on public.card_a_progress (user_id, deck_id, status)
+  where not coalesce(suspended, false);
+
+create index if not exists card_a_progress_user_deck_suspended_idx
+  on public.card_a_progress (user_id, deck_id)
+  where coalesce(suspended, false);
+
+create index if not exists card_c_progress_user_card_idx
+  on public.card_c_progress (user_id, card_id);
+
+create index if not exists card_c_progress_user_deck_status_idx
+  on public.card_c_progress (user_id, deck_id, status)
+  where not coalesce(suspended, false);
+
+create index if not exists card_c_progress_user_deck_suspended_idx
+  on public.card_c_progress (user_id, deck_id)
+  where coalesce(suspended, false);
+
+create index if not exists daily_deck_stats_user_date_idx
+  on public.daily_deck_stats (user_id, date);
+
+create index if not exists daily_deck_stats_deck_date_idx
+  on public.daily_deck_stats (deck_id, date);
 
 create or replace function public.card_mastered_interval_days()
 returns integer
@@ -232,23 +287,29 @@ begin
       count(*) filter (where status = 'waiting' and not suspended)::integer as waiting_count,
       count(*) filter (where status = 'due' and not suspended)::integer as due_count,
       count(*) filter (where status = 'mastered' and not suspended)::integer as mastered_count,
+      count(*) filter (where suspended)::integer as suspended_count,
       max(last_studied)::date as last_reviewed
     from unified_cards
   )
   update public.decks d
   set
     cards_count = counts.total_count,
-    new = counts.new_count,
-    learning = counts.waiting_count + counts.due_count,
-    mastered = counts.mastered_count,
+    new_count = counts.new_count,
+    waiting_count = counts.waiting_count,
+    due_count = counts.due_count,
+    mastered_count = counts.mastered_count,
+    suspended_count = counts.suspended_count,
+    active_cards_count = counts.total_count - counts.suspended_count,
     last_reviewed = counts.last_reviewed,
     status = case
-      when counts.total_count > 0 and counts.mastered_count = counts.total_count
+      when counts.total_count - counts.suspended_count > 0
+        and counts.mastered_count = counts.total_count - counts.suspended_count
         then 'mastered'
       else 'learning'
     end,
     mastered_at = case
-      when counts.total_count > 0 and counts.mastered_count = counts.total_count
+      when counts.total_count - counts.suspended_count > 0
+        and counts.mastered_count = counts.total_count - counts.suspended_count
         then coalesce(d.mastered_at, now())
       else null
     end
@@ -302,7 +363,8 @@ begin
     select
       count(*) filter (where status = 'new' and not suspended)::integer as new_count,
       count(*) filter (where status = 'waiting' and not suspended)::integer as waiting_count,
-      count(*) filter (where status = 'due' and not suspended)::integer as due_count
+      count(*) filter (where status = 'due' and not suspended)::integer as due_count,
+      count(*) filter (where suspended)::integer as suspended_count
     from unified_cards
   )
   update public.daily_deck_stats dds
@@ -310,6 +372,7 @@ begin
     new_count = counts.new_count,
     waiting_count = counts.waiting_count,
     due_count = counts.due_count,
+    suspended_count = counts.suspended_count,
     review_available_count = greatest(dds.review_available_count, counts.due_count),
     learn_available_count = greatest(dds.learn_available_count, counts.new_count),
     updated_at = now()
@@ -317,19 +380,6 @@ begin
   where dds.user_id = v_user_id
     and dds.deck_id = p_deck_id
     and dds.date = v_today;
-end;
-$$;
-
-create or replace function public.refresh_deck_counts(
-  p_deck_id uuid
-)
-returns void
-language plpgsql
-security definer
-set search_path = public
-as $$
-begin
-  perform public.refresh_deck_counts(p_deck_id, 'UTC');
 end;
 $$;
 
@@ -428,19 +478,6 @@ begin
 end;
 $$;
 
-create or replace function public.ensure_today_stats_for_user(
-  p_user_id uuid
-)
-returns void
-language plpgsql
-security definer
-set search_path = public
-as $$
-begin
-  perform public.ensure_today_stats_for_user(p_user_id, 'UTC');
-end;
-$$;
-
 create or replace function public.refresh_daily_stats_for_user(
   p_user_id uuid,
   p_user_timezone text
@@ -455,8 +492,9 @@ begin
 end;
 $$;
 
-create or replace function public.refresh_daily_stats_for_user(
-  p_user_id uuid
+create or replace function public.refresh_today_availability_for_user(
+  p_user_id uuid,
+  p_user_timezone text
 )
 returns void
 language plpgsql
@@ -464,7 +502,7 @@ security definer
 set search_path = public
 as $$
 begin
-  perform public.refresh_daily_stats_for_user(p_user_id, 'UTC');
+  perform public.refresh_daily_stats_for_user(p_user_id, p_user_timezone);
 end;
 $$;
 
@@ -597,39 +635,6 @@ begin
 end;
 $$;
 
-create or replace function public.update_streaks_after_session(
-  p_user_id uuid,
-  p_deck_ids uuid[],
-  p_cards_reviewed integer,
-  p_cards_learned integer,
-  p_review_limit integer,
-  p_learn_limit integer
-)
-returns void
-language plpgsql
-security definer
-set search_path = public
-as $$
-begin
-  if coalesce(cardinality(p_deck_ids), 0) <> 1 then
-    raise exception
-      'legacy update_streaks_after_session cannot split counts across multiple decks; call the jsonb overload instead';
-  end if;
-
-  perform public.update_streaks_after_session(
-    p_user_id,
-    jsonb_build_array(jsonb_build_object(
-      'deck_id', p_deck_ids[1],
-      'cards_reviewed', p_cards_reviewed,
-      'cards_learned', p_cards_learned
-    )),
-    p_review_limit,
-    p_learn_limit,
-    'UTC'
-  );
-end;
-$$;
-
 create or replace function public.resolve_inactive_streaks(
   p_review_limit integer,
   p_learn_limit integer,
@@ -705,31 +710,6 @@ begin
 end;
 $$;
 
-create or replace function public.resolve_inactive_streaks(
-  p_review_limit integer,
-  p_learn_limit integer
-)
-returns void
-language plpgsql
-security definer
-set search_path = public
-as $$
-begin
-  perform public.resolve_inactive_streaks(p_review_limit, p_learn_limit, 'UTC');
-end;
-$$;
-
-create or replace function public.resolve_inactive_streaks()
-returns void
-language plpgsql
-security definer
-set search_path = public
-as $$
-begin
-  raise exception 'resolve_inactive_streaks now requires review and learn limits';
-end;
-$$;
-
 create or replace function public._trg_card_progress_refresh()
 returns trigger
 language plpgsql
@@ -753,7 +733,7 @@ begin
   end if;
 
   if v_deck_id is not null then
-    perform public.refresh_deck_counts(v_deck_id);
+    perform public.refresh_deck_counts(v_deck_id, 'UTC');
   end if;
 
   return coalesce(new, old);
@@ -767,7 +747,7 @@ set search_path = public
 as $$
 begin
   if coalesce(new.deck_id, old.deck_id) is not null then
-    perform public.refresh_deck_counts(coalesce(new.deck_id, old.deck_id));
+    perform public.refresh_deck_counts(coalesce(new.deck_id, old.deck_id), 'UTC');
   end if;
 
   return coalesce(new, old);
@@ -813,14 +793,9 @@ for each row execute function public._trg_cards_refresh();
 grant execute on function public.card_mastered_interval_days() to authenticated;
 grant execute on function public.local_study_date(text) to authenticated;
 grant execute on function public.normalize_deck_card_states(uuid) to authenticated;
-grant execute on function public.refresh_deck_counts(uuid) to authenticated;
 grant execute on function public.refresh_deck_counts(uuid, text) to authenticated;
-grant execute on function public.ensure_today_stats_for_user(uuid) to authenticated;
 grant execute on function public.ensure_today_stats_for_user(uuid, text) to authenticated;
-grant execute on function public.refresh_daily_stats_for_user(uuid) to authenticated;
 grant execute on function public.refresh_daily_stats_for_user(uuid, text) to authenticated;
+grant execute on function public.refresh_today_availability_for_user(uuid, text) to authenticated;
 grant execute on function public.update_streaks_after_session(uuid, jsonb, integer, integer, text) to authenticated;
-grant execute on function public.update_streaks_after_session(uuid, uuid[], integer, integer, integer, integer) to authenticated;
-grant execute on function public.resolve_inactive_streaks() to authenticated;
-grant execute on function public.resolve_inactive_streaks(integer, integer) to authenticated;
 grant execute on function public.resolve_inactive_streaks(integer, integer, text) to authenticated;

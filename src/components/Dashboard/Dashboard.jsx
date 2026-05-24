@@ -20,7 +20,7 @@ import RevuLogo from "../../assets/revu2.png";
 
 import DeckCard from "../Decks/components/DeckCard";
 import { Heatmap } from "./Heatmap";
-import { Achievements } from "./Achievements";
+// import { Achievements } from "./Achievements";
 import { XPBar } from "./XPBar";
 import { StatCard } from "./StatCard";
 

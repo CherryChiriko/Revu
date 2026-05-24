@@ -8,10 +8,15 @@ import {
   selectCardsError,
   clearCards,
 } from "../../../slices/cardSlice";
+import {
+  fetchDeckCounts,
+  selectDeckNameById,
+  selectDecks,
+} from "../../../slices/deckSlice";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
-import selectDeckNameById from "../../../slices/deckSlice";
+import { supabase } from "../../../utils/supabaseClient";
 
 // --- CUSTOM TAILWIND COMPONENTS ---
 const Card = ({ children, activeTheme, className = "" }) => (
@@ -85,12 +90,17 @@ const IconX = () => (
 // --- CONFIG ---
 const STATUS_COLORS = {
   new: "bg-gray-100 text-gray-600 border border-gray-200",
-  learning: "bg-blue-100 text-blue-700 border border-blue-200",
-  review: "bg-yellow-100 text-yellow-800 border border-yellow-200",
+  waiting: "bg-blue-100 text-blue-700 border border-blue-200",
+  due: "bg-yellow-100 text-yellow-800 border border-yellow-200",
   mastered: "bg-green-100 text-green-700 border border-green-200",
+  suspended: "bg-zinc-200 text-zinc-700 border border-zinc-300",
 };
 
 const CHUNK_SIZE = 50;
+const PROGRESS_TABLES = {
+  A: "card_a_progress",
+  C: "card_c_progress",
+};
 
 export default function DeckDetails({ activeTheme }) {
   const { deckId } = useParams();
@@ -98,6 +108,9 @@ export default function DeckDetails({ activeTheme }) {
   const navigate = useNavigate();
 
   const deckName = useSelector(selectDeckNameById(deckId));
+  const deck = useSelector((state) =>
+    selectDecks(state).find((d) => d.deck_id === deckId),
+  );
 
   // Redux State
   const cards = useSelector(selectCards);
@@ -109,23 +122,31 @@ export default function DeckDetails({ activeTheme }) {
   const [visibleChunks, setVisibleChunks] = useState(1);
   const [expanded, setExpanded] = useState({ 0: true });
   const [selectedCard, setSelectedCard] = useState(null);
-
-  // Constants (Adjust these based on your Auth context later)
-  const USER_ID = "temp-user-id";
-  const STUDY_MODE = "A";
+  const [userId, setUserId] = useState(null);
+  const [isTogglingSuspension, setIsTogglingSuspension] = useState(false);
+  const studyMode = deck?.study_mode || "A";
 
   useEffect(() => {
-    if (deckId) {
+    const loadUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      setUserId(data?.user?.id ?? null);
+    };
+
+    loadUser();
+  }, []);
+
+  useEffect(() => {
+    if (deckId && userId) {
       dispatch(
         fetchCards({
           deck_id: deckId,
-          study_mode: STUDY_MODE,
-          user_id: USER_ID,
-        })
+          study_mode: studyMode,
+          user_id: userId,
+        }),
       );
     }
     return () => dispatch(clearCards());
-  }, [dispatch, deckId]);
+  }, [dispatch, deckId, studyMode, userId]);
 
   // Filtering Logic
   const filteredCards = useMemo(() => {
@@ -144,6 +165,51 @@ export default function DeckDetails({ activeTheme }) {
 
   const toggleGroup = (idx) => {
     setExpanded((prev) => ({ ...prev, [idx]: !prev[idx] }));
+  };
+
+  const toggleCardSuspension = async () => {
+    if (!selectedCard || !userId) return;
+
+    const progressTable = PROGRESS_TABLES[studyMode];
+    const suspended = !selectedCard.suspended;
+
+    setIsTogglingSuspension(true);
+    try {
+      const { error } = await supabase.from(progressTable).upsert(
+        {
+          user_id: userId,
+          deck_id: deckId,
+          card_id: selectedCard.card_id,
+          ease_factor: selectedCard.ease_factor ?? 2.5,
+          review_interval: selectedCard.review_interval ?? 0,
+          repetitions: selectedCard.repetitions ?? 0,
+          due_date: selectedCard.due_date ?? null,
+          last_studied: selectedCard.last_studied ?? null,
+          status: selectedCard.suspended ? "waiting" : selectedCard.status,
+          suspended,
+        },
+        { onConflict: "user_id,card_id" },
+      );
+
+      if (error) throw error;
+
+      await Promise.all([
+        dispatch(
+          fetchCards({
+            deck_id: deckId,
+            study_mode: studyMode,
+            user_id: userId,
+          }),
+        ),
+        dispatch(fetchDeckCounts({ user_id: userId })),
+      ]);
+
+      setSelectedCard(null);
+    } catch (err) {
+      console.error("Failed to update card suspension:", err);
+    } finally {
+      setIsTogglingSuspension(false);
+    }
   };
 
   if (status === "loading")
@@ -171,10 +237,10 @@ export default function DeckDetails({ activeTheme }) {
             </button>
             <div>
               <h1 className={`text-2xl font-bold ${activeTheme.text.primary}`}>
-                Deck Details
+                {deckName || "Deck Details"}
               </h1>
               <p className={`${activeTheme.text.secondary} text-sm`}>
-                Reviewing cards for {deckId}
+                Reviewing cards for {deckName || deckId}
               </p>
             </div>
           </div>
@@ -182,7 +248,7 @@ export default function DeckDetails({ activeTheme }) {
 
         {/* 2. Filter Bar */}
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-          {["new", "learning", "review", "mastered"].map((s) => (
+          {["new", "waiting", "due", "mastered", "suspended"].map((s) => (
             <Button
               key={s}
               activeTheme={activeTheme}
@@ -279,7 +345,7 @@ export default function DeckDetails({ activeTheme }) {
                 <div className="pt-8 border-t border-white/5 flex justify-between items-center">
                   <span
                     className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tighter ${
-                      STATUS_COLORS[selectedCard.status]
+                      STATUS_COLORS[selectedCard.status] || STATUS_COLORS.new
                     }`}
                   >
                     {selectedCard.status}
@@ -288,6 +354,18 @@ export default function DeckDetails({ activeTheme }) {
                     ID: {selectedCard.card_id}
                   </span>
                 </div>
+                <Button
+                  activeTheme={activeTheme}
+                  variant={selectedCard.suspended ? "default" : "outline"}
+                  onClick={toggleCardSuspension}
+                  className="w-full"
+                >
+                  {isTogglingSuspension
+                    ? "Updating..."
+                    : selectedCard.suspended
+                      ? "Reactivate card"
+                      : "Deactivate card"}
+                </Button>
               </div>
             </div>
           </>

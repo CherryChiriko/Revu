@@ -4,13 +4,14 @@
  * @returns {string} The computed status: 'due', 'waiting', 'new', or 'mastered'.
  */
 export const getCardStatus = (progress) => {
-  if (progress.suspended) return progress.status;
+  if (progress.suspended) return "suspended";
 
   const now = Date.now();
 
   switch (progress.status) {
     case "mastered":
     case "new":
+    case "due":
       return progress.status;
 
     case "waiting": {

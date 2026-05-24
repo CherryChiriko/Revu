@@ -4,42 +4,49 @@ import { selectHeatmapData } from "../../slices/activitySlice";
 
 // Weekday labels (Mon–Sun)
 const WEEKDAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-const TODAY_ISO = new Date().toISOString().slice(0, 10);
+// Safely builds an ISO date based strictly on local calendar time
+const localDate = new Date();
+const TODAY_ISO = `${localDate.getFullYear()}-${String(localDate.getMonth() + 1).padStart(2, "0")}-${String(localDate.getDate()).padStart(2, "0")}`;
 
 // Generate calendar grid aligned to weeks
 function generateCalendarGrid(dataMap, weeksToShow = 4) {
   const today = new Date();
-  const dayOfTheWeek = today.getDay();
-
-  const startDate = new Date(today);
-  const endDate = new Date(today);
-
-  endDate.setDate(
-    today.getDate() + (dayOfTheWeek === 0 ? 0 : 7 - dayOfTheWeek)
+  // Create a clean midnight comparative boundary matching your system's timezone
+  const baseTodayMidnight = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
   );
+
+  const dayOfWeek = today.getDay(); // 0 = Sun
+  // Days until end of week (Sunday)
+  const daysUntilSunday = dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
+
+  const endDate = new Date(today);
+  endDate.setDate(today.getDate() + daysUntilSunday);
+
+  // Start = weeksToShow*7 - 1 days before endDate
+  const startDate = new Date(endDate);
   startDate.setDate(endDate.getDate() - (weeksToShow * 7 - 1));
 
-  const gridStart = new Date(startDate);
-  gridStart.setDate(startDate.getDate());
-
   const cells = [];
-  const totalCells = weeksToShow * 7;
+  for (let i = 0; i < weeksToShow * 7; i++) {
+    const d = new Date(startDate);
+    d.setDate(startDate.getDate() + i);
 
-  for (let i = 0; i < totalCells; i++) {
-    const d = new Date(gridStart);
-    d.setDate(gridStart.getDate() + i);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    const iso = `${year}-${month}-${day}`;
 
-    const iso = d.toISOString().slice(0, 10);
-    const value = dataMap.get(iso) || 0;
-
-    // Mark future cells (after today)
-    const isFuture = d > today;
+    const cellMidnight = new Date(year, d.getMonth(), d.getDate());
+    const isFuture = cellMidnight.getTime() > baseTodayMidnight.getTime();
 
     cells.push({
       date: d,
       iso,
-      value,
-      isFuture,
+      value: dataMap.get(iso) || 0,
+      isFuture: isFuture,
     });
   }
 
@@ -105,8 +112,8 @@ export const Heatmap = ({ activeTheme }) => {
                   title={`${c.iso}: ${c.value}`}
                   className={`w-7 h-7 rounded-sm flex items-center justify-center text-xs font-medium
   ${isToday ? `border-2 ${activeTheme.border.card}` : ""} ${
-                    c.isFuture ? `border-2 ${activeTheme.border.muted}` : ""
-                  }`}
+    c.isFuture ? `border-2 ${activeTheme.border.muted}` : ""
+  }`}
                   style={{
                     background: getColor(c.value, c.isFuture),
                     color: c.isFuture

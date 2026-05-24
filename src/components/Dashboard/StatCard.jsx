@@ -4,6 +4,7 @@ import { selectGlobalStreakState } from "../../slices/streakSlice";
 
 export const StatCard = ({ icon, label, value, activeTheme }) => {
   const streakState = useSelector(selectGlobalStreakState);
+  console.log("streakState in StatCard:", streakState);
   const isStreakActive = streakState === "active";
 
   return (

@@ -68,6 +68,9 @@ export const fetchCards = createAsyncThunk(
       // Merge cards with their progress
       const mergedCards = cards.map((card) => {
         const progress = progressMap[card.id] || {
+          user_id,
+          deck_id,
+          card_id: card.id,
           ease_factor: 2.5,
           review_interval: 0,
           repetitions: 0,

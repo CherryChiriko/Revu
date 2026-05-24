@@ -13,11 +13,17 @@ import { supabase } from "../utils/supabaseClient";
 /* -------------------------------------------
    Helper Functions
 -------------------------------------------- */
+/* -------------------------------------------
+   Helper Functions
+-------------------------------------------- */
 const dateKey = () => {
-  const d = startOfToday();
-  return d.toISOString().slice(0, 10);
-};
+  const localDate = new Date();
+  const year = localDate.getFullYear();
+  const month = String(localDate.getMonth() + 1).padStart(2, "0");
+  const day = String(localDate.getDate()).padStart(2, "0");
 
+  return `${year}-${month}-${day}`;
+};
 /* -------------------------------------------
    Initial State
 -------------------------------------------- */
@@ -41,16 +47,21 @@ export const fetchDailyActivity = createAsyncThunk(
         throw new Error("Not authenticated");
       }
       const userId = userData.user.id;
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - 60);
+      const cutoffStr = cutoffDate.toISOString().slice(0, 10);
+
       const { data, error } = await supabase
         .from("daily_user_stats")
         .select("date, cards_reviewed, cards_learned")
-        .eq("user_id", userId);
+        .eq("user_id", userId)
+        .gte("date", cutoffStr);
       if (error) return rejectWithValue(error.message);
       return data;
     } catch (err) {
       return rejectWithValue(err.message);
     }
-  }
+  },
 );
 
 /* -------------------------------------------
@@ -141,12 +152,12 @@ const selectActivityError = (state) => state.activity.error;
 // Status selectors
 export const selectIsActivityLoading = createSelector(
   [selectActivityStatus],
-  (status) => status === "loading"
+  (status) => status === "loading",
 );
 
 export const selectActivityLoadError = createSelector(
   [selectActivityError],
-  (error) => error
+  (error) => error,
 );
 
 // Today's activity
@@ -162,7 +173,7 @@ export const selectTodayActivity = createSelector(
         cardsStudied: 0,
       }
     );
-  }
+  },
 );
 
 // Activity for a specific date
@@ -194,9 +205,9 @@ export const selectTotalActivity = createSelector(
         cardsLearned: 0,
         cardsStudied: 0,
         totalDays: 0,
-      }
+      },
     );
-  }
+  },
 );
 
 // Heatmap data (original implementation)
@@ -208,8 +219,8 @@ export const selectHeatmapData = createSelector(
         const objective = Math.round(
           Math.max(
             d.cardsReviewed / REVIEW_LIMIT,
-            d.cardsLearned / LEARN_LIMIT
-          ) * 100
+            d.cardsLearned / LEARN_LIMIT,
+          ) * 100,
         );
         const percent = Math.min(100, objective);
         return {
@@ -218,7 +229,7 @@ export const selectHeatmapData = createSelector(
         };
       })
       .sort((a, b) => a.date.localeCompare(b.date));
-  }
+  },
 );
 
 // Flexible heatmap data by metric (memoized version)
@@ -237,7 +248,7 @@ export const selectSortedActivityDays = createSelector(
   [selectActivityDays],
   (days) => {
     return Object.values(days).sort((a, b) => a.date.localeCompare(b.date));
-  }
+  },
 );
 
 // Recent activity (last N days)
@@ -249,7 +260,7 @@ export const selectRecentActivity = (numDays = 7) =>
 // Check if user studied today
 export const selectHasStudiedToday = createSelector(
   [selectTodayActivity],
-  (today) => today.cardsStudied > 0
+  (today) => today.cardsStudied > 0,
 );
 
 // Average cards per day
@@ -258,7 +269,7 @@ export const selectAverageCardsPerDay = createSelector(
   (total) => {
     if (total.totalDays === 0) return 0;
     return Math.round(total.cardsStudied / total.totalDays);
-  }
+  },
 );
 
 // Days with activity (count)
@@ -266,7 +277,7 @@ export const selectActiveDaysCount = createSelector(
   [selectActivityDays],
   (days) => {
     return Object.values(days).filter((d) => d.cardsStudied > 0).length;
-  }
+  },
 );
 
 /* -------------------------------------------

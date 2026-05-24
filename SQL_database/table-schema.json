@@ -15,25 +15,25 @@
     "table_name": "card_a_progress",
     "column_name": "deck_id",
     "data_type": "uuid",
-    "is_nullable": "YES"
+    "is_nullable": "NO"
   },
   {
     "table_name": "card_a_progress",
     "column_name": "ease_factor",
     "data_type": "double precision",
-    "is_nullable": "YES"
+    "is_nullable": "NO"
   },
   {
     "table_name": "card_a_progress",
     "column_name": "review_interval",
     "data_type": "integer",
-    "is_nullable": "YES"
+    "is_nullable": "NO"
   },
   {
     "table_name": "card_a_progress",
     "column_name": "repetitions",
     "data_type": "integer",
-    "is_nullable": "YES"
+    "is_nullable": "NO"
   },
   {
     "table_name": "card_a_progress",
@@ -51,13 +51,13 @@
     "table_name": "card_a_progress",
     "column_name": "status",
     "data_type": "text",
-    "is_nullable": "YES"
+    "is_nullable": "NO"
   },
   {
     "table_name": "card_a_progress",
     "column_name": "suspended",
     "data_type": "boolean",
-    "is_nullable": "YES"
+    "is_nullable": "NO"
   },
   {
     "table_name": "card_c_progress",
@@ -75,25 +75,25 @@
     "table_name": "card_c_progress",
     "column_name": "deck_id",
     "data_type": "uuid",
-    "is_nullable": "YES"
+    "is_nullable": "NO"
   },
   {
     "table_name": "card_c_progress",
     "column_name": "ease_factor",
     "data_type": "double precision",
-    "is_nullable": "YES"
+    "is_nullable": "NO"
   },
   {
     "table_name": "card_c_progress",
     "column_name": "review_interval",
     "data_type": "integer",
-    "is_nullable": "YES"
+    "is_nullable": "NO"
   },
   {
     "table_name": "card_c_progress",
     "column_name": "repetitions",
     "data_type": "integer",
-    "is_nullable": "YES"
+    "is_nullable": "NO"
   },
   {
     "table_name": "card_c_progress",
@@ -111,13 +111,13 @@
     "table_name": "card_c_progress",
     "column_name": "status",
     "data_type": "text",
-    "is_nullable": "YES"
+    "is_nullable": "NO"
   },
   {
     "table_name": "card_c_progress",
     "column_name": "suspended",
     "data_type": "boolean",
-    "is_nullable": "YES"
+    "is_nullable": "NO"
   },
   {
     "table_name": "cards_a",
@@ -145,7 +145,7 @@
   },
   {
     "table_name": "cards_a",
-    "column_name": "createdAt",
+    "column_name": "created_at",
     "data_type": "timestamp with time zone",
     "is_nullable": "YES"
   },
@@ -300,6 +300,12 @@
     "is_nullable": "NO"
   },
   {
+    "table_name": "daily_deck_stats",
+    "column_name": "suspended_count",
+    "data_type": "integer",
+    "is_nullable": "NO"
+  },
+  {
     "table_name": "daily_user_stats",
     "column_name": "id",
     "data_type": "uuid",
@@ -415,12 +421,6 @@
   },
   {
     "table_name": "decks",
-    "column_name": "mastered",
-    "data_type": "integer",
-    "is_nullable": "NO"
-  },
-  {
-    "table_name": "decks",
     "column_name": "last_reviewed",
     "data_type": "date",
     "is_nullable": "YES"
@@ -429,18 +429,6 @@
     "table_name": "decks",
     "column_name": "created_at",
     "data_type": "timestamp with time zone",
-    "is_nullable": "YES"
-  },
-  {
-    "table_name": "decks",
-    "column_name": "learning",
-    "data_type": "smallint",
-    "is_nullable": "YES"
-  },
-  {
-    "table_name": "decks",
-    "column_name": "new",
-    "data_type": "integer",
     "is_nullable": "YES"
   },
   {
@@ -454,6 +442,42 @@
     "column_name": "mastered_at",
     "data_type": "timestamp with time zone",
     "is_nullable": "YES"
+  },
+  {
+    "table_name": "decks",
+    "column_name": "due_count",
+    "data_type": "integer",
+    "is_nullable": "NO"
+  },
+  {
+    "table_name": "decks",
+    "column_name": "waiting_count",
+    "data_type": "integer",
+    "is_nullable": "NO"
+  },
+  {
+    "table_name": "decks",
+    "column_name": "new_count",
+    "data_type": "integer",
+    "is_nullable": "NO"
+  },
+  {
+    "table_name": "decks",
+    "column_name": "mastered_count",
+    "data_type": "integer",
+    "is_nullable": "NO"
+  },
+  {
+    "table_name": "decks",
+    "column_name": "suspended_count",
+    "data_type": "integer",
+    "is_nullable": "NO"
+  },
+  {
+    "table_name": "decks",
+    "column_name": "active_cards_count",
+    "data_type": "integer",
+    "is_nullable": "NO"
   },
   {
     "table_name": "profiles",

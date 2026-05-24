@@ -12,6 +12,7 @@ export default function useAppBoot(session) {
 
     supabase.rpc("refresh_today_availability_for_user", {
       p_user_id: session.user.id,
+      p_user_timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
   }, [session]);
 }

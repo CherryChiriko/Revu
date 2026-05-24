@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { selectCards, fetchCards } from "../../../slices/cardSlice";
+import { fetchDeckCounts } from "../../../slices/deckSlice";
 import {
   logStudySession,
   fetchDailyActivity,
@@ -161,11 +162,16 @@ export default function useStudySession({ deck, navMode }) {
         // 2. Update streaks in Supabase
         await supabase.rpc("update_streaks_after_session", {
           p_user_id: currentCard.user_id,
-          p_deck_ids: [deck.id],
-          p_cards_reviewed: cardsReviewed,
-          p_cards_learned: cardsLearned,
+          p_deck_results: [
+            {
+              deck_id: deck.id,
+              cards_reviewed: cardsReviewed,
+              cards_learned: cardsLearned,
+            },
+          ],
           p_review_limit: REVIEW_LIMIT,
           p_learn_limit: LEARN_LIMIT,
+          p_user_timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         });
 
         dispatch(fetchDailyActivity());
@@ -180,6 +186,7 @@ export default function useStudySession({ deck, navMode }) {
             })
           ),
           dispatch(fetchDailyStreakStats()),
+          dispatch(fetchDeckCounts({ user_id: currentCard.user_id })),
         ]);
 
         // 4. Log activity locally

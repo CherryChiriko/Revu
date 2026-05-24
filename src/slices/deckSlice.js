@@ -10,15 +10,36 @@ const orderDecksByPriority = (decks) => {
   if (!decks || decks.length === 0) return [];
 
   const dueDecks = decks.filter((d) => d.due > 0).sort((a, b) => b.due - a.due);
-  const newDecks = decks.filter(
-    (d) => !dueDecks.includes(d) && d.cards_count - d.mastered - d.due > 0,
-  );
+  const newDecks = decks.filter((d) => !dueDecks.includes(d) && d.new > 0);
   const masteredDecks = decks.filter(
     (d) => !dueDecks.includes(d) && !newDecks.includes(d),
   );
 
   return [...dueDecks, ...newDecks, ...masteredDecks];
 };
+
+const normalizeDeck = (deck) => {
+  const id = deck.deck_id ?? deck.id;
+  return {
+    ...deck,
+    deck_id: id,
+    id: id, // Ensure both variants are identical to prevent lookup failure
+    due: deck.due_count ?? 0,
+    waiting: deck.waiting_count ?? 0,
+    new: deck.new_count ?? 0,
+    mastered: deck.mastered_count ?? 0,
+    suspended: deck.suspended_count ?? 0,
+  };
+};
+
+const countsFromDeck = (deck) => ({
+  deckId: deck.deck_id ?? deck.id,
+  new: deck.new_count ?? 0,
+  mastered: deck.mastered_count ?? 0,
+  suspended: deck.suspended_count ?? 0,
+  waiting: deck.waiting_count ?? 0,
+  due: deck.due_count ?? 0,
+});
 
 /** Fetch decks */
 export const fetchDecks = createAsyncThunk(
@@ -40,84 +61,32 @@ export const fetchDecks = createAsyncThunk(
 
       if (error) throw error;
 
-      return (data || []).map((deck) => ({
-        ...deck,
-        deck_id: deck.id,
-      }));
+      return (data || []).map(normalizeDeck);
     } catch (err) {
       return rejectWithValue(err.message);
     }
   },
 );
 
-const getStatus = (progress) => {
-  let actualStatus;
-
-  const now = Date.now();
-
-  if (progress.suspended) {
-    actualStatus = "suspended";
-  } else {
-    switch (progress.status) {
-      case "mastered":
-      case "new":
-        actualStatus = progress.status;
-        break;
-      case "waiting": {
-        const dueDate = progress.due_date
-          ? Date.parse(progress.due_date)
-          : null;
-        actualStatus = dueDate !== null && dueDate <= now ? "due" : "waiting";
-        break;
-      }
-      default:
-        actualStatus = "new";
-    }
-  }
-  return actualStatus;
-};
-
-/** Deck counters */
 /** Deck counters */
 export const fetchDeckCounts = createAsyncThunk(
   "cards/fetchDeckCounts",
   async ({ user_id }, { rejectWithValue }) => {
     try {
-      // Fetch both progress tables
-      const { data: progressA, error: errorA } = await supabase
-        .from("card_a_progress")
-        .select("deck_id, status, suspended, due_date")
+      const { data, error } = await supabase
+        .from("decks")
+        .select(
+          "id, new_count, due_count, waiting_count, mastered_count, suspended_count",
+        )
         .eq("user_id", user_id);
 
-      if (errorA) throw errorA;
-
-      const { data: progressC, error: errorC } = await supabase
-        .from("card_c_progress")
-        .select("deck_id, status, suspended, due_date")
-        .eq("user_id", user_id);
-
-      if (errorC) throw errorC;
-
-      const allProgress = [...(progressA || []), ...(progressC || [])];
+      if (error) throw error;
 
       const deckCounts = {};
-
-      for (const record of allProgress) {
-        const deckId = record.deck_id;
-
-        if (!deckCounts[deckId]) {
-          deckCounts[deckId] = {
-            deckId,
-            new: 0,
-            mastered: 0,
-            suspended: 0,
-            waiting: 0,
-            due: 0,
-          };
-        }
-
-        const status = getStatus(record);
-        deckCounts[deckId][status]++;
+      for (const deck of data || []) {
+        // Enforce alignment with the main id property key string type
+        const idKey = deck.id;
+        deckCounts[idKey] = countsFromDeck(deck);
       }
 
       return deckCounts;
@@ -133,18 +102,34 @@ const initialState = {
   activeDeckId: localStorage.getItem("activeDeckId") || null,
   status: "idle",
   error: null,
+  countsLoading: false,
+  countsError: null,
 };
 
 export function updateDeckStatsFromRealtime(state, action) {
   const row = action.payload;
+  const targetId = row.deck_id ?? row.id;
 
-  const deck = state.entities[row.deck_id];
-  if (!deck) return;
+  const index = state.decks.findIndex((d) => d.deck_id === targetId);
+  if (index !== -1) {
+    state.decks[index] = normalizeDeck({
+      ...state.decks[index],
+      due_count: row.due_count,
+      waiting_count: row.waiting_count,
+      new_count: row.new_count,
+      mastered_count: row.mastered_count ?? state.decks[index].mastered_count,
+      suspended_count: row.suspended_count,
+    });
+  }
 
-  deck.due_count = row.due_count;
-  deck.new_count = row.new_count;
-  deck.streak = row.deck_streak;
-  deck.streak_state = row.streak_state;
+  state.deckCounts[targetId] = {
+    ...(state.deckCounts[targetId] || { deckId: targetId }),
+    due: row.due_count ?? 0,
+    waiting: row.waiting_count ?? 0,
+    new: row.new_count ?? 0,
+    mastered: row.mastered_count ?? state.deckCounts[targetId]?.mastered ?? 0,
+    suspended: row.suspended_count ?? 0,
+  };
 }
 
 const deckSlice = createSlice({
@@ -158,14 +143,16 @@ const deckSlice = createSlice({
     },
     updateDeckFromRealtime(state, action) {
       const deck = action.payload;
-      const index = state.decks.findIndex((d) => d.deck_id === deck.id);
+      const targetId = deck.id ?? deck.deck_id;
+      const index = state.decks.findIndex((d) => d.deck_id === targetId);
 
       if (index !== -1) {
-        state.decks[index] = {
+        state.decks[index] = normalizeDeck({
           ...state.decks[index],
           ...deck,
-          deck_id: deck.id,
-        };
+          deck_id: targetId,
+        });
+        state.deckCounts[targetId] = countsFromDeck(state.decks[index]);
       }
     },
   },
@@ -176,32 +163,25 @@ const deckSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchDecks.fulfilled, (state, action) => {
-        const decks = action.payload;
-
-        const normalized = decks.map((d) => ({
-          ...d,
-          deck_id: d.id,
-        }));
-
+        const normalized = (action.payload || []).map(normalizeDeck);
         const sorted = orderDecksByPriority(normalized);
-        state.decks = sorted;
 
-        // Restore persisted active deck
+        state.decks = sorted;
+        state.deckCounts = Object.fromEntries(
+          sorted.map((deck) => [deck.deck_id, countsFromDeck(deck)]),
+        );
+
         const persistedId =
           state.activeDeckId || localStorage.getItem("activeDeckId");
-
         if (persistedId) {
           const match = sorted.find((d) => d.deck_id === persistedId);
-
           if (match) {
             state.activeDeckId = persistedId;
           } else {
-            // Persisted deck no longer exists -> fallback
             state.activeDeckId = sorted[0]?.deck_id || null;
             localStorage.setItem("activeDeckId", state.activeDeckId);
           }
         } else {
-          // No persisted active deck -> use default first deck
           state.activeDeckId = sorted[0]?.deck_id || null;
           if (state.activeDeckId) {
             localStorage.setItem("activeDeckId", state.activeDeckId);
@@ -250,9 +230,21 @@ export const selectDeckNameById = (deckId) =>
 export const selectDeckCounts = (state) => state.decks.deckCounts;
 export const selectDeckCountsById = (deckId) =>
   createSelector(
-    (state) => state.decks.deckCounts,
-    (deckCounts) => deckCounts[deckId] || null,
+    (state) => state.decks.decks,
+    (decks) => {
+      const deck = decks.find((d) => d.deck_id === deckId);
+      if (!deck) return null;
+      return {
+        deckId: deckId,
+        new: deck.new ?? 0,
+        due: deck.due ?? 0,
+        waiting: deck.waiting ?? 0,
+        mastered: deck.mastered ?? 0,
+        suspended: deck.suspended ?? 0,
+      };
+    },
   );
+
 export const selectTotalDueCards = (state) => {
   const deckCounts = state.decks.deckCounts;
   return Object.values(deckCounts).reduce(

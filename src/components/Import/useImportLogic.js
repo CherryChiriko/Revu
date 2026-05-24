@@ -347,7 +347,7 @@ export const useImportLogic = () => {
           front: row[mappedColumns.front],
           back: row[mappedColumns.back],
           audioUrl: row[mappedColumns.audioUrl] || null,
-          createdAt: new Date(),
+          created_at: new Date(),
         };
       case 2:
         console.log(
@@ -498,9 +498,12 @@ export const useImportLogic = () => {
               ? deckSettings.tags.split(",").map((t) => t.trim())
               : [],
             cards_count: allCards.length,
-            mastered: 0,
-            learning: 0,
-            new: allCards.length,
+            mastered_count: 0,
+            waiting_count: 0,
+            due_count: 0,
+            new_count: allCards.length,
+            suspended_count: 0,
+            active_cards_count: allCards.length,
             last_reviewed: null,
             created_at: new Date(),
           },

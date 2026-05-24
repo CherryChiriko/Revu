@@ -18,6 +18,7 @@ export default function DecksLoader({ session, authLoading }) {
         // 1. Refresh daily stats ONCE
         await supabase.rpc("refresh_daily_stats_for_user", {
           p_user_id: session.user.id,
+          p_user_timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         });
       } catch (err) {
         console.error("Failed to refresh daily stats", err);

@@ -1,11 +1,13 @@
 import { useCallback, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { setActiveDeck, selectDeckCountsById } from "../../../slices/deckSlice";
+import {
+  fetchDecks,
+  setActiveDeck,
+  selectDeckCountsById,
+} from "../../../slices/deckSlice";
 import { selectDeckStreakById } from "../../../slices/streakSlice";
 import { supabase } from "../../../utils/supabaseClient";
-import fetchDecks from "../../../slices/deckSlice";
-
 import { confirmDialog } from "primereact/confirmdialog";
 
 export default function useDeckLogic(id, cards_count, { toast }) {
@@ -17,15 +19,20 @@ export default function useDeckLogic(id, cards_count, { toast }) {
     due: 0,
     mastered: 0,
     waiting: 0,
+    suspended: 0,
   };
 
+  console.log(counts);
   const { streak, maxStreak, isStreakActive } = useSelector(
     selectDeckStreakById(id),
   );
+  console.log("streak info ", streak, isStreakActive);
 
   const showLearn = counts.new > 0;
   const showReview = counts.due > 0;
-  const isMastered = cards_count === counts.mastered;
+  const activeCardsCount = Math.max(cards_count - (counts.suspended || 0), 0);
+  const isMastered =
+    activeCardsCount > 0 && activeCardsCount === counts.mastered;
 
   const handleCardClick = useCallback(() => {
     if (!isMastered) navigate(`/decks/${id}`);

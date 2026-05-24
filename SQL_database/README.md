@@ -6,6 +6,7 @@ It replaces the old numbered scratch snippets and defines:
 
 - explicit card states: `new`, `waiting`, `due`, and `mastered`
 - deck counts derived from both `cards_a` and `cards_c`
+- cached deck display counts: `due_count`, `waiting_count`, `new_count`, `mastered_count`, and `suspended_count`
 - per-deck daily reviewed/learned counters
 - timezone-local daily streak rows
 - limit-based active, inactive, and frozen streak states
@@ -25,4 +26,6 @@ select public.update_streaks_after_session(
 );
 ```
 
-The legacy overload is kept only for single-deck sessions because total counts cannot be split safely across multiple decks.
+Keep `supabase_sql.sql` as the canonical migration/source-of-truth file.
+
+`temp_schema_breaking_changes.sql` is a one-time cleanup for the current unreleased schema. Run `supabase_sql.sql` first so the new functions exist, then run the temp schema cleanup once, then delete the temp query/file after it succeeds.
