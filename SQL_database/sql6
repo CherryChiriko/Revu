@@ -1,0 +1,79 @@
+drop function if exists public.resolve_inactive_streaks();
+drop function public.resolve_inactive_streaks(integer, integer);
+
+-- ============================================================
+-- RESOLVE INACTIVE / FROZEN STREAKS (LIMIT-BASED)
+-- ============================================================
+create or replace function public.resolve_inactive_streaks(
+  p_review_limit int,
+  p_learn_limit  int
+)
+returns void
+language plpgsql
+security definer
+as $$
+declare
+  today date := (now() at time zone 'utc')::date;
+  yesterday date := today - 1;
+begin
+  -- Decks MISSED (cards were available)
+  update public.daily_deck_stats
+  set
+    deck_streak  = 0,
+    streak_state = 'inactive',
+    updated_at   = now()
+  where date = yesterday
+    and streak_state = 'inactive'
+    and (
+      due_count >= p_review_limit
+      or new_count >= p_learn_limit
+    );
+
+  -- Decks FROZEN (not enough cards)
+  update public.daily_deck_stats
+  set
+    streak_state = 'frozen',
+    updated_at   = now()
+  where date = yesterday
+    and streak_state = 'inactive'
+    and due_count < p_review_limit
+    and new_count < p_learn_limit;
+
+  -- Global MISSED
+  update public.daily_user_stats u
+  set
+    global_streak = 0,
+    streak_state  = 'inactive',
+    updated_at    = now()
+  where u.date = yesterday
+    and u.streak_state = 'inactive'
+    and exists (
+      select 1
+      from public.daily_deck_stats d
+      where d.user_id = u.user_id
+        and d.date = yesterday
+        and (
+          d.due_count >= p_review_limit
+          or d.new_count >= p_learn_limit
+        )
+    );
+
+  -- Global FROZEN
+  update public.daily_user_stats u
+  set
+    streak_state = 'frozen',
+    updated_at   = now()
+  where u.date = yesterday
+    and u.streak_state = 'inactive'
+    and not exists (
+      select 1
+      from public.daily_deck_stats d
+      where d.user_id = u.user_id
+        and d.date = yesterday
+        and (
+          d.due_count >= p_review_limit
+          or d.new_count >= p_learn_limit
+        )
+    );
+end;
+$$;

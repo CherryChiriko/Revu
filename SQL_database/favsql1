@@ -1,0 +1,87 @@
+-- ============================================================
+-- REFRESH ENGINE (CANONICAL)
+-- ============================================================
+create or replace function public.refresh_deck_counts(p_deck_id uuid)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user_id uuid;
+  today date := (now() at time zone 'utc')::date;
+begin
+  -- Resolve user
+  select user_id into v_user_id
+  from public.decks
+  where id = p_deck_id;
+
+  if not found then
+    return;
+  end if;
+
+  -- 1. Update global deck totals
+  update public.decks d
+  set cards_count = (
+    select count(*) from (
+      select id from public.cards_a where deck_id = p_deck_id
+      union all
+      select id from public.cards_c where deck_id = p_deck_id
+    ) t
+  )
+  where d.id = p_deck_id;
+
+  -- 2. Ensure daily row exists
+  insert into public.daily_deck_stats (
+    user_id, deck_id, date, updated_at
+  )
+  values (
+    v_user_id, p_deck_id, today, now()
+  )
+  on conflict (user_id, deck_id, date) do nothing;
+
+  -- 3. Compute counts
+  update public.daily_deck_stats dds
+  set
+    new_count     = counts.new_c,
+    due_count     = counts.due_c,
+    waiting_count = counts.waiting_c,
+    updated_at    = now()
+  from (
+    with unified_progress as (
+      select cp.status, cp.due_date, cp.suspended
+      from public.card_a_progress cp
+      join public.cards_a c on c.id = cp.card_id
+      where c.deck_id = p_deck_id
+
+      union all
+
+      select cp.status, cp.due_date, cp.suspended
+      from public.card_c_progress cp
+      join public.cards_c c on c.id = cp.card_id
+      where c.deck_id = p_deck_id
+    )
+    select
+      count(*) filter (
+        where status = 'new' and not suspended
+      ) as new_c,
+
+      count(*) filter (
+        where status = 'waiting'
+          and due_date <= (now() at time zone 'utc')
+          and not suspended
+      ) as due_c,
+
+      count(*) filter (
+        where status = 'waiting'
+          and (due_date > (now() at time zone 'utc') or due_date is null)
+          and not suspended
+      ) as waiting_c
+    from unified_progress
+  ) counts
+  where dds.deck_id = p_deck_id
+    and dds.date = today;
+end;
+$$;
+
+grant execute on function public.refresh_deck_counts(uuid) to authenticated;

@@ -1,0 +1,2 @@
+ALTER TABLE public.cards_a 
+ALTER COLUMN "createdAt" SET DEFAULT now();

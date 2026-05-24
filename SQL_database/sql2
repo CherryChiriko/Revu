@@ -1,0 +1,107 @@
+-- ============================================================
+-- 1. REFRESH ENGINE (Now handles initialization)
+-- ============================================================
+
+
+-- ============================================================
+-- 2. TRIGGER FUNCTIONS (Connect tables to the engine)
+-- ============================================================
+
+-- Function for Card Progress Tables
+create or replace function public._trg_card_progress_refresh()
+returns trigger language plpgsql as $$
+declare v_deck_id uuid;
+begin
+  -- Find the deck_id from the parent card table
+  if (tg_table_name = 'card_a_progress') then
+    select deck_id into v_deck_id from public.cards_a where id = coalesce(new.card_id, old.card_id);
+  else
+    select deck_id into v_deck_id from public.cards_c where id = coalesce(new.card_id, old.card_id);
+  end if;
+
+  if v_deck_id is not null then
+    perform public.refresh_deck_counts(v_deck_id);
+  end if;
+  return coalesce(new, old);
+end; $$;
+
+-- Function for Card Definition Tables
+create or replace function public._trg_cards_refresh()
+returns trigger language plpgsql as $$
+begin
+  perform public.refresh_deck_counts(coalesce(new.deck_id, old.deck_id));
+  return coalesce(new, old);
+end; $$;
+
+-- RE-APPLY TRIGGERS
+drop trigger if exists trg_refresh_a on public.card_a_progress;
+create trigger trg_refresh_a after insert or update or delete on public.card_a_progress for each row execute function public._trg_card_progress_refresh();
+
+drop trigger if exists trg_refresh_c on public.card_c_progress;
+create trigger trg_refresh_c after insert or update or delete on public.card_c_progress for each row execute function public._trg_card_progress_refresh();
+
+drop trigger if exists trg_card_def_a on public.cards_a;
+create trigger trg_card_def_a after insert or update or delete on public.cards_a for each row execute function public._trg_cards_refresh();
+
+drop trigger if exists trg_card_def_c on public.cards_c;
+create trigger trg_card_def_c after insert or update or delete on public.cards_c for each row execute function public._trg_cards_refresh();
+
+-- ============================================================
+-- 3. SESSION UPDATE (With Streak Fix)
+-- ============================================================
+create or replace function public.update_streaks_after_session(
+  p_user_id uuid,
+  p_deck_ids uuid[],
+  p_cards_reviewed integer,
+  p_cards_learned integer,
+  p_review_limit integer,
+  p_learn_limit integer
+)
+returns void language plpgsql security definer as $$
+declare
+  today date := (now() at time zone 'utc')::date;
+  yesterday date := today - 1;
+  d_id uuid;
+begin
+  -- 1. Ensure User Stats for Today
+  insert into public.daily_user_stats (user_id, date, global_streak, max_global_streak, streak_state)
+  select p_user_id, today, coalesce(global_streak, 0), coalesce(max_global_streak, 0), 'inactive'
+  from public.daily_user_stats where user_id = p_user_id and date = yesterday
+  on conflict (user_id, date) do nothing;
+
+  -- 2. Update User Counters
+  update public.daily_user_stats
+  set cards_reviewed = cards_reviewed + p_cards_reviewed,
+      cards_learned = cards_learned + p_cards_learned,
+      updated_at = now()
+  where user_id = p_user_id and date = today;
+
+  -- 3. Update Deck Streaks
+  foreach d_id in array p_deck_ids loop
+    -- Ensure deck row exists for today
+    insert into public.daily_deck_stats (user_id, deck_id, date, deck_streak, max_streak, streak_state)
+    select p_user_id, d_id, today, coalesce(deck_streak, 0), coalesce(max_streak, 0), 'inactive'
+    from public.daily_deck_stats where deck_id = d_id and date = yesterday
+    on conflict (user_id, deck_id, date) do nothing;
+
+    -- Update to Active
+    update public.daily_deck_stats
+    set deck_streak = deck_streak + 1,
+        max_streak = greatest(max_streak, deck_streak + 1),
+        streak_state = 'active',
+        updated_at = now()
+    where deck_id = d_id and date = today and streak_state != 'active';
+
+    perform public.refresh_deck_counts(d_id);
+  end loop;
+
+  -- 4. Check Global Streak Completion
+  if (p_cards_reviewed >= p_review_limit or p_cards_learned >= p_learn_limit) then
+    update public.daily_user_stats
+    set global_streak = global_streak + 1,
+        max_global_streak = greatest(max_global_streak, global_streak + 1),
+        streak_state = 'active',
+        updated_at = now()
+    where user_id = p_user_id and date = today and streak_state != 'active';
+  end if;
+end; $$;

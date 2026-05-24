@@ -1,0 +1,62 @@
+create or replace function public.update_streaks_after_session(
+  p_user_id uuid,
+  p_deck_ids uuid[],
+  p_cards_reviewed integer,
+  p_cards_learned integer,
+  p_review_limit integer,
+  p_learn_limit integer
+)
+returns void
+language plpgsql
+security definer
+as $$
+declare
+  today date := (now() at time zone 'utc')::date;
+  yesterday date := today - 1;
+  d_id uuid;
+  global_completed boolean :=
+    p_cards_reviewed >= p_review_limit
+    or p_cards_learned >= p_learn_limit;
+begin
+  -- Accumulate user counters
+  update daily_user_stats
+  set
+    cards_reviewed = cards_reviewed + p_cards_reviewed,
+    cards_learned  = cards_learned  + p_cards_learned,
+    updated_at     = now()
+  where user_id = p_user_id
+    and date = today;
+
+  -- Deck streaks
+  foreach d_id in array p_deck_ids loop
+    update daily_deck_stats d
+    set
+      deck_streak = coalesce(y.deck_streak, 0) + 1,
+      max_streak  = greatest(d.max_streak, coalesce(y.deck_streak, 0) + 1),
+      streak_state = 'active',
+      updated_at = now()
+    from daily_deck_stats y
+    where d.user_id = p_user_id
+      and d.deck_id = d_id
+      and d.date = today
+      and y.deck_id = d_id
+      and y.user_id = p_user_id
+      and y.date = yesterday;
+  end loop;
+
+  -- Global streak
+  if global_completed then
+    update daily_user_stats u
+    set
+      global_streak = coalesce(y.global_streak, 0) + 1,
+      max_global_streak = greatest(u.max_global_streak, coalesce(y.global_streak, 0) + 1),
+      streak_state = 'active',
+      updated_at = now()
+    from daily_user_stats y
+    where u.user_id = p_user_id
+      and u.date = today
+      and y.user_id = p_user_id
+      and y.date = yesterday;
+  end if;
+end;
+$$;

@@ -1,0 +1,61 @@
+create or replace function public.resolve_inactive_streaks()
+returns void
+language plpgsql
+security definer
+as $$
+declare
+  today date := (now() at time zone 'utc')::date;
+  yesterday date := today - 1;
+begin
+  -- Deck missed
+  update daily_deck_stats
+  set
+    deck_streak = 0,
+    streak_state = 'inactive',
+    updated_at = now()
+  where date = yesterday
+    and streak_state = 'inactive'
+    and (due_count > 0 or new_count > 0);
+
+  -- Deck frozen
+  update daily_deck_stats
+  set
+    streak_state = 'frozen',
+    updated_at = now()
+  where date = yesterday
+    and streak_state = 'inactive'
+    and due_count = 0
+    and new_count = 0;
+
+  -- Global missed
+  update daily_user_stats u
+  set
+    global_streak = 0,
+    streak_state = 'inactive',
+    updated_at = now()
+  where u.date = yesterday
+    and u.streak_state = 'inactive'
+    and exists (
+      select 1
+      from daily_deck_stats d
+      where d.user_id = u.user_id
+        and d.date = yesterday
+        and (d.due_count > 0 or d.new_count > 0)
+    );
+
+  -- Global frozen
+  update daily_user_stats u
+  set
+    streak_state = 'frozen',
+    updated_at = now()
+  where u.date = yesterday
+    and u.streak_state = 'inactive'
+    and not exists (
+      select 1
+      from daily_deck_stats d
+      where d.user_id = u.user_id
+        and d.date = yesterday
+        and (d.due_count > 0 or d.new_count > 0)
+    );
+end;
+$$;
