@@ -1,0 +1,13 @@
+Fix the behaviour in supabase. Focus for now on the SQL_database folder.
+1. Remove duplicated or useless code
+2. Make sure the streak behaviour is as follows:
+- A streak is active is the user completes either a certain number of reviewed cards or a certain number of learned cards. These numbers refer to a single deck. Completing at least one deck's streak qualifies for completing a global streak.
+- At midnight in the user's timezone, the streak becomes inactive and keeps the number it had the previous day. If the user completes the objective as described above, the streak turns active and the number is incremented by 1 only once. If the user fails to complete the objective, the streak must return to 0.
+- There is a special state for a streak, which is "freeze". The streak stays at the current number without resetting or incrementing if the user has no significant work to do. Meaning that if the user cannot complete the objective because there are not enough cards to study or review, the number stays the same and the status is "frozen". The streak should only reset if the user ignored work that was actually available.
+3. Make sure the card behaviour is as follows:
+- A card starts out as "new" when it has never been studied before. 
+- Once a card has been studied, it changes its status to "waiting". "waiting" cards are such that are not yet due, meaning they can't be reviewed yet. 
+- Once it's time to review a card, it changes its status to "due". "due" cards can be studied in "review" mode. The time at which they become "due" is determined by the srs algorithm. 
+- "waiting" and "due" together make up "learning cards". Whether this classification is useful or not, I'm not sure.
+- Once a card is deemed to be mastered by the srs algorithm, that is when its due time is very long (check this information), the card changes its status to "mastered"
+- Once all cards in a deck become "mastered", the deck itself is "mastered". 

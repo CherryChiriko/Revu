@@ -276,6 +276,30 @@
     "is_nullable": "YES"
   },
   {
+    "table_name": "daily_deck_stats",
+    "column_name": "cards_reviewed",
+    "data_type": "integer",
+    "is_nullable": "NO"
+  },
+  {
+    "table_name": "daily_deck_stats",
+    "column_name": "cards_learned",
+    "data_type": "integer",
+    "is_nullable": "NO"
+  },
+  {
+    "table_name": "daily_deck_stats",
+    "column_name": "review_available_count",
+    "data_type": "integer",
+    "is_nullable": "NO"
+  },
+  {
+    "table_name": "daily_deck_stats",
+    "column_name": "learn_available_count",
+    "data_type": "integer",
+    "is_nullable": "NO"
+  },
+  {
     "table_name": "daily_user_stats",
     "column_name": "id",
     "data_type": "uuid",
@@ -417,6 +441,18 @@
     "table_name": "decks",
     "column_name": "new",
     "data_type": "integer",
+    "is_nullable": "YES"
+  },
+  {
+    "table_name": "decks",
+    "column_name": "status",
+    "data_type": "text",
+    "is_nullable": "NO"
+  },
+  {
+    "table_name": "decks",
+    "column_name": "mastered_at",
+    "data_type": "timestamp with time zone",
     "is_nullable": "YES"
   },
   {
