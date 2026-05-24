@@ -22,11 +22,9 @@ export default function useDeckLogic(id, cards_count, { toast }) {
     suspended: 0,
   };
 
-  console.log(counts);
   const { streak, maxStreak, isStreakActive } = useSelector(
     selectDeckStreakById(id),
   );
-  console.log("streak info ", streak, isStreakActive);
 
   const showLearn = counts.new > 0;
   const showReview = counts.due > 0;
@@ -79,7 +77,6 @@ export default function useDeckLogic(id, cards_count, { toast }) {
 
           accept: async () => {
             await deleteDeck(deckData);
-            console.log("deckData:", deckData);
 
             toast.current?.show({
               severity: "success",

@@ -4,6 +4,7 @@ import {
   createSelector,
 } from "@reduxjs/toolkit";
 import { supabase } from "../utils/supabaseClient";
+import { getTodayISO } from "../utils/dateHelper";
 
 /* -------------------------------------------
    Thunk: fetch daily streak stats
@@ -20,7 +21,7 @@ export const fetchDailyStreakStats = createAsyncThunk(
       }
 
       const userId = userData.user.id;
-      const today = new Date().toISOString().slice(0, 10);
+      const today = getTodayISO();
 
       const [deckRes, userRes] = await Promise.all([
         supabase
@@ -51,7 +52,7 @@ export const fetchDailyStreakStats = createAsyncThunk(
     } catch (err) {
       return rejectWithValue(err.message);
     }
-  }
+  },
 );
 
 export function updateGlobalStreakFromRealtime(state, action) {
@@ -161,33 +162,17 @@ const selectGlobalState = (state) => state.streak.global;
 // Global streak selectors
 export const selectGlobalStreak = createSelector(
   [selectGlobalState],
-  (global) => global.streak
+  (global) => global.streak,
 );
 
 export const selectGlobalMaxStreak = createSelector(
   [selectGlobalState],
-  (global) => global.maxStreak
+  (global) => global.maxStreak,
 );
 
 export const selectGlobalStreakState = createSelector(
   [selectGlobalState],
-  (global) => global.streakState
-);
-
-// export const selectIsGlobalStreakActive = createSelector(
-//   [selectGlobalStreakState],
-//   (streakState) => streakState === "active"
-// );
-
-// export const selectIsGlobalStreakFrozen = createSelector(
-//   [selectGlobalStreakState],
-//   (streakState) => streakState === "frozen"
-// );
-
-// Returns the entire global object (memoized)
-export const selectGlobalStreakData = createSelector(
-  [selectGlobalState],
-  (global) => global
+  (global) => global.streakState,
 );
 
 // Deck streak selectors
@@ -207,32 +192,20 @@ export const selectDeckStreakById = (deckId) =>
     };
   });
 
-// export const selectIsDeckStreakActive = (deckId) =>
-//   createSelector(
-//     [selectDeckStatsCache],
-//     (deckStatsCache) => deckStatsCache[deckId]?.streakState === "active"
-//   );
-
-// export const selectIsDeckStreakFrozen = (deckId) =>
-//   createSelector(
-//     [selectDeckStatsCache],
-//     (deckStatsCache) => deckStatsCache[deckId]?.streakState === "frozen"
-//   );
-
 // Status selectors
 export const selectStreakStatus = createSelector(
   [selectStreakState],
-  (streak) => streak.status
+  (streak) => streak.status,
 );
 
 export const selectStreakError = createSelector(
   [selectStreakState],
-  (streak) => streak.error
+  (streak) => streak.error,
 );
 
 export const selectIsStreakLoading = createSelector(
   [selectStreakStatus],
-  (status) => status === "loading"
+  (status) => status === "loading",
 );
 
 /* -------------------------------------------

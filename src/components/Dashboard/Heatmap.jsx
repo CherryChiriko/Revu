@@ -1,12 +1,11 @@
 import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { selectHeatmapData } from "../../slices/activitySlice";
+import { getTodayISO } from "../../utils/dateHelper";
 
 // Weekday labels (Mon–Sun)
 const WEEKDAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-// Safely builds an ISO date based strictly on local calendar time
-const localDate = new Date();
-const TODAY_ISO = `${localDate.getFullYear()}-${String(localDate.getMonth() + 1).padStart(2, "0")}-${String(localDate.getDate()).padStart(2, "0")}`;
+const TODAY_ISO = getTodayISO();
 
 // Generate calendar grid aligned to weeks
 function generateCalendarGrid(dataMap, weeksToShow = 4) {
