@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { supabase } from "../../utils/supabaseClient";
 import { generateReading } from "./generateReading";
 import Papa from "papaparse";
 import * as XLSX from "xlsx";
-
-import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { fetchDecks } from "../../slices/deckSlice";
 
 export const useImportLogic = () => {
-  const navigate = useNavigate();
+  const dispatch = useDispatch(); // 👈 Initialize dispatch
 
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedType, setSelectedType] = useState(1);
@@ -32,12 +32,13 @@ export const useImportLogic = () => {
       const {
         data: { user },
       } = await supabase.auth.getUser();
+      if (!user) return;
+
       const { data } = await supabase
         .from("decks")
         .select("language")
         .eq("user_id", user.id);
 
-      // Get unique, cleaned values
       const unique = [...new Set(data?.map((d) => d.language))].filter(Boolean);
       setExistingLanguages(unique);
     };
@@ -76,7 +77,6 @@ export const useImportLogic = () => {
     let fileName = "";
     let filePath = "";
 
-    // 1. Determine the file details based on selection
     switch (selectedType) {
       case 1:
         fileName = "template_standard.xlsx";
@@ -91,7 +91,6 @@ export const useImportLogic = () => {
         return;
     }
 
-    // 2. Execute the download logic once
     const link = document.createElement("a");
     link.href = filePath;
     link.setAttribute("download", fileName);
@@ -100,6 +99,7 @@ export const useImportLogic = () => {
     link.click();
     document.body.removeChild(link);
   };
+
   //  -------------- File parsing  -------------- //
   const [hasHeaders, setHasHeaders] = useState(true);
 
@@ -115,13 +115,12 @@ export const useImportLogic = () => {
     }
   }, [selectedFile, hasHeaders]);
 
-  // --- Helper: Parse CSV (.csv) ---
   const parseCSV = (file) => {
     Papa.parse(file, {
       header: hasHeaders,
       skipEmptyLines: true,
       encoding: "UTF-8",
-      delimiter: "", // AUTO-DETECT
+      delimiter: "",
       delimitersToGuess: [",", ";", "\t", "|"],
       complete: (results) => {
         if (results.errors.length > 0) {
@@ -137,10 +136,8 @@ export const useImportLogic = () => {
               ),
             );
           });
-          console.log(normalized);
           setFileContent(normalized);
         } else {
-          console.log(results.data);
           setFileContent(results.data);
         }
       },
@@ -148,7 +145,6 @@ export const useImportLogic = () => {
     });
   };
 
-  // --- Helper: Parse Excel (.xlsx, .xls) ---
   const parseExcel = (file) => {
     const reader = new FileReader();
 
@@ -159,13 +155,11 @@ export const useImportLogic = () => {
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
 
-        // ALWAYS read as raw rows first
         const rows = XLSX.utils.sheet_to_json(worksheet, {
-          header: 1, // <-- ARRAY OF ARRAYS
+          header: 1,
           blankrows: false,
           defval: "",
         });
-        console.log("rows", rows);
 
         if (!rows.length) {
           setUploadError("Excel file is empty.");
@@ -175,14 +169,10 @@ export const useImportLogic = () => {
         let normalized;
 
         if (hasHeaders) {
-          // 1. Extract the first row as headers
           const headers = rows[0];
-
-          // 2. Map the remaining rows using the header strings as keys
           normalized = rows.slice(1).map((row) =>
             row.reduce((acc, cell, index) => {
               if (cell !== "" && cell !== null && cell !== undefined) {
-                // Use the header name if it exists, otherwise fallback to index
                 const key = headers[index] || index;
                 acc[key] = cell;
               }
@@ -190,7 +180,6 @@ export const useImportLogic = () => {
             }, {}),
           );
         } else {
-          // Logic for no headers (numeric keys)
           normalized = rows.map((row) =>
             row.reduce((acc, cell, index) => {
               if (cell !== "" && cell !== null && cell !== undefined) {
@@ -201,7 +190,6 @@ export const useImportLogic = () => {
           );
         }
 
-        console.log("Normalized Data:", normalized);
         setFileContent(normalized);
       } catch (err) {
         console.error(err);
@@ -219,7 +207,6 @@ export const useImportLogic = () => {
       "application/vnd.ms-excel",
     ];
 
-    // Get the extension (e.g., "csv", "xlsx")
     const fileExtension = file.name.split(".").pop().toLowerCase();
     const validExtensions = ["csv", "xlsx", "xls"];
 
@@ -233,13 +220,12 @@ export const useImportLogic = () => {
 
     return fileExtension;
   };
-  // Extract the file processing logic so both Drop and Click can use it
+
   const processFile = (file) => {
     const extension = getFileExtension(file);
     if (!extension) return;
 
     setSelectedFile(file);
-
     extension === "csv" ? parseCSV(file) : parseExcel(file);
   };
 
@@ -248,16 +234,15 @@ export const useImportLogic = () => {
     if (file) processFile(file);
   };
 
-  //  -------------- Interpret file -------------- //
   const getFields = () => {
     switch (selectedType) {
-      case 1: // Standard
+      case 1:
         return [
           { key: "front", label: "Front (Word)", required: true },
           { key: "back", label: "Back (Meaning)", required: true },
           { key: "audioUrl", label: "Audio URL", required: false },
         ];
-      case 2: // Chinese writing
+      case 2:
         return [
           { key: "front", label: "Character", required: true },
           { key: "back", label: "Meaning", required: true },
@@ -269,7 +254,6 @@ export const useImportLogic = () => {
     }
   };
 
-  // The Swap Function
   const handleSwap = () => {
     setMappedColumns({
       ...mappedColumns,
@@ -324,7 +308,11 @@ export const useImportLogic = () => {
   //  -------------- Send out result -------------- //
 
   const [isProcessing, setIsProcessing] = useState(false);
-  const [processingProgress, setProcessingProgress] = useState(0);
+
+  const [processingProgress, setProcessingProgress] = useState({
+    current: 0,
+    total: 0,
+  });
 
   const getStudyMode = () => {
     switch (selectedType) {
@@ -337,9 +325,6 @@ export const useImportLogic = () => {
     }
   };
 
-  const study_mode = getStudyMode();
-  const table = "cards_" + study_mode.toLowerCase();
-
   const prepareCardsForInsert = (row) => {
     switch (selectedType) {
       case 1:
@@ -350,12 +335,6 @@ export const useImportLogic = () => {
           created_at: new Date(),
         };
       case 2:
-        console.log(
-          "row",
-          mappedColumns.reading,
-          row[mappedColumns.reading] || null,
-          row[mappedColumns.reading],
-        );
         const card = {
           front: row[mappedColumns.front],
           back: row[mappedColumns.back],
@@ -369,7 +348,6 @@ export const useImportLogic = () => {
           card.reading,
         );
 
-        console.log("result here", reading, strokeColors, tones);
         return {
           ...card,
           reading: reading,
@@ -382,7 +360,6 @@ export const useImportLogic = () => {
   };
 
   const allCards = useMemo(() => {
-    // Guard: If front or back mapping is missing, don't process yet
     if (
       !mappedColumns.front ||
       !mappedColumns.back ||
@@ -400,70 +377,112 @@ export const useImportLogic = () => {
           card.front.trim() !== "" &&
           card.back.trim() !== "",
       );
-  }, [fileContent, mappedColumns, selectedType]); // Only re-run when these change
+  }, [fileContent, mappedColumns, selectedType]);
 
-  const uploadCards = async (deckId) => {
+  console.log("CARDS ", allCards.slice(0, 10));
+
+  const uploadCards = async (deckId, targetTable) => {
     try {
-      // 1. Prepare all cards first
       allCards.forEach((card) => {
         card.deck_id = deckId;
       });
 
       const CHUNK_SIZE = 400;
+      const total = allCards.length;
 
-      for (let i = 0; i < allCards.length; i += CHUNK_SIZE) {
+      const progressTable =
+        targetTable.replace("cards_", "card_") + "_progress";
+
+      setProcessingProgress({ current: 0, total });
+
+      // Get authenticated user ID
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("User session not found during card linking.");
+
+      for (let i = 0; i < total; i += CHUNK_SIZE) {
         const chunk = allCards.slice(i, i + CHUNK_SIZE);
 
         let retryCount = 0;
         const maxRetries = 3;
         let success = false;
+        let insertedCards = [];
 
+        // --- STEP 1: INSERT CARD CONTENT ---
         while (!success && retryCount < maxRetries) {
-          const { error } = await supabase.from(table).insert(chunk);
+          const { data, error } = await supabase
+            .from(targetTable)
+            .insert(chunk)
+            .select("id");
+
+          if (!error) {
+            insertedCards = data;
+            success = true;
+          } else {
+            retryCount++;
+            console.warn(
+              `Content chunk failed (attempt ${retryCount}). Retrying...`,
+            );
+            await new Promise((res) => setTimeout(res, retryCount * 2000));
+          }
+        }
+
+        if (!success)
+          throw new Error("Server is unresponsive. Card content save aborted.");
+
+        const progressChunk = insertedCards.map((card) => ({
+          user_id: user.id,
+          card_id: card.id,
+          deck_id: deckId,
+          status: "new",
+          ease_factor: 2.5,
+          review_interval: 0,
+          repetitions: 0,
+          suspended: false,
+          due_date: null,
+          last_studied: null,
+        }));
+
+        retryCount = 0;
+        success = false;
+
+        // --- STEP 3: INSERT CARD PROGRESS ENTRIES ---
+        while (!success && retryCount < maxRetries) {
+          const { error } = await supabase
+            .from(progressTable)
+            .insert(progressChunk);
 
           if (!error) {
             success = true;
           } else {
             retryCount++;
             console.warn(
-              `Chunk failed (attempt ${retryCount}). Retrying in ${
-                retryCount * 2
-              }s...`,
+              `Progress chunk failed (attempt ${retryCount}). Retrying...`,
+              error,
             );
-            // Wait longer each time it fails (Exponential Backoff)
             await new Promise((res) => setTimeout(res, retryCount * 2000));
           }
         }
 
         if (!success)
           throw new Error(
-            "Server is unresponsive after multiple attempts. Please try again later.",
+            "Card data written, but progress profile mapping failed.",
           );
 
-        const total = allCards.length;
-        // Calculate the progress locally
         const newProgress = Math.min(i + CHUNK_SIZE, total);
+        setProcessingProgress({ current: newProgress, total });
 
-        // Update UI state
-        setProcessingProgress(newProgress);
-
-        // Log the local variable so you see real numbers in console
-        console.log(`Successfully uploaded ${newProgress} / ${total}`);
-
-        // Yield to event loop to keep UI responsive
+        console.log(
+          `Successfully mapped ${newProgress} / ${total} database entities.`,
+        );
         await new Promise((res) => setTimeout(res, 50));
       }
-
-      // Success!
     } catch (err) {
-      console.error("Batch upload failed:", err);
-
+      console.error("Batch upload transaction aborted:", err);
+      // Clean up orphaned deck record structural shells if execution drops mid-way
       await supabase.from("decks").delete().eq("id", deckId);
-      await supabase.from(table).delete().eq("deck_id", deckId);
-
-      setUploadError(
-        "Error during upload. The deck and cards were removed to prevent data corruption.",
-      );
+      throw err;
     }
   };
 
@@ -472,8 +491,10 @@ export const useImportLogic = () => {
     setIsProcessing(true);
     setUploadError(null);
 
+    const study_mode = getStudyMode();
+    const targetTable = "cards_" + study_mode.toLowerCase();
+
     try {
-      // 1. Get the current user
       const {
         data: { user },
         error: userError,
@@ -484,7 +505,6 @@ export const useImportLogic = () => {
       const formattedLanguage =
         language.charAt(0).toUpperCase() + language.slice(1);
 
-      // 2. Insert the deck and select the new record back
       const { data: newDeck, error: deckError } = await supabase
         .from("decks")
         .insert([
@@ -508,17 +528,21 @@ export const useImportLogic = () => {
             created_at: new Date(),
           },
         ])
-        .select() // This is critical: it returns the inserted row
-        .single(); // Since we only inserted one deck, get it as an object
+        .select()
+        .single();
+
+      if (deckError) throw deckError;
 
       const deckId = newDeck.id;
       console.log("New Deck Created with ID:", deckId);
 
-      // 3. Now proceed to upload the cards
-      await uploadCards(deckId);
+      // Upload cards into the determined table target
+      await uploadCards(deckId, targetTable);
+
+      await dispatch(fetchDecks()).unwrap();
     } catch (err) {
       console.error("Import failed:", err);
-      setUploadError(err.message);
+      setUploadError(err.message || "Error during upload execution.");
     } finally {
       setIsProcessing(false);
     }

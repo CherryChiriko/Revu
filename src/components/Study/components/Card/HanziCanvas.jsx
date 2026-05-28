@@ -23,6 +23,13 @@ const HanziCanvas = ({
   const bgColor = activeTheme?.background?.canvas ?? "bg-white";
   const borderColor = activeTheme?.border?.card ?? "border-gray-200";
 
+  console.log(
+    "[HanziCanvas] Rendered with character:",
+    character,
+    "displayState:",
+    displayState,
+  );
+
   return (
     <div className="flex flex-col items-center justify-center h-full w-full">
       <div

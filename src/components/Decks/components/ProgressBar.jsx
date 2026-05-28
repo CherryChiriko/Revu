@@ -4,11 +4,19 @@ export const ProgressBar = ({
   activeTheme,
   isMastered,
 }) => {
-  const masteredPct = cards_count ? (counts.mastered / cards_count) * 100 : 0;
-  const suspendedPct = cards_count ? (counts.suspended / cards_count) * 100 : 0;
-  const learningPct = cards_count ? (counts.waiting / cards_count) * 100 : 0;
-  const duePct = cards_count ? (counts.due / cards_count) * 100 : 0;
-  const newPct = cards_count ? (counts.new / cards_count) * 100 : 0;
+  const [mastered, suspended, waiting, due, newCards] = [
+    counts.mastered,
+    counts.suspended,
+    counts.waiting,
+    counts.due,
+    counts.new,
+  ];
+
+  const masteredPct = cards_count ? (mastered / cards_count) * 100 : 0;
+  const suspendedPct = cards_count ? (suspended / cards_count) * 100 : 0;
+  const learningPct = cards_count ? (waiting / cards_count) * 100 : 0;
+  const duePct = cards_count ? (due / cards_count) * 100 : 0;
+  const newPct = cards_count ? (newCards / cards_count) * 100 : 0;
 
   // Base classes for the container and segments
   const baseBar = `w-full h-2 rounded-full overflow-hidden flex`;
@@ -39,35 +47,35 @@ export const ProgressBar = ({
           <div
             className={`${segmentBase} ${activeTheme.background.canvas}`}
             style={{ width: `${suspendedPct}%` }}
-            title={`Suspended: ${counts.suspended}`}
+            title={`Suspended: ${suspended}`}
           />
         )}
         {masteredPct > 0 && (
           <div
             className={`${segmentBase} ${activeTheme.background.accent3}`}
             style={{ width: `${masteredPct}%` }}
-            title={`Mastered: ${counts.mastered}`}
+            title={`Mastered: ${mastered}`}
           />
         )}
         {duePct > 0 && (
           <div
             className={`${segmentBase} ${activeTheme.background.accent1}`}
             style={{ width: `${duePct}%` }}
-            title={`Due: ${counts.due}`}
+            title={`Due: ${due}`}
           />
         )}
         {learningPct > 0 && (
           <div
             className={`${segmentBase} ${activeTheme.background.accent2}`}
             style={{ width: `${learningPct}%` }}
-            title={`Learning: ${counts.waiting}`}
+            title={`Learning: ${waiting}`}
           />
         )}
         {newPct > 0 && (
           <div
             className={`${segmentBase} ${trackClass}`}
             style={{ width: `${newPct}%` }}
-            title={`New: ${counts.new}`}
+            title={`New: ${newCards}`}
           />
         )}
       </div>
@@ -76,27 +84,27 @@ export const ProgressBar = ({
         <div className="flex flex-wrap gap-x-4 gap-y-2 mt-3 px-0.5">
           <StatItem
             label="due"
-            count={counts.due}
+            count={due}
             colorClass={activeTheme.background.accent1}
           />
           <StatItem
-            label="learning"
-            count={counts.waiting}
+            label="waiting"
+            count={waiting}
             colorClass={activeTheme.background.accent2}
           />
           <StatItem
             label="new"
-            count={counts.new}
+            count={newCards}
             colorClass={activeTheme.background.light}
           />
           <StatItem
             label="mastered"
-            count={counts.mastered}
+            count={mastered}
             colorClass={activeTheme.background.accent3}
           />
           <StatItem
             label="suspended"
-            count={counts.suspended}
+            count={suspended}
             colorClass={activeTheme.background.muted}
           />
         </div>

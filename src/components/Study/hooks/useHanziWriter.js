@@ -27,10 +27,11 @@ export function useHanziWriter({
 
   const state = revealed ? "reveal" : displayState;
 
-  // Init / recreate writer on character change
+  // Master setup effect: Runs whenever character, properties, OR state changes
   useEffect(() => {
     if (!character || !window.HanziWriter || !containerRef.current) return;
 
+    // 1. Wipe the container and drop any old instance
     containerRef.current.innerHTML = "";
     writerRef.current = null;
 
@@ -45,21 +46,16 @@ export function useHanziWriter({
           highlightColor: strokeColor,
           width,
           height,
-        }
+        },
       );
 
       writerRef.current = writer;
-    } catch (err) {
-      console.error("[HanziWriter] Failed to init:", err);
-    }
-  }, [character, outlineColor, strokeColor, width, height]);
+      console.log("[useHanziWriter] Hook hook-level evaluated:", {
+        character,
+        state,
+      });
 
-  // Apply mode-specific behavior
-  useEffect(() => {
-    const writer = writerRef.current;
-    if (!writer) return;
-
-    try {
+      // 2. Apply behavior directly upon creation based on the current state
       switch (state) {
         case "animation":
           writer.hideCharacter();
@@ -87,19 +83,26 @@ export function useHanziWriter({
         case "reveal":
         default:
           writer.showCharacter();
+          break;
       }
     } catch (err) {
-      console.error("[useHanziWriter] Mode error:", err);
+      console.error("[HanziWriter] Setup Error:", err);
     }
-  }, [state, onQuizComplete]);
 
-  // Cleanup
-  useEffect(() => {
+    // Cleanup when moving away or unmounting
     return () => {
       writerRef.current = null;
       if (containerRef.current) containerRef.current.innerHTML = "";
     };
-  }, []);
+  }, [
+    character,
+    state,
+    outlineColor,
+    strokeColor,
+    width,
+    height,
+    onQuizComplete,
+  ]);
 
   return { containerRef };
 }

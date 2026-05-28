@@ -19,7 +19,7 @@ import { createSelector } from "@reduxjs/toolkit";
 // ----------------------
 const selectCardsForDeck = createSelector(
   [selectCards, (_, deckId) => deckId],
-  (allCards, deckId) => allCards.filter((c) => c.deck_id === deckId)
+  (allCards, deckId) => allCards.filter((c) => c.deck_id === deckId),
 );
 
 export default function useStudySession({ deck, navMode }) {
@@ -40,14 +40,14 @@ export default function useStudySession({ deck, navMode }) {
   // Cards
   // ----------------------
   const allCards = useSelector((state) =>
-    selectCardsForDeck(state, deck?.id || -1)
+    selectCardsForDeck(state, deck?.id || -1),
   );
 
   const { cards, limit } = useMemo(() => {
     if (!deck?.id || allCards.length === 0) return { cards: [], limit: 0 };
 
     const filteredCards = allCards.filter(
-      (c) => c.status === (isReviewMode ? "due" : "new")
+      (c) => c.status === (isReviewMode ? "due" : "new"),
     );
 
     const sessionLimit = Math.min(modeLimit, filteredCards.length);
@@ -69,7 +69,7 @@ export default function useStudySession({ deck, navMode }) {
   // ----------------------
   const phases = isReviewMode
     ? [{ displayState: "quiz", allowRating: true }]
-    : PHASES[deck?.study_mode] ?? PHASES.A;
+    : (PHASES[deck?.study_mode] ?? PHASES.A);
   const totalPhases = phases.length;
 
   const currentPhase = phases[phaseIndex];
@@ -132,7 +132,7 @@ export default function useStudySession({ deck, navMode }) {
 
       advanceCard();
     },
-    [currentCard, currentPhase.allowRating, advanceCard]
+    [currentCard, currentPhase.allowRating, advanceCard],
   );
 
   // ----------------------
@@ -156,7 +156,7 @@ export default function useStudySession({ deck, navMode }) {
 
         // 1. Update progress in Redux + DB
         await dispatch(
-          updateProgress({ sessionUpdates, study_mode: deck.study_mode })
+          updateProgress({ sessionUpdates, study_mode: deck.study_mode }),
         ).unwrap();
 
         // 2. Update streaks in Supabase
@@ -183,7 +183,7 @@ export default function useStudySession({ deck, navMode }) {
               deck_id: deck.id,
               user_id: currentCard.user_id,
               study_mode: deck.study_mode,
-            })
+            }),
           ),
           dispatch(fetchDailyStreakStats()),
           dispatch(fetchDeckCounts({ user_id: currentCard.user_id })),
@@ -223,6 +223,7 @@ export default function useStudySession({ deck, navMode }) {
     currentStep,
     totalSteps,
     handleRate,
+    handlePassComplete: advanceCard,
     restartSession,
     resetSession: restartSession,
     exitStudy,

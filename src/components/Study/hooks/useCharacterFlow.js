@@ -19,7 +19,7 @@ export function useCharacterFlow({
 
   const characters = useMemo(
     () => (card?.front || "").split(""),
-    [card?.front]
+    [card?.front],
   );
 
   const currentCharacter = characters[currentIndex];
@@ -42,12 +42,13 @@ export function useCharacterFlow({
   }, []);
 
   useEffect(() => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
     setCurrentIndex(0);
     setRevealed(false);
     setMistakeList([]);
     setCompletedChars([]);
     playAudio?.();
-  }, [card?.id, playAudio]);
+  }, [card?.id, playAudio, displayState]);
 
   const calculateAverage = useCallback(
     (mistakesForCurrentChar) => {
@@ -59,7 +60,7 @@ export function useCharacterFlow({
       // );
       return allMistakes.reduce((a, b) => a + b, 0) / allMistakes.length;
     },
-    [mistakeList]
+    [mistakeList],
   );
 
   // Auto-advance after showing character
@@ -105,17 +106,27 @@ export function useCharacterFlow({
       getRatingFromMistakes,
       onRate,
       onPassComplete,
-    ]
+    ],
   );
 
   // For outline/animation mode: manual continue
   const handleContinue = useCallback(() => {
+    console.log("[useCharacterFlow] handleContinue clicked!", {
+      currentIndex,
+      isLastCharacter,
+      displayState,
+      character: characters[currentIndex],
+    });
     if (displayState === "outline") {
       handleReveal();
       return;
     }
 
     if (!isLastCharacter) {
+      console.log(
+        "[useCharacterFlow] Moving to next character index:",
+        currentIndex + 1,
+      );
       setCurrentIndex((i) => i + 1);
       setRevealed(false);
       return;

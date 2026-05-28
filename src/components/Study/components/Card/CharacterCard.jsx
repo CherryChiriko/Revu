@@ -44,6 +44,7 @@ const CharacterCard = ({
     playAudio,
   });
 
+  console.log("[CharacterCard] onPassComplete ", onPassComplete);
   const showContinueButtons =
     displayState === "animation" || displayState === "outline";
 

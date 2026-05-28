@@ -2,39 +2,75 @@ import { useNavigate } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { selectActiveTheme } from "../../../slices/themeSlice";
-import { selectActiveDeck } from "../../../slices/deckSlice";
+import { selectActiveDeck, selectDecks } from "../../../slices/deckSlice";
 import useStudySession from "../hooks/useStudySession";
 import SessionMode from "./SessionMode";
 
 const StudySession = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-
   const params = searchParams.get("mode"); // "learn" or "review"
 
   const activeTheme = useSelector(selectActiveTheme);
   const activeDeck = useSelector(selectActiveDeck);
+  const allDecks = useSelector(selectDecks);
 
-  const navMode = params ?? (activeDeck.due_count > 0 ? "review" : "learn");
+  const navMode = params ?? (activeDeck?.due > 0 ? "review" : "learn");
 
-  // --- Use new hook ---
   const { status, cards, error } = useStudySession({
     deck: activeDeck,
     navMode,
   });
 
-  // --- No active deck ---
+  if (!allDecks || allDecks.length === 0) {
+    return (
+      <div
+        className={`h-screen flex flex-col items-center justify-center p-6 text-center ${activeTheme.background.app}`}
+      >
+        <div className="max-w-md space-y-6">
+          <div className="flex justify-center">
+            <div className="relative w-20 h-24 border-2 border-dashed border-neutral-400 rounded-xl flex items-center justify-center opacity-40">
+              <span className="text-2xl font-light">+</span>
+              <div className="absolute top-1 left-1 w-full h-full border-2 border-dashed border-neutral-400 rounded-xl -z-10 translate-x-2 translate-y-2 opacity-50"></div>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <h2
+              className={`text-2xl font-bold tracking-tight ${activeTheme.text.primary}`}
+            >
+              Your collection is empty
+            </h2>
+            <p
+              className={`text-sm max-w-xs mx-auto ${activeTheme.text.secondary}`}
+            >
+              Create your very first deck of study flashcards to kickstart your
+              daily learning streak!
+            </p>
+          </div>
+
+          <button
+            onClick={() => navigate("/decks?action=create")}
+            className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-500 rounded-lg shadow-md hover:shadow-lg transform active:scale-95 transition-all duration-200"
+          >
+            Create First Deck
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (!activeDeck) {
     return (
       <div
         className={`h-screen flex flex-col items-center justify-center ${activeTheme.background.app}`}
       >
-        <p className={`${activeTheme.text.primary} text-xl`}>
+        <p className={`${activeTheme.text.primary} text-xl mb-4`}>
           No active deck selected.
         </p>
         <button
           onClick={() => navigate("/decks")}
-          className={`flex items-center ${activeTheme.text.muted} hover:${activeTheme.text.primary} transition-colors duration-200`}
+          className={`flex items-center px-4 py-2 border rounded-lg ${activeTheme.text.muted} hover:${activeTheme.text.primary} transition-colors duration-200`}
         >
           Return to Decks
         </button>
@@ -78,7 +114,7 @@ const StudySession = () => {
     );
   }
 
-  // --- No cards available fallback (only after data has fully loaded) ---
+  // --- No cards available fallback ---
   if (status === "succeeded") {
     return (
       <div
@@ -87,7 +123,7 @@ const StudySession = () => {
         <p className={`${activeTheme.text.primary} text-2xl font-bold`}>
           All caught up!
         </p>
-        <p className={`${activeTheme.text.secondary} text-xl mt-2`}>
+        <p className={`${activeTheme.text.secondary} text-xl mt-2 mb-4`}>
           "{activeDeck.name}" has no new or due cards.
         </p>
         <button

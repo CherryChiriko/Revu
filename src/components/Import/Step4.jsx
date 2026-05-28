@@ -12,7 +12,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 const Step4 = ({ activeTheme, logic, onNext, onBack }) => {
-  console.log("FILE CONTENT", logic.fileContent);
   const getLanguageOptions = () => {
     switch (logic.selectedType) {
       case 1:

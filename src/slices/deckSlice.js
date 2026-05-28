@@ -4,6 +4,7 @@ import {
   createSelector,
 } from "@reduxjs/toolkit";
 import { supabase } from "../utils/supabaseClient";
+import { getTodayISO } from "../utils/dateHelper";
 
 /** Priority ordering */
 const orderDecksByPriority = (decks) => {
@@ -139,7 +140,16 @@ const deckSlice = createSlice({
     setActiveDeck(state, action) {
       const id = action.payload;
       state.activeDeckId = id;
-      localStorage.setItem("activeDeckId", id);
+
+      if (id) {
+        const today = getTodayISO();
+
+        localStorage.setItem("activeDeckId", id);
+        localStorage.setItem("activeDeckIdDate", today);
+      } else {
+        localStorage.removeItem("activeDeckId");
+        localStorage.removeItem("activeDeckIdDate");
+      }
     },
     updateDeckFromRealtime(state, action) {
       const deck = action.payload;

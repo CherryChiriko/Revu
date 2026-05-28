@@ -17,37 +17,41 @@ export default function CompactVariant({ deck, activeTheme, logic }) {
 
   return (
     <div className="relative">
-      {" "}
-      {/* Added relative for absolute positioning if needed */}
-      <div className="flex flex-row justify-between items-start mb-2 gap-2">
-        <div className="flex flex-col flex-grow min-w-0">
+      {/* Top Row: Name on the left, Badges & Menu on the right */}
+      <div className="flex flex-row justify-between items-center mb-2 gap-4">
+        {/* Left Side: Name container. min-w-0 is CRITICAL for truncation inside flex */}
+        <div className="min-w-0 flex-grow">
           <span
-            className={`text-sm font-bold truncate ${activeTheme.text.primary}`}
+            className={`text-sm font-bold block truncate ${activeTheme.text.primary}`}
+            title={deck.name}
           >
             {deck.name}
           </span>
-          <div className="flex items-center gap-2 mt-1">
-            <DeckBadges
-              streak={streak}
-              activeTheme={activeTheme}
-              isMastered={isMastered}
-              isStreakActive={isStreakActive}
-            />
-          </div>
         </div>
 
-        <DeckMenu
-          activeTheme={activeTheme}
-          onEdit={(e) => handleAction(e, "edit", deck)}
-          onDelete={(e) => handleAction(e, "delete", deck)}
-        />
+        {/* Right Side: Badges and Menu grouped together */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <DeckBadges
+            streak={streak}
+            activeTheme={activeTheme}
+            isMastered={isMastered}
+            isStreakActive={isStreakActive}
+          />
+          <DeckMenu
+            activeTheme={activeTheme}
+            onEdit={(e) => handleAction(e, "edit", deck)}
+            onDelete={(e) => handleAction(e, "delete", deck)}
+          />
+        </div>
       </div>
+
       <ProgressBar
         counts={counts}
         activeTheme={activeTheme}
         isMastered={isMastered}
         cards_count={cards_count}
       />
+
       <div className="flex justify-between items-center mt-3">
         <DeckActions
           activeTheme={activeTheme}

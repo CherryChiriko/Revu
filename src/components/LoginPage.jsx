@@ -135,10 +135,10 @@ const LoginPage = ({ activeTheme }) => {
             {authLoading
               ? "Loading..."
               : isResetting
-              ? "Send Reset Email"
-              : isSigningUp
-              ? "Sign Up"
-              : "Login"}
+                ? "Send Reset Email"
+                : isSigningUp
+                  ? "Sign Up"
+                  : "Login"}
           </button>
         </form>
 
@@ -178,6 +178,9 @@ const LoginPage = ({ activeTheme }) => {
           )}
         </div>
       </div>
+      <span className={`mt-2 ${activeTheme.text.primary}`}>
+        Demo only: Username - "guest", Password - "guest123"
+      </span>
     </div>
   );
 };
