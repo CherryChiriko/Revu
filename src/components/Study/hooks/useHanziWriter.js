@@ -25,11 +25,11 @@ export function useHanziWriter({
   const containerRef = useRef(null);
   const writerRef = useRef(null);
 
-  const state = revealed ? "reveal" : displayState;
-
   // Master setup effect: Runs whenever character, properties, OR state changes
   useEffect(() => {
     if (!character || !window.HanziWriter || !containerRef.current) return;
+
+    const resolvedState = revealed ? "reveal" : displayState;
 
     // 1. Wipe the container and drop any old instance
     containerRef.current.innerHTML = "";
@@ -52,11 +52,11 @@ export function useHanziWriter({
       writerRef.current = writer;
       console.log("[useHanziWriter] Hook hook-level evaluated:", {
         character,
-        state,
+        resolvedState,
       });
 
       // 2. Apply behavior directly upon creation based on the current state
-      switch (state) {
+      switch (resolvedState) {
         case "animation":
           writer.hideCharacter();
           writer.loopCharacterAnimation();
@@ -96,12 +96,13 @@ export function useHanziWriter({
     };
   }, [
     character,
-    state,
     outlineColor,
     strokeColor,
     width,
     height,
     onQuizComplete,
+    revealed,
+    displayState,
   ]);
 
   return { containerRef };

@@ -98,6 +98,7 @@ export default function useStudySession({ deck, navMode }) {
   }, [navigate]);
 
   const advanceCard = useCallback(() => {
+    console.log("[advanceCard BEFORE]", currentCard);
     if (cardIndex + 1 < limit) {
       setCardIndex((i) => i + 1);
       return;

@@ -79,6 +79,12 @@ export function useCharacterFlow({
 
       // Auto-advance after showing the character for 600ms
       timeoutRef.current = setTimeout(() => {
+        console.log("[timeout firing]", {
+          character: currentCharacter,
+          cardId: card?.id,
+          isLastCharacter,
+        });
+
         setRevealed(false);
         if (!isLastCharacter) {
           // Move to next character
@@ -91,6 +97,7 @@ export function useCharacterFlow({
             // console.log("rating", rating);
             onRate?.(rating);
           } else {
+            console.log("[calling onPassComplete]");
             onPassComplete?.();
           }
         }
@@ -117,34 +124,34 @@ export function useCharacterFlow({
       displayState,
       character: characters[currentIndex],
     });
+
+    if (!isLastCharacter) {
+      setCurrentIndex((i) => i + 1);
+      return;
+    }
+
+    // last character reached
     if (displayState === "outline") {
       handleReveal();
       return;
     }
 
-    if (!isLastCharacter) {
-      console.log(
-        "[useCharacterFlow] Moving to next character index:",
-        currentIndex + 1,
-      );
-      setCurrentIndex((i) => i + 1);
-      setRevealed(false);
-      return;
-    }
-
-    // Last character
     if (allowRating) {
       const avg = calculateAverage(mistakeList[mistakeList.length - 1] ?? 0);
+
       const rating = getRatingFromMistakes(Math.round(avg));
+
       onRate?.(rating);
     } else {
       onPassComplete?.();
     }
   }, [
-    displayState,
+    currentIndex,
     isLastCharacter,
-    allowRating,
+    displayState,
+    characters,
     handleReveal,
+    allowRating,
     calculateAverage,
     mistakeList,
     getRatingFromMistakes,
