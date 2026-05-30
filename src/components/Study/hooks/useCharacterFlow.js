@@ -91,9 +91,7 @@ export function useCharacterFlow({
   const handleReveal = useCallback(
     (mistakes = 0) => {
       const generation = phaseGenerationRef.current;
-      // allow manual reveals during quiz or outline — caller may invoke
-      // handleReveal when the user presses Continue to reveal the stroke
-      // immediately.
+
       // Clear any pending triggers safely
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);

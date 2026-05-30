@@ -85,13 +85,16 @@ export function useHanziWriter({
         break;
 
       case "outline":
-        // In outline mode, show the stroke outline but do NOT auto-complete.
-        // The parent flow will call `handleReveal` (triggering a reveal)
-        // when the user presses Continue. Previously we auto-fired
-        // completion which caused outlines to reveal automatically.
         writer.cancelQuiz();
         writer.hideCharacter();
         writer.showOutline();
+        // Start a quiz, but force the background outline to stay visible!
+        writer.quiz({
+          onComplete: () => {
+            console.log("[Outline Trace] Tracing complete!");
+            onQuizComplete?.();
+          },
+        });
         break;
 
       case "quiz":
