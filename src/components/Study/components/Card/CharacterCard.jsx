@@ -16,9 +16,15 @@ const CharacterCard = ({
   onRate,
   getRatingFromMistakes,
   onPassComplete,
-  sessionKey,
 }) => {
   const audioRef = useRef(null);
+
+  console.log("[CharacterCard] MOUNTED", card?.front);
+
+  React.useEffect(() => {
+    console.log("[CharacterCard] useEffect mount", card?.front);
+    return () => console.log("[CharacterCard] UNMOUNTED", card?.front);
+  }, []);
 
   const playAudio = useCallback(() => {
     if (audioRef.current && card?.audioUrl) {
@@ -44,7 +50,6 @@ const CharacterCard = ({
     onReveal,
     displayState,
     playAudio,
-    sessionKey,
   });
 
   const showContinueButtons = useMemo(() => {

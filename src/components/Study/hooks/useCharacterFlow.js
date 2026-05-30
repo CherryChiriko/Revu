@@ -16,7 +16,6 @@ export function useCharacterFlow({
   onReveal,
   playAudio,
   displayState,
-  sessionKey,
 }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
@@ -40,100 +39,93 @@ export function useCharacterFlow({
 
   const isLastCharacter = currentIndex === characters.length - 1;
 
-  // -------------------------------------------------------------
-  // CRITICAL FIX: Store fast-changing values in tracking refs
-  // so timeouts never read stale snapshots from a closed function
-  // -------------------------------------------------------------
+  // Track fast-changing values for timeouts
   const stateRef = useRef({});
   useEffect(() => {
     stateRef.current = {
       isLastCharacter,
       currentIndex,
       allowRating,
-      mistakes: mistakeList[mistakeList.length - 1] ?? 0,
+      displayState,
     };
-  }, [isLastCharacter, currentIndex, allowRating, mistakeList]);
+  }, [isLastCharacter, currentIndex, allowRating, displayState]);
 
-  // Split the reset effect from the displayState-watching effect
+  // Master cleanup for active timeouts
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+  }, [card?.id, displayState, currentIndex]);
+
+  const phaseGenerationRef = useRef(0);
+
   useLayoutEffect(() => {
-    console.log("[useLayoutEffect RESET] firing", {
-      cardId: card?.id,
-      currentIndexBefore: currentIndex, // add this
-    });
+    phaseGenerationRef.current += 1;
     console.log(
-      "[useLayoutEffect RESET] card?.id:",
+      "[useCharacterFlow] layoutEffect reset — card:",
       card?.id,
       "displayState:",
       displayState,
-    );
+    ); // ADD THIS
+
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
+
     setCurrentIndex(0);
-    setRevealed(false);
     setMistakeList([]);
     setCompletedChars([]);
-    playAudio?.();
-  }, [card?.id, sessionKey]); // ← Remove displayState from here
 
-  // Separate effect just for displayState-driven resets (no state wipe)
-  useEffect(() => {
-    console.log("[displayState effect]", {
-      displayState,
-      hasTimeout: !!timeoutRef.current,
-    });
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
+    // CRITICAL: Always hide the character when a new phase or card mounts!
+    // This ensures Quiz phase starts completely blank.
     setRevealed(false);
-  }, [displayState]);
 
-  const calculateAverage = useCallback(
-    (mistakesForCurrentChar) => {
-      const allMistakes = [...mistakeList, mistakesForCurrentChar];
-      return allMistakes.reduce((a, b) => a + b, 0) / allMistakes.length;
-    },
-    [mistakeList],
-  );
+    playAudio?.();
+  }, [card?.id, displayState]);
 
-  // Auto-advance after showing character
+  // Handles character completion/reveal (either auto in outline or on-complete in quiz)
   const handleReveal = useCallback(
     (mistakes = 0) => {
+      const generation = phaseGenerationRef.current;
+      // allow manual reveals during quiz or outline — caller may invoke
+      // handleReveal when the user presses Continue to reveal the stroke
+      // immediately.
+      // Clear any pending triggers safely
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
       }
 
+      // Show the character strokes now that it's completed/revealed
       setRevealed(true);
+      console.log(
+        "[useCharacterFlow] setRevealed(true) — displayState at call time:",
+        displayState,
+      );
       onReveal?.();
       setMistakeList((prev) => [...prev, mistakes]);
       setCompletedChars((prev) => [...prev, currentCharacter]);
       playAudio?.();
 
-      // Clear any floating handlers from the engine queue
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-      console.log("[handleReveal] setting timeout", {
-        character: currentCharacter,
-        cardId: card?.id,
-      });
       timeoutRef.current = setTimeout(() => {
+        if (phaseGenerationRef.current !== generation) return;
         timeoutRef.current = null;
-        setRevealed(false);
 
-        // ALWAYS read from the latest updated values ref
         const current = stateRef.current;
 
-        if (!current.isLastCharacter) {
-          console.log("[TIMEOUT ACTION] Safely advancing internal index");
+        // If the user manually changed phases out from under us, stop execution
+        if (current.displayState !== displayState) return;
+
+        // Turn reveal back off for the next character coming up
+        setRevealed(false);
+
+        if (!isLastCharacter) {
           setCurrentIndex((i) => i + 1);
         } else {
-          console.log(
-            "[TIMEOUT ACTION] Last character matched via Ref. Syncing state.",
-          );
           if (current.allowRating) {
             const avg = calculateAverage(mistakes);
             const rating = getRatingFromMistakes(Math.round(avg));
@@ -148,26 +140,44 @@ export function useCharacterFlow({
       onReveal,
       playAudio,
       currentCharacter,
-      calculateAverage,
-      getRatingFromMistakes,
+      isLastCharacter,
+      displayState,
+      allowRating,
       onRate,
       onPassComplete,
+      getRatingFromMistakes,
     ],
   );
 
-  // For manual skipping
+  const calculateAverage = useCallback(
+    (mistakesForCurrentChar) => {
+      const allMistakes = [...mistakeList, mistakesForCurrentChar];
+      return allMistakes.reduce((a, b) => a + b, 0) / allMistakes.length;
+    },
+    [mistakeList],
+  );
+
+  // Manual fallback button navigation
   const handleContinue = useCallback(() => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
 
+    // In outline mode, continue should first reveal the current character.
+    if (displayState === "outline" && !revealed) {
+      handleReveal();
+      return;
+    }
+
     if (!isLastCharacter) {
+      setRevealed(false); // Hide for next character
       setCurrentIndex((i) => i + 1);
       return;
     }
 
-    if (displayState === "outline") {
+    // Auto-reveal on continue for quiz mode when there is no outline branch.
+    if (displayState === "quiz") {
       handleReveal();
       return;
     }
@@ -191,6 +201,7 @@ export function useCharacterFlow({
     getRatingFromMistakes,
     onRate,
     onPassComplete,
+    revealed,
   ]);
 
   const renderWordProgress = () => {

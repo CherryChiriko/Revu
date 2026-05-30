@@ -9,6 +9,11 @@ const HanziCanvas = ({
   strokeColor,
   revealed,
 }) => {
+  React.useEffect(() => {
+    console.log("[HanziCanvas] MOUNTED", character);
+    return () => console.log("[HanziCanvas] UNMOUNTED", character);
+  }, []);
+
   const { containerRef } = useHanziWriter({
     character,
     displayState,

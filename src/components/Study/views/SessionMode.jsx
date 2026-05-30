@@ -10,6 +10,11 @@ import { Bar } from "../../General/ui/Bar";
 const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
   const navigate = useNavigate();
 
+  React.useEffect(() => {
+    console.log("[SessionMode] MOUNTED");
+    return () => console.log("[SessionMode] UNMOUNTED");
+  }, []);
+
   const {
     currentCard,
     currentPhase,
@@ -23,7 +28,6 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
     handlePassComplete,
     resetSession,
     exitSession,
-    sessionKey,
   } = session;
 
   // SessionMode.jsx
@@ -75,6 +79,13 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
     );
   }
 
+  console.log("[SessionMode render]", {
+    currentCard: currentCard?.id,
+    phase: currentPhase?.displayState,
+    isTransitioning,
+    sessionFinished,
+  });
+
   return (
     <div
       className={`min-h-screen ${activeTheme.background.app} ${activeTheme.text.primary} w-full`}
@@ -102,6 +113,7 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
 
         <div className="relative perspective-1000 w-full max-w-2xl mx-auto h-96 mb-8">
           <CardRenderer
+            key={currentCard.id}
             card={currentCard}
             study_mode={activeDeck.study_mode}
             phase={currentPhase}
@@ -111,7 +123,6 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
             onReveal={onReveal}
             onRate={handleRate}
             onPassComplete={handlePassComplete}
-            sessionKey={sessionKey}
           />
         </div>
       </div>

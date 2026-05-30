@@ -1,3 +1,4 @@
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -7,6 +8,10 @@ import useStudySession from "../hooks/useStudySession";
 import SessionMode from "./SessionMode";
 
 const StudySession = () => {
+  React.useEffect(() => {
+    console.log("[StudySession] MOUNTED");
+    return () => console.log("[StudySession] UNMOUNTED");
+  }, []);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const params = searchParams.get("mode"); // "learn" or "review"
@@ -100,6 +105,12 @@ const StudySession = () => {
       </div>
     );
   }
+
+  console.log("[StudySession render]", {
+    status,
+    cardsLength: cards?.length,
+    activeDeckId: activeDeck?.id,
+  });
 
   // --- Session Mode ---
   if (status === "succeeded" && cards.length > 0 && navMode) {

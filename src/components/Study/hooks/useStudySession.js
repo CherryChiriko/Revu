@@ -67,12 +67,16 @@ export default function useStudySession({ deck, navMode }) {
   // ----------------------
   // Phases
   // ----------------------
-  const phases = isReviewMode
-    ? [{ displayState: "quiz", allowRating: true }]
-    : (PHASES[deck?.study_mode] ?? PHASES.A);
+  const phases = useMemo(
+    () =>
+      isReviewMode
+        ? [{ displayState: "quiz", allowRating: true }]
+        : (PHASES[deck?.study_mode] ?? PHASES.A),
+    [isReviewMode, deck?.study_mode],
+  );
   const totalPhases = phases.length;
 
-  const currentPhase = phases[phaseIndex];
+  const currentPhase = useMemo(() => phases[phaseIndex], [phases, phaseIndex]);
   const currentCard = cards[cardIndex];
 
   const totalSteps = totalPhases * limit || 1;
@@ -82,14 +86,11 @@ export default function useStudySession({ deck, navMode }) {
   // ----------------------
   // Session Control
   // ----------------------
-  const [sessionKey, setSessionKey] = useState(0);
-
   const restartSession = useCallback(() => {
     setSessionFinished(false);
     setPhaseIndex(0);
     setCardIndex(0);
     setSessionUpdates([]);
-    setSessionKey((k) => k + 1);
   }, []);
 
   useEffect(() => {
@@ -194,7 +195,6 @@ export default function useStudySession({ deck, navMode }) {
           dispatch(fetchDailyStreakStats()),
           dispatch(fetchDeckCounts({ user_id: currentCard.user_id })),
         ]);
-
         // 4. Log activity locally
         dispatch(logStudySession({ cardsReviewed, cardsLearned }));
 
@@ -237,6 +237,5 @@ export default function useStudySession({ deck, navMode }) {
     limit,
     mode: navMode,
     status,
-    sessionKey,
   };
 }
