@@ -5,6 +5,7 @@ import { faVolumeHigh } from "@fortawesome/free-solid-svg-icons";
 import RevealButton from "../Controls/RevealButton";
 import ContinueButton from "../Controls/ContinueButton";
 import { useCharacterFlow } from "../../hooks/useCharacterFlow";
+import { useMemo } from "react";
 
 const CharacterCard = ({
   card,
@@ -15,6 +16,7 @@ const CharacterCard = ({
   onRate,
   getRatingFromMistakes,
   onPassComplete,
+  sessionKey,
 }) => {
   const audioRef = useRef(null);
 
@@ -42,10 +44,14 @@ const CharacterCard = ({
     onReveal,
     displayState,
     playAudio,
+    sessionKey,
   });
 
-  const showContinueButtons =
-    displayState === "animation" || displayState === "outline";
+  const showContinueButtons = useMemo(() => {
+    if (revealed) return false;
+
+    return displayState === "animation" || displayState === "outline";
+  }, [displayState, revealed]);
 
   return (
     <div

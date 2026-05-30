@@ -82,11 +82,14 @@ export default function useStudySession({ deck, navMode }) {
   // ----------------------
   // Session Control
   // ----------------------
+  const [sessionKey, setSessionKey] = useState(0);
+
   const restartSession = useCallback(() => {
     setSessionFinished(false);
     setPhaseIndex(0);
     setCardIndex(0);
     setSessionUpdates([]);
+    setSessionKey((k) => k + 1);
   }, []);
 
   useEffect(() => {
@@ -98,6 +101,8 @@ export default function useStudySession({ deck, navMode }) {
   }, [navigate]);
 
   const advanceCard = useCallback(() => {
+    console.log("[advanceCard]", { cardIndex, phaseIndex, limit, totalPhases });
+    console.trace("[advanceCard] call stack"); // ← shows exactly who called it
     console.log("[advanceCard BEFORE]", currentCard);
     if (cardIndex + 1 < limit) {
       setCardIndex((i) => i + 1);
@@ -232,5 +237,6 @@ export default function useStudySession({ deck, navMode }) {
     limit,
     mode: navMode,
     status,
+    sessionKey,
   };
 }

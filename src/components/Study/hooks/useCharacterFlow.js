@@ -1,4 +1,11 @@
-import { useState, useMemo, useCallback, useEffect, useRef } from "react";
+import {
+  useState,
+  useMemo,
+  useCallback,
+  useEffect,
+  useRef,
+  useLayoutEffect,
+} from "react";
 
 export function useCharacterFlow({
   card,
@@ -9,6 +16,7 @@ export function useCharacterFlow({
   onReveal,
   playAudio,
   displayState,
+  sessionKey,
 }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
@@ -32,32 +40,59 @@ export function useCharacterFlow({
 
   const isLastCharacter = currentIndex === characters.length - 1;
 
-  // Cleanup timeout on unmount or card change
+  // -------------------------------------------------------------
+  // CRITICAL FIX: Store fast-changing values in tracking refs
+  // so timeouts never read stale snapshots from a closed function
+  // -------------------------------------------------------------
+  const stateRef = useRef({});
   useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
+    stateRef.current = {
+      isLastCharacter,
+      currentIndex,
+      allowRating,
+      mistakes: mistakeList[mistakeList.length - 1] ?? 0,
     };
-  }, []);
+  }, [isLastCharacter, currentIndex, allowRating, mistakeList]);
 
-  useEffect(() => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+  // Split the reset effect from the displayState-watching effect
+  useLayoutEffect(() => {
+    console.log("[useLayoutEffect RESET] firing", {
+      cardId: card?.id,
+      currentIndexBefore: currentIndex, // add this
+    });
+    console.log(
+      "[useLayoutEffect RESET] card?.id:",
+      card?.id,
+      "displayState:",
+      displayState,
+    );
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
     setCurrentIndex(0);
     setRevealed(false);
     setMistakeList([]);
     setCompletedChars([]);
     playAudio?.();
-  }, [card?.id, playAudio, displayState]);
+  }, [card?.id, sessionKey]); // ← Remove displayState from here
+
+  // Separate effect just for displayState-driven resets (no state wipe)
+  useEffect(() => {
+    console.log("[displayState effect]", {
+      displayState,
+      hasTimeout: !!timeoutRef.current,
+    });
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    setRevealed(false);
+  }, [displayState]);
 
   const calculateAverage = useCallback(
     (mistakesForCurrentChar) => {
-      // console.log(mistakesForCurrentChar);
       const allMistakes = [...mistakeList, mistakesForCurrentChar];
-      // console.log(
-      //   allMistakes,
-      //   allMistakes.reduce((a, b) => a + b, 0) / allMistakes.length
-      // );
       return allMistakes.reduce((a, b) => a + b, 0) / allMistakes.length;
     },
     [mistakeList],
@@ -66,38 +101,44 @@ export function useCharacterFlow({
   // Auto-advance after showing character
   const handleReveal = useCallback(
     (mistakes = 0) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+
       setRevealed(true);
       onReveal?.();
       setMistakeList((prev) => [...prev, mistakes]);
       setCompletedChars((prev) => [...prev, currentCharacter]);
       playAudio?.();
 
-      // Clear any existing timeout
+      // Clear any floating handlers from the engine queue
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
-
-      // Auto-advance after showing the character for 600ms
+      console.log("[handleReveal] setting timeout", {
+        character: currentCharacter,
+        cardId: card?.id,
+      });
       timeoutRef.current = setTimeout(() => {
-        console.log("[timeout firing]", {
-          character: currentCharacter,
-          cardId: card?.id,
-          isLastCharacter,
-        });
-
+        timeoutRef.current = null;
         setRevealed(false);
-        if (!isLastCharacter) {
-          // Move to next character
+
+        // ALWAYS read from the latest updated values ref
+        const current = stateRef.current;
+
+        if (!current.isLastCharacter) {
+          console.log("[TIMEOUT ACTION] Safely advancing internal index");
           setCurrentIndex((i) => i + 1);
         } else {
-          // Last character - finish the card
-          if (allowRating) {
+          console.log(
+            "[TIMEOUT ACTION] Last character matched via Ref. Syncing state.",
+          );
+          if (current.allowRating) {
             const avg = calculateAverage(mistakes);
             const rating = getRatingFromMistakes(Math.round(avg));
-            // console.log("rating", rating);
             onRate?.(rating);
           } else {
-            console.log("[calling onPassComplete]");
             onPassComplete?.();
           }
         }
@@ -107,8 +148,6 @@ export function useCharacterFlow({
       onReveal,
       playAudio,
       currentCharacter,
-      isLastCharacter,
-      allowRating,
       calculateAverage,
       getRatingFromMistakes,
       onRate,
@@ -116,21 +155,18 @@ export function useCharacterFlow({
     ],
   );
 
-  // For outline/animation mode: manual continue
+  // For manual skipping
   const handleContinue = useCallback(() => {
-    console.log("[useCharacterFlow] handleContinue clicked!", {
-      currentIndex,
-      isLastCharacter,
-      displayState,
-      character: characters[currentIndex],
-    });
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
 
     if (!isLastCharacter) {
       setCurrentIndex((i) => i + 1);
       return;
     }
 
-    // last character reached
     if (displayState === "outline") {
       handleReveal();
       return;
@@ -138,9 +174,7 @@ export function useCharacterFlow({
 
     if (allowRating) {
       const avg = calculateAverage(mistakeList[mistakeList.length - 1] ?? 0);
-
       const rating = getRatingFromMistakes(Math.round(avg));
-
       onRate?.(rating);
     } else {
       onPassComplete?.();

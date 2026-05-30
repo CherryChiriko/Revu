@@ -26,84 +26,75 @@ export function useHanziWriter({
   const writerRef = useRef(null);
 
   // Master setup effect: Runs whenever character, properties, OR state changes
+  // create writer ONLY when character changes
   useEffect(() => {
     if (!character || !window.HanziWriter || !containerRef.current) return;
 
-    const resolvedState = revealed ? "reveal" : displayState;
-
-    // 1. Wipe the container and drop any old instance
     containerRef.current.innerHTML = "";
-    writerRef.current = null;
 
-    try {
-      const writer = window.HanziWriter.create(
-        containerRef.current,
-        character,
-        {
-          ...WRITER_CONFIG,
-          strokeColor,
-          outlineColor,
-          highlightColor: strokeColor,
-          width,
-          height,
-        },
-      );
+    const writer = window.HanziWriter.create(containerRef.current, character, {
+      ...WRITER_CONFIG,
+      strokeColor,
+      outlineColor,
+      highlightColor: strokeColor,
+      width,
+      height,
+    });
 
-      writerRef.current = writer;
-      console.log("[useHanziWriter] Hook hook-level evaluated:", {
-        character,
-        resolvedState,
-      });
+    writerRef.current = writer;
 
-      // 2. Apply behavior directly upon creation based on the current state
-      switch (resolvedState) {
-        case "animation":
-          writer.hideCharacter();
-          writer.loopCharacterAnimation();
-          break;
-
-        case "outline":
-          writer.hideCharacter();
-          writer.quiz({
-            onComplete: () => onQuizComplete?.(0),
-          });
-          break;
-
-        case "quiz":
-          writer.hideCharacter();
-          writer.hideOutline();
-          writer.quiz({
-            onComplete: (summary) => {
-              const mistakes = summary?.totalMistakes ?? 0;
-              onQuizComplete?.(mistakes);
-            },
-          });
-          break;
-
-        case "reveal":
-        default:
-          writer.showCharacter();
-          break;
-      }
-    } catch (err) {
-      console.error("[HanziWriter] Setup Error:", err);
-    }
-
-    // Cleanup when moving away or unmounting
     return () => {
       writerRef.current = null;
-      if (containerRef.current) containerRef.current.innerHTML = "";
+      if (containerRef.current) {
+        containerRef.current.innerHTML = "";
+      }
     };
-  }, [
-    character,
-    outlineColor,
-    strokeColor,
-    width,
-    height,
-    onQuizComplete,
-    revealed,
-    displayState,
-  ]);
+  }, [character]);
+
+  useEffect(() => {
+    const writer = writerRef.current;
+    if (!writer) return;
+
+    const resolvedState = revealed ? "reveal" : displayState;
+
+    switch (resolvedState) {
+      case "animation":
+        writer.hideCharacter();
+        writer.loopCharacterAnimation();
+        break;
+
+      case "outline":
+        writer.hideCharacter();
+        writer.quiz({
+          onComplete: () => {
+            console.log("[HanziWriter onComplete outline]", {
+              character,
+              displayState,
+            });
+            onQuizComplete?.(0);
+          },
+        });
+        break;
+
+      case "quiz":
+        writer.quiz({
+          onComplete: (summary) => {
+            console.log("[HanziWriter onComplete quiz]", {
+              character,
+              displayState,
+              summary,
+            });
+            onQuizComplete?.(summary?.totalMistakes ?? 0);
+          },
+        });
+        break;
+
+      case "reveal":
+      default:
+        writer.showCharacter();
+        break;
+    }
+  }, [displayState, revealed, onQuizComplete]);
 
   return { containerRef };
 }

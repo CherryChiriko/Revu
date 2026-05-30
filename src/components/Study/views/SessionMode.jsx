@@ -1,3 +1,4 @@
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../General/ui/Header";
 import CardRenderer from "../../Study/components/Card/CardRenderer";
@@ -5,9 +6,8 @@ import SessionComplete from "../components/Modals/SessionComplete";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { Bar } from "../../General/ui/Bar";
-import useStudySession from "../hooks/useStudySession";
 
-const SessionMode = ({ mode, activeTheme, activeDeck }) => {
+const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
   const navigate = useNavigate();
 
   const {
@@ -23,7 +23,18 @@ const SessionMode = ({ mode, activeTheme, activeDeck }) => {
     handlePassComplete,
     resetSession,
     exitSession,
-  } = useStudySession({ deck: activeDeck, navMode: mode });
+    sessionKey,
+  } = session;
+
+  // SessionMode.jsx
+  const [isTransitioning, setIsTransitioning] = React.useState(false);
+
+  const handleResetSession = React.useCallback(() => {
+    setIsTransitioning(true);
+    resetSession();
+    // Give Redux one tick to update cards
+    setTimeout(() => setIsTransitioning(false), 50);
+  }, [resetSession]);
 
   if (sessionFinished) {
     return (
@@ -34,12 +45,15 @@ const SessionMode = ({ mode, activeTheme, activeDeck }) => {
           learnedCount={limit}
           isOpen={!!sessionSummary}
           onGoBack={exitSession}
-          onLearnMore={resetSession}
+          onLearnMore={handleResetSession}
           activeTheme={activeTheme}
         />
       </div>
     );
   }
+
+  if (isTransitioning || !currentCard) return null;
+  if (!currentCard) return null;
 
   if (!cards.length) {
     return (
@@ -97,6 +111,7 @@ const SessionMode = ({ mode, activeTheme, activeDeck }) => {
             onReveal={onReveal}
             onRate={handleRate}
             onPassComplete={handlePassComplete}
+            sessionKey={sessionKey}
           />
         </div>
       </div>

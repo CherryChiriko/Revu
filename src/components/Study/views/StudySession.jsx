@@ -17,10 +17,8 @@ const StudySession = () => {
 
   const navMode = params ?? (activeDeck?.due > 0 ? "review" : "learn");
 
-  const { status, cards, error } = useStudySession({
-    deck: activeDeck,
-    navMode,
-  });
+  const session = useStudySession({ deck: activeDeck, navMode });
+  const { status, cards, error } = session;
 
   if (!allDecks || allDecks.length === 0) {
     return (
@@ -110,6 +108,7 @@ const StudySession = () => {
         mode={navMode}
         activeTheme={activeTheme}
         activeDeck={activeDeck}
+        session={session}
       />
     );
   }
