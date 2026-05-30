@@ -59,14 +59,14 @@ export const ProgressBar = ({
         )}
         {duePct > 0 && (
           <div
-            className={`${segmentBase} ${activeTheme.background.accent1}`}
+            className={`${segmentBase} ${activeTheme.background.accent2}`}
             style={{ width: `${duePct}%` }}
             title={`Due: ${due}`}
           />
         )}
         {learningPct > 0 && (
           <div
-            className={`${segmentBase} ${activeTheme.background.accent2}`}
+            className={`${segmentBase} ${activeTheme.background.accent1}`}
             style={{ width: `${learningPct}%` }}
             title={`Learning: ${waiting}`}
           />
@@ -85,12 +85,12 @@ export const ProgressBar = ({
           <StatItem
             label="due"
             count={due}
-            colorClass={activeTheme.background.accent1}
+            colorClass={activeTheme.background.accent2}
           />
           <StatItem
             label="waiting"
             count={waiting}
-            colorClass={activeTheme.background.accent2}
+            colorClass={activeTheme.background.accent1}
           />
           <StatItem
             label="new"

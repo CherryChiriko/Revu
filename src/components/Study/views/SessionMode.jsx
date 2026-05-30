@@ -31,14 +31,44 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
   } = session;
 
   // SessionMode.jsx
+  const [previousCardId, setPreviousCardId] = React.useState(currentCard?.id);
   const [isTransitioning, setIsTransitioning] = React.useState(false);
+  const [sessionResetCount, setSessionResetCount] = React.useState(0);
+  const transitionTimeoutRef = React.useRef(null);
+
+  React.useEffect(() => {
+    if (!isTransitioning) return;
+
+    if (transitionTimeoutRef.current) {
+      window.clearTimeout(transitionTimeoutRef.current);
+      transitionTimeoutRef.current = null;
+    }
+
+    if (currentCard?.id && currentCard?.id !== previousCardId) {
+      setIsTransitioning(false);
+      setPreviousCardId(currentCard.id);
+      return;
+    }
+
+    transitionTimeoutRef.current = window.setTimeout(() => {
+      setIsTransitioning(false);
+      transitionTimeoutRef.current = null;
+    }, 1000);
+
+    return () => {
+      if (transitionTimeoutRef.current) {
+        window.clearTimeout(transitionTimeoutRef.current);
+        transitionTimeoutRef.current = null;
+      }
+    };
+  }, [isTransitioning, currentCard?.id, previousCardId]);
 
   const handleResetSession = React.useCallback(() => {
+    setPreviousCardId(currentCard?.id);
     setIsTransitioning(true);
+    setSessionResetCount((count) => count + 1);
     resetSession();
-    // Give Redux one tick to update cards
-    setTimeout(() => setIsTransitioning(false), 50);
-  }, [resetSession]);
+  }, [currentCard?.id, resetSession]);
 
   if (sessionFinished) {
     return (
@@ -56,7 +86,21 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
     );
   }
 
-  if (isTransitioning || !currentCard) return null;
+  if (isTransitioning) {
+    return (
+      <div
+        className={`min-h-screen ${activeTheme.background.app} ${activeTheme.text.primary} w-full`}
+      >
+        <div className="max-w-screen-xl mx-auto px-4 md:px-8 py-8">
+          <Header title={`${activeDeck.name}`} />
+          <div className="h-96 flex items-center justify-center">
+            <p className="text-xl animate-pulse">Loading next card…</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!currentCard) return null;
 
   if (!cards.length) {
@@ -82,7 +126,6 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
   console.log("[SessionMode render]", {
     currentCard: currentCard?.id,
     phase: currentPhase?.displayState,
-    isTransitioning,
     sessionFinished,
   });
 
@@ -113,7 +156,7 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
 
         <div className="relative perspective-1000 w-full max-w-2xl mx-auto h-96 mb-8">
           <CardRenderer
-            key={currentCard.id}
+            key={`${currentCard.id}-${sessionResetCount}`}
             card={currentCard}
             study_mode={activeDeck.study_mode}
             phase={currentPhase}

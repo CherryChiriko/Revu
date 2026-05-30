@@ -45,12 +45,15 @@ export const fetchCards = createAsyncThunk(
       }
 
       // Fetch progress for these cards
-      const cardIds = cards.map((c) => c.id);
+      // const cardIds = cards.map((c) => c.id);
       const { data: progressData, error: progressError } = await supabase
         .from(progressTable)
         .select("*")
-        .in("card_id", cardIds)
-        .eq("user_id", user_id);
+        .eq("deck_id", deck_id)
+        .eq("user_id", user_id)
+        .limit(200); // Limit to 200 for performance; adjust as needed
+
+      console.log(progressData);
 
       if (progressError) {
         console.warn("[fetchCards] Progress fetch failed:", progressError);
@@ -95,7 +98,7 @@ export const fetchCards = createAsyncThunk(
       console.error("[fetchCards] Error:", err);
       return rejectWithValue(err.message);
     }
-  }
+  },
 );
 
 const cardSlice = createSlice({

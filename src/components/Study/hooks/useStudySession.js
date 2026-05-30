@@ -49,6 +49,10 @@ export default function useStudySession({ deck, navMode }) {
     const filteredCards = allCards.filter(
       (c) => c.status === (isReviewMode ? "due" : "new"),
     );
+    console.log(
+      "[useStudySession] allCards statuses:",
+      allCards.map((c) => ({ id: c.card_id, status: c.status })),
+    );
 
     const sessionLimit = Math.min(modeLimit, filteredCards.length);
 
@@ -150,6 +154,7 @@ export default function useStudySession({ deck, navMode }) {
 
     const runUpdates = async () => {
       try {
+        console.log("[runUpdates] starting, sessionUpdates:", sessionUpdates);
         const cardsStudied = sessionUpdates.length;
         const cardsReviewed = isReviewMode ? cardsStudied : 0;
         const cardsLearned = isReviewMode ? 0 : cardsStudied;
@@ -162,9 +167,10 @@ export default function useStudySession({ deck, navMode }) {
         }
 
         // 1. Update progress in Redux + DB
-        await dispatch(
+        const result = await dispatch(
           updateProgress({ sessionUpdates, study_mode: deck.study_mode }),
         ).unwrap();
+        console.log("[runUpdates] updateProgress result:", result);
 
         // 2. Update streaks in Supabase
         await supabase.rpc("update_streaks_after_session", {
@@ -184,17 +190,34 @@ export default function useStudySession({ deck, navMode }) {
         dispatch(fetchDailyActivity());
 
         // 3. Refresh cards & streaks in Redux
-        await Promise.all([
-          dispatch(
-            fetchCards({
-              deck_id: deck.id,
-              user_id: currentCard.user_id,
-              study_mode: deck.study_mode,
-            }),
-          ),
-          dispatch(fetchDailyStreakStats()),
-          dispatch(fetchDeckCounts({ user_id: currentCard.user_id })),
-        ]);
+        const fetchResult = await dispatch(
+          fetchCards({
+            deck_id: deck.id,
+            user_id: currentCard.user_id,
+            study_mode: deck.study_mode,
+          }),
+        ).unwrap();
+        console.log(
+          "[runUpdates] fetchCards result — first 3 cards:",
+          fetchResult.slice(0, 3),
+        );
+        console.log(
+          "[runUpdates] studied card after fetch:",
+          fetchResult.find((c) => c.card_id === sessionUpdates[0]?.card_id),
+        );
+        console.log("[runUpdates] fetchCards count:", fetchResult.length);
+        console.log(
+          "[runUpdates] new cards after fetch:",
+          fetchResult
+            .filter((c) => c.status === "new")
+            .map((c) => ({ id: c.card_id, front: c.front, status: c.status })),
+        );
+        console.log(
+          "[runUpdates] studied card in result:",
+          fetchResult.find((c) => c.card_id === sessionUpdates[0]?.card_id)
+            ?.status ?? "NOT IN RESULT",
+        );
+
         // 4. Log activity locally
         dispatch(logStudySession({ cardsReviewed, cardsLearned }));
 
