@@ -1,7 +1,8 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { selectActiveTheme } from "./slices/themeSlice";
+import { clearUser, fetchUserProfile } from "./slices/userSlice";
 import {
   selectActiveDeck,
   selectDeckStatus,
@@ -19,6 +20,7 @@ import DeckListView from "./components/Decks/views/DeckListView";
 import DeckDetails from "./components/Decks/views/DeckDetails";
 import ImportView from "./components/Import/ImportView";
 import StudySession from "./components/Study/views/StudySession";
+import SettingsPage from "./components/Settings/SettingsPage";
 import LoginPage from "./components/LoginPage";
 import NotFound404 from "./components/404";
 
@@ -34,6 +36,7 @@ import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 function App() {
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const activeTheme = useSelector(selectActiveTheme);
   const { session, loading: authLoading } = useAuth();
   const status = useSelector(selectDeckStatus);
@@ -46,6 +49,14 @@ function App() {
   useDeckLiveSync(session && status === "succeeded");
   useGlobalStatsLiveSync(!!session);
   useAppBoot(session);
+
+  React.useEffect(() => {
+    if (session?.user?.id) {
+      dispatch(fetchUserProfile(session.user.id));
+    } else {
+      dispatch(clearUser());
+    }
+  }, [dispatch, session?.user?.id]);
 
   function setPrimeTheme(isDark) {
     const themeLink = document.getElementById("primereact-theme");
@@ -148,6 +159,7 @@ function App() {
             element={<DeckDetails activeTheme={activeTheme} />}
           />
           <Route path="/study" element={<StudySession />} />
+          <Route path="/settings" element={<SettingsPage />} />
           <Route
             path="/reset-password"
             element={<ResetPasswordPage activeTheme={activeTheme} />}

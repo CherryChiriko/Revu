@@ -4,7 +4,18 @@ import { selectGlobalStreakState } from "../../slices/streakSlice";
 
 export const StatCard = ({ icon, label, value, activeTheme }) => {
   const streakState = useSelector(selectGlobalStreakState);
-  const isStreakActive = streakState === "active";
+  const streakColor = () => {
+    switch (streakState) {
+      case "active":
+        return "text-amber-500";
+      case "inactive":
+        return "";
+      case "frozen":
+        return "text-blue-300";
+      default:
+        return "";
+    }
+  };
 
   return (
     <div
@@ -12,7 +23,7 @@ export const StatCard = ({ icon, label, value, activeTheme }) => {
     >
       <div
         className={`w-12 h-12 rounded-lg flex items-center justify-center bg-opacity-20  ${
-          isStreakActive && icon.iconName === "fire" ? " text-amber-500" : ""
+          icon.iconName === "fire" ? streakColor() : ""
         }`}
       >
         <FontAwesomeIcon icon={icon} className="w-5 h-5" />

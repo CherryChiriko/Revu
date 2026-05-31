@@ -1,6 +1,13 @@
 import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
-import { selectHeatmapData } from "../../slices/activitySlice";
+import {
+  selectActivityDays,
+  selectHeatmapData,
+} from "../../slices/activitySlice";
+import {
+  selectDailyGoal,
+  selectHeatmapMetric,
+} from "../../slices/settingsSlice";
 import { getTodayISO } from "../../utils/dateHelper";
 
 // Weekday labels (Mon–Sun)
@@ -54,7 +61,28 @@ function generateCalendarGrid(dataMap, weeksToShow = 4) {
 
 export const Heatmap = ({ activeTheme }) => {
   const COLORS = activeTheme.gradients.colors;
-  const heatmapData = useSelector(selectHeatmapData);
+  const heatmapMetric = useSelector(selectHeatmapMetric);
+  const dailyGoal = useSelector(selectDailyGoal);
+  const activityDays = useSelector(selectActivityDays);
+  const consistencyHeatmapData = useSelector(selectHeatmapData);
+
+  const heatmapData = useMemo(() => {
+    if (heatmapMetric === "consistency") return consistencyHeatmapData;
+
+    return Object.values(activityDays)
+      .map((day) => {
+        const value =
+          heatmapMetric === "learned"
+            ? day.cardsLearned || 0
+            : day.cardsStudied || 0;
+        return {
+          date: day.date,
+          value: Math.min(100, Math.round((value / dailyGoal) * 100)),
+          rawValue: value,
+        };
+      })
+      .sort((a, b) => a.date.localeCompare(b.date));
+  }, [activityDays, consistencyHeatmapData, dailyGoal, heatmapMetric]);
 
   const dataMap = useMemo(() => {
     const m = new Map();
@@ -86,7 +114,13 @@ export const Heatmap = ({ activeTheme }) => {
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <h3 className="font-semibold">Activity</h3>
-        <div className="text-xs opacity-60">daily objectives reached</div>
+        <div className="text-xs opacity-60">
+          {heatmapMetric === "consistency"
+            ? "daily objectives reached"
+            : heatmapMetric === "learned"
+              ? "cards learned"
+              : "cards studied"}
+        </div>
       </div>
 
       {/* Weekday header - FIRST ROW */}
@@ -108,7 +142,7 @@ export const Heatmap = ({ activeTheme }) => {
               return (
                 <div
                   key={idx}
-                  title={`${c.iso}: ${c.value}`}
+                  title={`${c.iso}: ${c.value}%`}
                   className={`w-7 h-7 rounded-sm flex items-center justify-center text-xs font-medium
   ${isToday ? `border-2 ${activeTheme.border.card}` : ""} ${
     c.isFuture ? `border-2 ${activeTheme.border.muted}` : ""

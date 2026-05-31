@@ -38,6 +38,12 @@ const userSlice = createSlice({
       state.status = "idle";
       state.error = null;
     },
+    updateLocalProfile(state, action) {
+      state.profile = {
+        ...(state.profile || {}),
+        ...action.payload,
+      };
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -57,13 +63,13 @@ const userSlice = createSlice({
   },
 });
 
-export const { clearUser } = userSlice.actions;
+export const { clearUser, updateLocalProfile } = userSlice.actions;
 
 // Selectors
-export const selectUserProfile = (state) => state.user?.profile;
-export const selectUsername = (state) => state.user?.profile?.username;
+export const selectUserProfile = (state) => state.users?.profile;
+export const selectUsername = (state) => state.users?.profile?.username;
 
-export const selectUserStatus = (state) => state.user?.status;
-export const selectUserError = (state) => state.user?.error;
+export const selectUserStatus = (state) => state.users?.status;
+export const selectUserError = (state) => state.users?.error;
 
 export default userSlice.reducer;

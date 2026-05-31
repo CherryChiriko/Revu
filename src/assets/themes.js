@@ -73,6 +73,7 @@ const themes = [
       secondary: "bg-white",
       navbar: "bg-white/80",
       canvas: "bg-white",
+      track: "bg-gray-300",
       accent1: "bg-sky-500",
       accent2: "bg-purple-500",
       accent3: "bg-purple-500",

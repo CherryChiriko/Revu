@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { selectActiveTheme } from "../../slices/themeSlice";
+import { selectUserProfile } from "../../slices/userSlice";
+import { selectSettings } from "../../slices/settingsSlice";
 
 import RevuLogo from "../../assets/Revu_logo.png"; // This should be a transparent PNG or SVG
 import navigationItems from "../../data/navigationItems";
@@ -12,9 +14,12 @@ import NavItem from "./NavItem";
 
 const Navbar = () => {
   const activeTheme = useSelector(selectActiveTheme);
+  const profile = useSelector(selectUserProfile);
+  const settings = useSelector(selectSettings);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const gradient = `bg-gradient-to-r ${activeTheme.gradients.from} ${activeTheme.gradients.to}`;
+  const username = profile?.username || "Settings";
 
   return (
     <>
@@ -49,6 +54,14 @@ const Navbar = () => {
           {navigationItems.map((item) => (
             <NavItem key={item.id} item={item} />
           ))}
+          <Link
+            to="/settings"
+            title={username}
+            className={`ml-2 w-10 h-10 rounded-xl flex items-center justify-center text-sm font-black text-white shadow-md ring-2 ring-white/10 hover:scale-[1.03] transition-transform`}
+            style={{ backgroundColor: settings.profileColor }}
+          >
+            {settings.profileIcon}
+          </Link>
         </div>
       </nav>
 
@@ -77,14 +90,24 @@ const Navbar = () => {
           </div>
         </Link>
 
-        <button
-          className={`${activeTheme.text.primary} transition-colors duration-200`}
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          aria-expanded={isMenuOpen}
-          aria-controls="mobile-menu"
-        >
-          <FontAwesomeIcon icon={faBars} className="h-6 w-6" />
-        </button>
+        <div className="flex items-center gap-3">
+          <Link
+            to="/settings"
+            title={username}
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black text-white shadow-md"
+            style={{ backgroundColor: settings.profileColor }}
+          >
+            {settings.profileIcon}
+          </Link>
+          <button
+            className={`${activeTheme.text.primary} transition-colors duration-200`}
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-menu"
+          >
+            <FontAwesomeIcon icon={faBars} className="h-6 w-6" />
+          </button>
+        </div>
       </div>
 
       {/* Mobile Dropdown */}

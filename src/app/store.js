@@ -6,6 +6,7 @@ import streakReducer from "../slices/streakSlice";
 import userReducer from "../slices/userSlice";
 import progressReducer from "../slices/progressSlice";
 import activityReducer from "../slices/activitySlice";
+import settingsReducer from "../slices/settingsSlice";
 import { getTodayISO } from "../utils/dateHelper";
 
 const checkMidnightReset = () => {
@@ -39,5 +40,6 @@ export const store = configureStore({
     streak: streakReducer,
     progress: progressReducer,
     activity: activityReducer,
+    settings: settingsReducer,
   },
 });

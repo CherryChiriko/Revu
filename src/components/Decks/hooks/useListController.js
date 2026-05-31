@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { selectDecks } from "../../../slices/deckSlice";
+import { selectDefaultDeckView } from "../../../slices/settingsSlice";
 
 export default function useListController({
   initialView = "grid",
@@ -9,12 +10,13 @@ export default function useListController({
   initialPage = 1,
 } = {}) {
   const decks = useSelector(selectDecks);
+  const preferredView = useSelector(selectDefaultDeckView);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedLanguage, setSelectedLanguage] = useState(initialLanguage);
   const [sortBy, setSortBy] = useState(initialSort);
   const [currentPage, setCurrentPage] = useState(initialPage);
-  const [viewMode, setViewMode] = useState(initialView);
+  const [viewMode, setViewMode] = useState(preferredView || initialView);
 
   // decks per page based on view
   const decksPerPage = useMemo(() => (viewMode === "grid" ? 3 : 8), [viewMode]);
