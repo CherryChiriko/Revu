@@ -1,14 +1,17 @@
-import React, { useMemo } from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect, useMemo, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { selectActiveTheme } from "../../slices/themeSlice";
 import { selectGlobalStreak } from "../../slices/streakSlice";
 import {
+  fetchDeckCounts,
   selectDecks,
   selectTotalDueCards,
   selectTotalMasteredCards,
 } from "../../slices/deckSlice";
+import { fetchDailyStreakStats } from "../../slices/streakSlice";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import useAuth from "../../hooks/useAuth";
 import {
   faBookOpen,
   faFire,
@@ -23,13 +26,14 @@ import { Heatmap } from "./Heatmap";
 // import { Achievements } from "./Achievements";
 import { XPBar } from "./XPBar";
 import { StatCard } from "./StatCard";
-import { useRef } from "react";
 import { Toast } from "primereact/toast";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const activeTheme = useSelector(selectActiveTheme);
   const toast = useRef(null);
+  const { session } = useAuth();
 
   const decks = useSelector(selectDecks);
 
@@ -44,6 +48,13 @@ const Dashboard = () => {
     () => Math.max(0, mastered_cards * 5 + globalStreak * 10 + cards_due_today),
     [mastered_cards, globalStreak, cards_due_today],
   );
+
+  useEffect(() => {
+    if (!session?.user?.id) return;
+
+    dispatch(fetchDeckCounts({ user_id: session.user.id }));
+    dispatch(fetchDailyStreakStats());
+  }, [dispatch, session?.user?.id]);
 
   return (
     <div

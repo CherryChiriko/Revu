@@ -1,11 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  fetchDecks,
-  setActiveDeck,
-  selectDecks, // 👈 Import the raw decks array selector instead
-} from "../../../slices/deckSlice";
+import { fetchDecks, setActiveDeck } from "../../../slices/deckSlice";
 import { selectDeckStreakById } from "../../../slices/streakSlice";
 import { supabase } from "../../../utils/supabaseClient";
 import DeckConfirmationDialog from "../components/DeckConfirmationDialog";
@@ -23,21 +19,9 @@ export default function useDeckLogic(id, cards_count, { toast, activeTheme }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // 1. Efficient Inline Lookup: Grabs the master decks array without breaking memoization
-  const decks = useSelector(selectDecks);
-
-  const counts = useMemo(() => {
-    const deck = decks.find((d) => d.deck_id === id);
-    if (!deck) return DEFAULT_COUNTS;
-    return {
-      deckId: id,
-      new: deck.new ?? 0,
-      due: deck.due ?? 0,
-      waiting: deck.waiting ?? 0,
-      mastered: deck.mastered ?? 0,
-      suspended: deck.suspended ?? 0,
-    };
-  }, [decks, id]);
+  const counts = useSelector(
+    (state) => state.decks.deckCounts[id] ?? DEFAULT_COUNTS,
+  );
 
   // 2. Do the exact same thing for streaks if selectDeckStreakById is structured similarly
   const streakData = useSelector(selectDeckStreakById(id));

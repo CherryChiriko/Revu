@@ -187,16 +187,20 @@ export default function useStudySession({ deck, navMode }) {
           p_user_timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         });
 
-        dispatch(fetchDailyActivity());
+        // 3. Refresh cards, deck counts, streaks, and activity in parallel for faster UI updates
+        const [fetchResult] = await Promise.all([
+          dispatch(
+            fetchCards({
+              deck_id: deck.id,
+              user_id: currentCard.user_id,
+              study_mode: deck.study_mode,
+            }),
+          ).unwrap(),
+          dispatch(fetchDeckCounts({ user_id: currentCard.user_id })).unwrap(),
+          dispatch(fetchDailyStreakStats()).unwrap(),
+          dispatch(fetchDailyActivity()),
+        ]);
 
-        // 3. Refresh cards & streaks in Redux
-        const fetchResult = await dispatch(
-          fetchCards({
-            deck_id: deck.id,
-            user_id: currentCard.user_id,
-            study_mode: deck.study_mode,
-          }),
-        ).unwrap();
         console.log(
           "[runUpdates] fetchCards result — first 3 cards:",
           fetchResult.slice(0, 3),
