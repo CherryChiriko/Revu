@@ -113,7 +113,11 @@ export default function SettingsPage() {
 
   const saveProfile = async () => {
     const cleanName = username.trim();
-    const cleanIcon = (iconDraft.trim()[0] || cleanName[0] || "R").toUpperCase();
+    const cleanIcon = (
+      iconDraft.trim()[0] ||
+      cleanName[0] ||
+      "R"
+    ).toUpperCase();
 
     setSaveState("saving");
     dispatch(updateSettings({ profileIcon: cleanIcon }));
@@ -308,7 +312,11 @@ export default function SettingsPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <SettingCard icon={faBolt} title="Study Flow" activeTheme={activeTheme}>
+          <SettingCard
+            icon={faBolt}
+            title="Study Flow"
+            activeTheme={activeTheme}
+          >
             <div className="space-y-6">
               <Toggle
                 checked={settings.autoflipModeA}
@@ -367,14 +375,20 @@ export default function SettingsPage() {
             </div>
           </SettingCard>
 
-          <SettingCard icon={faLayerGroup} title="Defaults" activeTheme={activeTheme}>
+          <SettingCard
+            icon={faLayerGroup}
+            title="Defaults"
+            activeTheme={activeTheme}
+          >
             <div className="space-y-6">
               <div>
                 <div className="font-semibold mb-2">
                   <FontAwesomeIcon icon={faCalendarDays} className="mr-2" />
                   Date format
                 </div>
-                <div className={`p-1 rounded-xl ${activeTheme.background.canvas} flex gap-1`}>
+                <div
+                  className={`p-1 rounded-xl ${activeTheme.background.canvas} flex gap-1`}
+                >
                   <SegmentButton
                     active={settings.dateFormat === "dd/mm/yyyy"}
                     onClick={() => updateSetting("dateFormat", "dd/mm/yyyy")}
@@ -396,7 +410,9 @@ export default function SettingsPage() {
                   <FontAwesomeIcon icon={faRotate} className="mr-2" />
                   Default deck view
                 </div>
-                <div className={`p-1 rounded-xl ${activeTheme.background.canvas} flex gap-1`}>
+                <div
+                  className={`p-1 rounded-xl ${activeTheme.background.canvas} flex gap-1`}
+                >
                   <SegmentButton
                     active={settings.defaultDeckView === "grid"}
                     onClick={() => updateSetting("defaultDeckView", "grid")}

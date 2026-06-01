@@ -4,7 +4,10 @@ import FullVariant from "./variants/FullVariant";
 import CompactVariant from "./variants/CompactVariant";
 
 function DeckCardItem({ deck, activeTheme, variant, toast }) {
-  const logic = useDeckLogic(deck.id, deck.cards_count, { toast });
+  const logic = useDeckLogic(deck.id, deck.cards_count || 0, {
+    toast,
+    activeTheme,
+  });
 
   if (!deck || !logic) return null;
 

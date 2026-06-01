@@ -23,10 +23,13 @@ import { Heatmap } from "./Heatmap";
 // import { Achievements } from "./Achievements";
 import { XPBar } from "./XPBar";
 import { StatCard } from "./StatCard";
+import { useRef } from "react";
+import { Toast } from "primereact/toast";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const activeTheme = useSelector(selectActiveTheme);
+  const toast = useRef(null);
 
   const decks = useSelector(selectDecks);
 
@@ -139,12 +142,16 @@ const Dashboard = () => {
                 </button>
               </div>
             ) : (
-              <DeckCard
-                decks={decks.slice(0, 4)}
-                activeTheme={activeTheme}
-                variant="compact"
-                gridClasses={"grid grid-cols-1 md:grid-cols-2 gap-4"}
-              />
+              <>
+                <DeckCard
+                  decks={decks.slice(0, 4)}
+                  activeTheme={activeTheme}
+                  variant="compact"
+                  gridClasses={"grid grid-cols-1 md:grid-cols-2 gap-4"}
+                  toast={toast}
+                />
+                <Toast ref={toast} position="top-center" />
+              </>
             )}
           </div>
 

@@ -74,3 +74,14 @@ select.no-arrow {
 .p-toast-message-success .p-toast-icon {
   color: #22c55e;
 }
+
+/* Move toast close button to the far right of the toast content */
+.p-toast .p-toast-message-content > div {
+  margin-left: auto;
+  display: flex;
+  align-items: flex-start;
+}
+
+.p-toast .p-toast-icon-close {
+  margin-left: 0.5rem;
+}

@@ -8,7 +8,7 @@ import {
 } from "../../../slices/deckSlice";
 import { selectDeckStreakById } from "../../../slices/streakSlice";
 import { supabase } from "../../../utils/supabaseClient";
-import { confirmDialog } from "primereact/confirmdialog";
+import DeckConfirmationDialog from "../components/DeckConfirmationDialog";
 
 // Safe fallback object outside the hook so its reference remains completely static
 const DEFAULT_COUNTS = {
@@ -19,7 +19,7 @@ const DEFAULT_COUNTS = {
   suspended: 0,
 };
 
-export default function useDeckLogic(id, cards_count, { toast }) {
+export default function useDeckLogic(id, cards_count, { toast, activeTheme }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -57,18 +57,57 @@ export default function useDeckLogic(id, cards_count, { toast }) {
     if (!isMastered) navigate(`/decks/${id}`);
   }, [isMastered, id, navigate]);
 
-  const deleteDeck = async (deck) => {
-    try {
-      const table = "cards_" + deck.study_mode.toLowerCase();
+  const deleteDeck = useCallback(
+    async (deckData) => {
+      try {
+        toast?.current?.clear();
 
-      await supabase.from(table).delete().eq("deck_id", id);
-      await supabase.from("decks").delete().eq("id", id);
+        if (!deckData || !deckData.study_mode) {
+          throw new Error("Deck data is missing or invalid");
+        }
 
-      dispatch(fetchDecks());
-    } catch (err) {
-      console.error("Delete failed", err);
-    }
-  };
+        const table = "cards_" + deckData.study_mode.toLowerCase();
+
+        const { error: cardsError } = await supabase
+          .from(table)
+          .delete()
+          .eq("deck_id", id);
+
+        if (cardsError) throw cardsError;
+
+        const { error: decksError } = await supabase
+          .from("decks")
+          .delete()
+          .eq("id", id);
+
+        if (decksError) throw decksError;
+
+        await dispatch(fetchDecks());
+
+        if (toast?.current?.show) {
+          toast.current.show({
+            severity: "success",
+            summary: "Deck deleted",
+            detail: `"${deckData?.name || "Deck"}" was removed`,
+            life: 3000,
+            className: `shadow-2xl`,
+          });
+        }
+      } catch (err) {
+        console.error("Delete failed", err);
+        if (toast?.current?.show) {
+          toast.current.show({
+            severity: "error",
+            summary: "Delete failed",
+            detail: err.message || "Could not delete deck",
+            life: 4000,
+            className: `shadow-2xl`,
+          });
+        }
+      }
+    },
+    [dispatch, id, toast],
+  );
 
   const handleAction = useCallback(
     (e, type, deckData = null) => {
@@ -87,39 +126,35 @@ export default function useDeckLogic(id, cards_count, { toast }) {
       }
 
       if (type === "delete") {
-        confirmDialog({
-          header: "Confirm Delete",
-          message: "This will permanently delete the deck and all its cards.",
-          icon: "pi pi-exclamation-triangle",
-          acceptClassName: "p-button-danger ml-3",
-          rejectClassName: "p-button-text",
-          maskClassName: "backdrop-blur-sm",
-          defaultFocus: "reject",
+        if (!deckData) return;
 
-          accept: async () => {
-            await deleteDeck(deckData);
-
-            toast.current?.show({
-              severity: "success",
-              summary: "Deck deleted",
-              detail: `"${deckData.name}" was removed`,
-              life: 3000,
-              className: `shadow-2xl `,
-            });
-          },
-
-          reject: () => {
-            toast.current?.show({
-              severity: "info",
-              summary: "Cancelled",
-              detail: "Deletion cancelled",
-              life: 2000,
-            });
-          },
+        toast?.current?.show({
+          severity: "warn",
+          sticky: true,
+          className: `space-y-3 rounded-2xl border ${activeTheme.border.card} ${activeTheme.background.danger} p-4 shadow-2xl`,
+          content: (
+            <DeckConfirmationDialog
+              deckName={deckData?.name}
+              activeTheme={activeTheme}
+              isToast
+              onConfirm={() => deleteDeck(deckData)}
+              onCancel={() => {
+                toast?.current?.clear();
+                if (toast?.current?.show) {
+                  toast.current.show({
+                    severity: "info",
+                    summary: "Cancelled",
+                    detail: "Deletion cancelled",
+                    life: 2000,
+                  });
+                }
+              }}
+            />
+          ),
         });
       }
     },
-    [dispatch, id, navigate, toast], // Added missing 'toast' dependency reference safely
+    [dispatch, id, navigate, toast, activeTheme, deleteDeck],
   );
 
   return useMemo(

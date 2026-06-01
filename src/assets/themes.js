@@ -7,6 +7,7 @@ const themes = [
     background: {
       app: "bg-gray-900",
       secondary: "bg-gray-800",
+      card: "bg-gray-800",
       light: "bg-gray-400",
       track: "bg-gray-700",
       navbar: "bg-gray-800",
@@ -14,6 +15,7 @@ const themes = [
       accent1: "bg-sky-500",
       accent2: "bg-purple-500",
       accent3: "bg-indigo-500",
+      danger: "bg-[#2c0b0e]",
     },
 
     text: {
@@ -21,6 +23,7 @@ const themes = [
       secondary: "text-gray-300",
       muted: "text-gray-500",
       activeButton: "text-white",
+      danger: "text-red-300",
       accent1: "text-sky-500",
       accent2: "text-purple-500",
       accent3: "text-indigo-500",
@@ -45,10 +48,13 @@ const themes = [
       accent:
         "bg-purple-500 hover:bg-purple-600 active:bg-purple-600 text-white",
       accent2: "bg-sky-500 hover:bg-sky-600 active:bg-sky-600 text-white",
+      danger: "bg-red-600 hover:bg-red-700 active:bg-red-800 text-white",
     },
     border: {
       card: "border-gray-700",
       muted: "border-gray-700",
+      secondary: "border-gray-600",
+      danger: "border-red-700",
     },
     gradients: {
       from: "from-indigo-500",
@@ -71,12 +77,14 @@ const themes = [
     background: {
       app: "bg-gray-50",
       secondary: "bg-white",
+      card: "bg-white",
       navbar: "bg-white/80",
       canvas: "bg-white",
       track: "bg-gray-300",
       accent1: "bg-sky-500",
       accent2: "bg-purple-500",
       accent3: "bg-purple-500",
+      danger: "bg-[#2c0b0e]",
     },
 
     text: {
@@ -84,6 +92,7 @@ const themes = [
       secondary: "text-gray-700",
       muted: "text-gray-500",
       activeButton: "text-white",
+      danger: "text-red-600",
       accent1: "text-sky-500",
       accent2: "text-purple-500",
       accent3: "text-purple-500",
@@ -109,10 +118,13 @@ const themes = [
         "bg-purple-200 hover:bg-purple-300 active:bg-purple-400 text-purple-800",
       disabled: "bg-gray-100 text-gray-400 cursor-not-allowed",
       accent2: "bg-sky-500 hover:bg-sky-600 active:bg-sky-600 text-white",
+      danger: "bg-red-600 hover:bg-red-700 active:bg-red-800 text-white",
     },
     border: {
       card: "border-gray-200",
       muted: "border-gray-700",
+      secondary: "border-gray-300",
+      danger: "border-red-300",
     },
     gradients: {
       from: "from-indigo-400",

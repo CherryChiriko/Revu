@@ -15,11 +15,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Header from "../../General/ui/Header";
 
-import { confirmDialog } from "primereact/confirmdialog";
-
-import { ConfirmDialog } from "primereact/confirmdialog"; // For <ConfirmDialog /> component
 import { Toast } from "primereact/toast";
-import { Button } from "primereact/button";
 
 export default function DeckListView() {
   const activeTheme = useSelector(selectActiveTheme);
@@ -205,8 +201,7 @@ export default function DeckListView() {
         )}
 
         <div>
-          <Toast ref={toast} />
-          <ConfirmDialog />
+          <Toast ref={toast} position="top-center" />
         </div>
 
         {/* pagination */}
