@@ -183,19 +183,58 @@ const deckSlice = createSlice({
 
         const persistedId =
           state.activeDeckId || localStorage.getItem("activeDeckId");
+
+        // Debug information to help trace why a particular deck becomes active
+        try {
+          console.debug(
+            "[deckSlice] fetchDecks.fulfilled - persistedId:",
+            persistedId,
+            "(type:",
+            typeof persistedId,
+            ")",
+          );
+          console.debug(
+            "[deckSlice] fetchDecks.fulfilled - sorted decks (deck_id:due):",
+            sorted.map((d) => ({ id: d.deck_id, due: d.due })),
+          );
+        } catch (e) {
+          /* ignore debug failures */
+        }
+
         if (persistedId) {
-          const match = sorted.find((d) => d.deck_id === persistedId);
+          // Use string coercion to avoid type mismatches between stored ids and fetched ids
+          const match = sorted.find(
+            (d) => String(d.deck_id) === String(persistedId),
+          );
           if (match) {
             state.activeDeckId = persistedId;
+            try {
+              console.debug(
+                "[deckSlice] Keeping persisted activeDeckId:",
+                persistedId,
+              );
+            } catch (e) {}
           } else {
             state.activeDeckId = sorted[0]?.deck_id || null;
             localStorage.setItem("activeDeckId", state.activeDeckId);
+            try {
+              console.debug(
+                "[deckSlice] persistedId not found in fetched decks, selecting:",
+                state.activeDeckId,
+              );
+            } catch (e) {}
           }
         } else {
           state.activeDeckId = sorted[0]?.deck_id || null;
           if (state.activeDeckId) {
             localStorage.setItem("activeDeckId", state.activeDeckId);
           }
+          try {
+            console.debug(
+              "[deckSlice] No persistedId, selected first prioritized deck:",
+              state.activeDeckId,
+            );
+          } catch (e) {}
         }
 
         state.status = "succeeded";
