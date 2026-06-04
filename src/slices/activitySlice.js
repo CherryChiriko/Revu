@@ -3,7 +3,6 @@ import {
   createSelector,
   createAsyncThunk,
 } from "@reduxjs/toolkit";
-import startOfToday from "date-fns/startOfToday";
 import {
   REVIEW_LIMIT,
   LEARN_LIMIT,
@@ -53,7 +52,7 @@ export const fetchDailyActivity = createAsyncThunk(
 
       const { data, error } = await supabase
         .from("daily_user_stats")
-        .select("date, cards_reviewed, cards_learned")
+        .select("date, cards_reviewed, cards_learned, time_studied_seconds")
         .eq("user_id", userId)
         .gte("date", cutoffStr);
       if (error) return rejectWithValue(error.message);
@@ -85,6 +84,7 @@ export const activitySlice = createSlice({
         date: key,
         cardsReviewed: (existing.cardsReviewed || 0) + cardsReviewed,
         cardsLearned: (existing.cardsLearned || 0) + cardsLearned,
+        timeStudiedSeconds: existing.timeStudiedSeconds || 0,
         cardsStudied:
           (existing.cardsStudied || 0) + cardsReviewed + cardsLearned,
       };
@@ -99,12 +99,18 @@ export const activitySlice = createSlice({
     },
 
     updateDayFromRealtime: (state, action) => {
-      const { date, cards_reviewed, cards_learned } = action.payload;
+      const {
+        date,
+        cards_reviewed,
+        cards_learned,
+        time_studied_seconds,
+      } = action.payload;
       state.days[date] = {
         date,
-        cardsReviewed: cards_reviewed,
-        cardsLearned: cards_learned,
-        cardsStudied: cards_reviewed + cards_learned,
+        cardsReviewed: cards_reviewed || 0,
+        cardsLearned: cards_learned || 0,
+        timeStudiedSeconds: time_studied_seconds || 0,
+        cardsStudied: (cards_reviewed || 0) + (cards_learned || 0),
       };
       state.lastUpdated = new Date().toISOString();
     },
@@ -122,9 +128,10 @@ export const activitySlice = createSlice({
         action.payload.forEach((d) => {
           state.days[d.date] = {
             date: d.date,
-            cardsReviewed: d.cards_reviewed,
-            cardsLearned: d.cards_learned,
-            cardsStudied: d.cards_reviewed + d.cards_learned,
+            cardsReviewed: d.cards_reviewed || 0,
+            cardsLearned: d.cards_learned || 0,
+            timeStudiedSeconds: d.time_studied_seconds || 0,
+            cardsStudied: (d.cards_reviewed || 0) + (d.cards_learned || 0),
           };
         });
         state.lastUpdated = new Date().toISOString();
@@ -170,6 +177,7 @@ export const selectTodayActivity = createSelector(
         date: today,
         cardsReviewed: 0,
         cardsLearned: 0,
+        timeStudiedSeconds: 0,
         cardsStudied: 0,
       }
     );
@@ -184,6 +192,7 @@ export const selectActivityByDate = (date) =>
         date,
         cardsReviewed: 0,
         cardsLearned: 0,
+        timeStudiedSeconds: 0,
         cardsStudied: 0,
       }
     );
@@ -197,12 +206,15 @@ export const selectTotalActivity = createSelector(
       (acc, day) => ({
         cardsReviewed: acc.cardsReviewed + day.cardsReviewed,
         cardsLearned: acc.cardsLearned + day.cardsLearned,
+        timeStudiedSeconds:
+          acc.timeStudiedSeconds + (day.timeStudiedSeconds || 0),
         cardsStudied: acc.cardsStudied + day.cardsStudied,
         totalDays: acc.totalDays + 1,
       }),
       {
         cardsReviewed: 0,
         cardsLearned: 0,
+        timeStudiedSeconds: 0,
         cardsStudied: 0,
         totalDays: 0,
       },

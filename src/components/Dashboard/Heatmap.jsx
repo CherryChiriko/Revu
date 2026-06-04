@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import {
   selectActivityDays,
@@ -10,7 +11,7 @@ import {
 } from "../../slices/settingsSlice";
 import { getTodayISO } from "../../utils/dateHelper";
 
-// Weekday labels (Mon–Sun)
+// Weekday labels (Mon-Sun)
 const WEEKDAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const TODAY_ISO = getTodayISO();
 
@@ -176,6 +177,13 @@ export const Heatmap = ({ activeTheme }) => {
         </div>
         <span>100%</span>
       </div>
+
+      <Link
+        to="/activity"
+        className={`inline-flex items-center justify-center w-full rounded-lg py-2 text-sm font-semibold no-underline ${activeTheme.button.secondary} ${activeTheme.text.secondary}`}
+      >
+        View activity
+      </Link>
     </div>
   );
 };

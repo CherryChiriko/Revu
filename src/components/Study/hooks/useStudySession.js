@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { selectCards, fetchCards } from "../../../slices/cardSlice";
@@ -11,6 +11,7 @@ import { updateProgress } from "../../../slices/progressSlice";
 import { fetchDailyStreakStats } from "../../../slices/streakSlice";
 import { computeSM2 } from "../../../utils/srs";
 import { supabase } from "../../../utils/supabaseClient";
+import { getTodayISO } from "../../../utils/dateHelper";
 import { PHASES, LEARN_LIMIT, REVIEW_LIMIT } from "../constants/constants";
 import { createSelector } from "@reduxjs/toolkit";
 
@@ -35,6 +36,7 @@ export default function useStudySession({ deck, navMode }) {
   const [sessionFinished, setSessionFinished] = useState(false);
   const [sessionUpdates, setSessionUpdates] = useState([]);
   const [sessionSummary, setSessionSummary] = useState(null);
+  const sessionStartedAtRef = useRef(Date.now());
 
   // ----------------------
   // Cards
@@ -95,6 +97,7 @@ export default function useStudySession({ deck, navMode }) {
     setPhaseIndex(0);
     setCardIndex(0);
     setSessionUpdates([]);
+    sessionStartedAtRef.current = Date.now();
   }, []);
 
   useEffect(() => {
@@ -107,7 +110,7 @@ export default function useStudySession({ deck, navMode }) {
 
   const advanceCard = useCallback(() => {
     console.log("[advanceCard]", { cardIndex, phaseIndex, limit, totalPhases });
-    console.trace("[advanceCard] call stack"); // ← shows exactly who called it
+    console.trace("[advanceCard] call stack"); // shows exactly who called it
     console.log("[advanceCard BEFORE]", currentCard);
     if (cardIndex + 1 < limit) {
       setCardIndex((i) => i + 1);
@@ -187,6 +190,27 @@ export default function useStudySession({ deck, navMode }) {
           p_user_timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         });
 
+        const studiedSeconds = Math.max(
+          1,
+          Math.round((Date.now() - sessionStartedAtRef.current) / 1000),
+        );
+        const today = getTodayISO();
+        const { data: dailyStats } = await supabase
+          .from("daily_user_stats")
+          .select("time_studied_seconds")
+          .eq("user_id", currentCard.user_id)
+          .eq("date", today)
+          .maybeSingle();
+
+        await supabase
+          .from("daily_user_stats")
+          .update({
+            time_studied_seconds:
+              (dailyStats?.time_studied_seconds || 0) + studiedSeconds,
+          })
+          .eq("user_id", currentCard.user_id)
+          .eq("date", today);
+
         // 3. Refresh cards, deck counts, streaks, and activity in parallel for faster UI updates
         const [fetchResult] = await Promise.all([
           dispatch(
@@ -202,7 +226,7 @@ export default function useStudySession({ deck, navMode }) {
         ]);
 
         console.log(
-          "[runUpdates] fetchCards result — first 3 cards:",
+          "[runUpdates] fetchCards result - first 3 cards:",
           fetchResult.slice(0, 3),
         );
         console.log(

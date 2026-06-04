@@ -21,6 +21,7 @@ import DeckDetails from "./components/Decks/views/DeckDetails";
 import ImportView from "./components/Import/ImportView";
 import StudySession from "./components/Study/views/StudySession";
 import SettingsPage from "./components/Settings/SettingsPage";
+import ActivityPage from "./components/Activity/ActivityPage";
 import LoginPage from "./components/LoginPage";
 import NotFound404 from "./components/404";
 
@@ -159,6 +160,7 @@ function App() {
             element={<DeckDetails activeTheme={activeTheme} />}
           />
           <Route path="/study" element={<StudySession />} />
+          <Route path="/activity" element={<ActivityPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route
             path="/reset-password"

@@ -20,18 +20,18 @@ export const ProgressBar = ({
   const segments = useMemo(() => {
     const total = cards_count || 1; // Safeguard against division by zero
     return [
-      { status: "suspended", count: suspended, pct: (suspended / total) * 100 },
-      { status: "mastered", count: mastered, pct: (mastered / total) * 100 },
       { status: "due", count: due, pct: (due / total) * 100 },
       { status: "waiting", count: waiting, pct: (waiting / total) * 100 },
       { status: "new", count: newCards, pct: (newCards / total) * 100 },
+      { status: "mastered", count: mastered, pct: (mastered / total) * 100 },
+      { status: "suspended", count: suspended, pct: (suspended / total) * 100 },
     ].filter((seg) => seg.count > 0);
   }, [counts, cards_count, suspended, mastered, due, waiting, newCards]);
 
   // 3. Centralized theme background color string retriever
   const getStatusBackground = (status) => {
     const themeKey = STATUS_COLOR[status];
-    return activeTheme?.background?.[themeKey] || "bg-transparent";
+    return activeTheme?.background?.[themeKey] || activeTheme.background.canvas;
   };
 
   // 4. Clean up structural tracking frame backgrounds
