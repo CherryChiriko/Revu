@@ -119,7 +119,7 @@ const ResetPasswordPage = ({ activeTheme }) => {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full mt-2 py-2 rounded ${activeTheme.button.accent2} ${activeTheme.text.primary} disabled:opacity-50`}
+              className={`w-full mt-2 py-2 rounded ${activeTheme.button.accent2} disabled:opacity-50`}
             >
               {loading ? "Updating..." : "Reset Password"}
             </button>

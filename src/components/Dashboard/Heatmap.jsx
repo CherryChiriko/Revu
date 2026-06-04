@@ -97,7 +97,7 @@ export const Heatmap = ({ activeTheme }) => {
     const max_value = 100;
     const nonzero_steps = COLORS.length - 1;
 
-    if (isFuture) return "rgba(255,255,255,0)";
+    if (isFuture) return "transparent";
     if (value === 0) return COLORS[0];
     if (value >= max_value) return COLORS[nonzero_steps];
 
@@ -147,12 +147,9 @@ export const Heatmap = ({ activeTheme }) => {
                   className={`w-7 h-7 rounded-sm flex items-center justify-center text-xs font-medium
   ${isToday ? `border-2 ${activeTheme.border.card}` : ""} ${
     c.isFuture ? `border-2 ${activeTheme.border.muted}` : ""
-  }`}
+  } ${activeTheme.text.activeButton}`}
                   style={{
                     background: getColor(c.value, c.isFuture),
-                    color: c.isFuture
-                      ? activeTheme.text.primary
-                      : activeTheme.text.secondary,
                   }}
                 >
                   {c.date.getDate()}

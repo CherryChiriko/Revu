@@ -140,7 +140,7 @@ export default function DeckListView() {
             </div>
 
             <button
-              className={`flex items-center ${activeTheme.button.accent2} ${activeTheme.text.secondary} font-semibold py-2 px-3 rounded-lg`}
+              className={`flex items-center ${activeTheme.button.accent2} font-semibold py-2 px-3 rounded-lg`}
               title="Import"
               onClick={handleImportClick}
             >
@@ -150,7 +150,7 @@ export default function DeckListView() {
             </button>
 
             <button
-              className={`flex items-center ${activeTheme.button.accent2} ${activeTheme.text.primary} font-semibold py-2 px-3 rounded-lg`}
+              className={`flex items-center ${activeTheme.button.accent2} font-semibold py-2 px-3 rounded-lg`}
               title="Create deck"
             >
               <FontAwesomeIcon icon={faPlus} className="h-5 w-5 mr-2" />

@@ -130,7 +130,7 @@ const LoginPage = ({ activeTheme }) => {
           <button
             type="submit"
             disabled={authLoading}
-            className={`w-full ${activeTheme.button.accent2} ${activeTheme.text.primary} mt-4 py-2 rounded transition disabled:opacity-50`}
+            className={`w-full ${activeTheme.button.accent2} mt-4 py-2 rounded transition disabled:opacity-50`}
           >
             {authLoading
               ? "Loading..."

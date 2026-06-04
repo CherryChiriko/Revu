@@ -51,7 +51,7 @@ const themes = [
       danger: "bg-red-600 hover:bg-red-700 active:bg-red-800 text-white",
     },
     border: {
-      card: "border-gray-700",
+      card: "border-gray-300",
       muted: "border-gray-700",
       secondary: "border-gray-600",
       danger: "border-red-700",
@@ -78,13 +78,15 @@ const themes = [
       app: "bg-gray-50",
       secondary: "bg-white",
       card: "bg-white",
+      light: "bg-gray-200",
       navbar: "bg-white/80",
-      canvas: "bg-white",
+      canvas: "bg-gray-200",
       track: "bg-gray-300",
-      accent1: "bg-sky-500",
-      accent2: "bg-purple-500",
-      accent3: "bg-purple-500",
+      accent1: "bg-sky-400",
+      accent2: "bg-purple-400",
+      accent3: "bg-indigo-400",
       danger: "bg-[#2c0b0e]",
+      muted: "bg-gray-100",
     },
 
     text: {
@@ -111,31 +113,40 @@ const themes = [
 
     // Components (Buttons, Borders, Gradients)
     button: {
-      primary: "bg-indigo-500 hover:bg-indigo-600 active:bg-indigo-700",
+      primary: "bg-indigo-400 hover:bg-indigo-500 active:bg-indigo-600",
       secondary:
-        "bg-gray-200 hover:bg-gray-300 active:bg-gray-400 text-gray-800",
+        "bg-gray-100 hover:bg-gray-300 active:bg-gray-400 text-gray-800",
       accent:
-        "bg-purple-200 hover:bg-purple-300 active:bg-purple-400 text-purple-800",
+        "bg-purple-400 hover:bg-purple-500 active:bg-purple-600 text-purple-800",
       disabled: "bg-gray-100 text-gray-400 cursor-not-allowed",
-      accent2: "bg-sky-500 hover:bg-sky-600 active:bg-sky-600 text-white",
-      danger: "bg-red-600 hover:bg-red-700 active:bg-red-800 text-white",
+      accent2: "bg-sky-400 hover:bg-sky-500 active:bg-sky-600 text-white",
+      danger: "bg-red-500 hover:bg-red-600 active:bg-red-700 text-white",
     },
     border: {
-      card: "border-gray-200",
-      muted: "border-gray-700",
+      card: "border-gray-700",
+      muted: "border-gray-100",
       secondary: "border-gray-300",
       danger: "border-red-300",
     },
     gradients: {
       from: "from-indigo-400",
-      to: "to-blue-500",
+      to: "to-purple-400",
+
+      // colors: [
+      //   "#FFDBFD",
+      //   "#efbff9",
+      //   "#daa4f8",
+      //   "#be8df9",
+      //   "#9878fc",
+      //   "#8084FF",
+      // ],
       colors: [
-        "#111827",
-        "#1a2347",
-        "#2d2d67",
-        "#4b3284",
-        "#71329d",
-        "#9c27b0",
+        "#D2A7FB",
+        "#c6a2fa",
+        "#ba9df9",
+        "#ac98f8",
+        "#9e94f7",
+        "#8E90F5",
       ],
     },
   },
