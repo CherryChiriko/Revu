@@ -12,3 +12,11 @@ export const PHASES = {
     { displayState: "quiz", allowRating: true },
   ],
 };
+
+export const STATUS_COLOR = {
+  new: "light",
+  waiting: "accent1",
+  due: "accent2",
+  mastered: "accent3",
+  suspended: "muted",
+};

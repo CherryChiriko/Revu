@@ -1,114 +1,85 @@
+import React, { useMemo } from "react";
+import { STATUS_COLOR } from "../../Study/constants/constants";
+
 export const ProgressBar = ({
-  counts,
-  cards_count,
+  counts = {},
+  cards_count = 0,
   activeTheme,
-  isMastered,
+  isMastered = false,
 }) => {
-  const [mastered, suspended, waiting, due, newCards] = [
-    counts.mastered,
-    counts.suspended,
-    counts.waiting,
-    counts.due,
-    counts.new,
-  ];
+  // 1. Destructure with default fallbacks safely
+  const {
+    mastered = 0,
+    suspended = 0,
+    waiting = 0,
+    due = 0,
+    new: newCards = 0,
+  } = counts;
 
-  const masteredPct = cards_count ? (mastered / cards_count) * 100 : 0;
-  const suspendedPct = cards_count ? (suspended / cards_count) * 100 : 0;
-  const learningPct = cards_count ? (waiting / cards_count) * 100 : 0;
-  const duePct = cards_count ? (due / cards_count) * 100 : 0;
-  const newPct = cards_count ? (newCards / cards_count) * 100 : 0;
+  // 2. Compute percentages efficiently using useMemo to prevent re-renders
+  const segments = useMemo(() => {
+    const total = cards_count || 1; // Safeguard against division by zero
+    return [
+      { status: "suspended", count: suspended, pct: (suspended / total) * 100 },
+      { status: "mastered", count: mastered, pct: (mastered / total) * 100 },
+      { status: "due", count: due, pct: (due / total) * 100 },
+      { status: "waiting", count: waiting, pct: (waiting / total) * 100 },
+      { status: "new", count: newCards, pct: (newCards / total) * 100 },
+    ].filter((seg) => seg.count > 0);
+  }, [counts, cards_count, suspended, mastered, due, waiting, newCards]);
 
-  // Base classes for the container and segments
-  const baseBar = `w-full h-2 rounded-full overflow-hidden flex`;
-  const segmentBase = `h-2 transition-all`;
-
-  // Track background
-  const trackClass = activeTheme.isDark ? "bg-gray-700" : "bg-gray-200";
-
-  // Reusable Stat Item Component
-  const StatItem = ({ label, count, colorClass }) => {
-    if (count === 0) return null; // Clean up UI by hiding zeros
-    return (
-      <div className="flex items-center gap-1.5">
-        <div className={`w-1.5 h-1.5 rounded-full ${colorClass}`} />
-        <span
-          className={`${activeTheme.text.muted} text-[11px] font-medium leading-none`}
-        >
-          <span>{count}</span> {label}
-        </span>
-      </div>
-    );
+  // 3. Centralized theme background color string retriever
+  const getStatusBackground = (status) => {
+    const themeKey = STATUS_COLOR[status];
+    return activeTheme?.background?.[themeKey] || "bg-transparent";
   };
 
+  // 4. Clean up structural tracking frame backgrounds
+  const trackClass = activeTheme?.isDark ? "bg-gray-700" : "bg-gray-200";
+
   return (
-    <div>
-      <div className={`${baseBar} ${trackClass}`}>
-        {suspendedPct > 0 && (
+    <div className="w-full">
+      {/* FIXED CONTAINER: 
+        Adding 'rounded-full' and 'overflow-hidden' right here on the parent bar 
+        automatically clips all child segments to the exact rounded container bounds.
+        No more complex first-child/last-child index tracking loops needed.
+      */}
+      <div
+        className={`w-full h-2 rounded-full overflow-hidden flex ${trackClass}`}
+      >
+        {segments.map((seg) => (
           <div
-            className={`${segmentBase} ${activeTheme.background.canvas}`}
-            style={{ width: `${suspendedPct}%` }}
-            title={`Suspended: ${suspended}`}
+            key={seg.status}
+            className={`h-2 transition-all duration-300 ease-in-out ${getStatusBackground(seg.status)}`}
+            style={{ width: `${seg.pct}%` }}
+            title={`${seg.status.charAt(0).toUpperCase() + seg.status.slice(1)}: ${seg.count}`}
           />
-        )}
-        {masteredPct > 0 && (
-          <div
-            className={`${segmentBase} ${activeTheme.background.accent3}`}
-            style={{ width: `${masteredPct}%` }}
-            title={`Mastered: ${mastered}`}
-          />
-        )}
-        {duePct > 0 && (
-          <div
-            className={`${segmentBase} ${activeTheme.background.accent2}`}
-            style={{ width: `${duePct}%` }}
-            title={`Due: ${due}`}
-          />
-        )}
-        {learningPct > 0 && (
-          <div
-            className={`${segmentBase} ${activeTheme.background.accent1}`}
-            style={{ width: `${learningPct}%` }}
-            title={`Learning: ${waiting}`}
-          />
-        )}
-        {newPct > 0 && (
-          <div
-            className={`${segmentBase} ${trackClass}`}
-            style={{ width: `${newPct}%` }}
-            title={`New: ${newCards}`}
-          />
-        )}
+        ))}
       </div>
 
-      {!isMastered && (
+      {/* Legend Block */}
+      {!isMastered && segments.length > 0 && (
         <div className="flex flex-wrap gap-x-4 gap-y-2 mt-3 px-0.5">
-          <StatItem
-            label="due"
-            count={due}
-            colorClass={activeTheme.background.accent2}
-          />
-          <StatItem
-            label="waiting"
-            count={waiting}
-            colorClass={activeTheme.background.accent1}
-          />
-          <StatItem
-            label="new"
-            count={newCards}
-            colorClass={activeTheme.background.light}
-          />
-          <StatItem
-            label="mastered"
-            count={mastered}
-            colorClass={activeTheme.background.accent3}
-          />
-          <StatItem
-            label="suspended"
-            count={suspended}
-            colorClass={activeTheme.background.muted}
-          />
+          {segments.map((item) => (
+            <div key={item.status} className="flex items-center gap-1.5">
+              {/* Colored Dot Indicator */}
+              <div
+                className={`w-1.5 h-1.5 rounded-full ${getStatusBackground(item.status)}`}
+              />
+
+              {/* Quantitative Label Typography */}
+              <span
+                className={`${activeTheme?.text?.muted || "text-gray-500"} text-[11px] font-medium leading-none`}
+              >
+                <span className={activeTheme?.text?.primary}>{item.count}</span>{" "}
+                {item.status}
+              </span>
+            </div>
+          ))}
         </div>
       )}
     </div>
   );
 };
+
+export default ProgressBar;

@@ -1,9 +1,5 @@
 // src/slices/cardSlice.js
-import {
-  createSlice,
-  createSelector,
-  createAsyncThunk,
-} from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { supabase } from "../utils/supabaseClient";
 import { getCardStatus } from "../utils/cardUtils";
 
@@ -17,85 +13,105 @@ const PROGRESS = {
   C: "card_c_progress",
 };
 
+async function loadCardsForDeck({
+  deck_id,
+  study_mode,
+  user_id,
+  page,
+  pageSize,
+}) {
+  if (!deck_id || !study_mode || !user_id) {
+    throw new Error("Missing required parameters");
+  }
+
+  const table = TABLES[study_mode];
+  const progressTable = PROGRESS[study_mode];
+
+  if (!table || !progressTable) {
+    throw new Error(`Invalid study mode: ${study_mode}`);
+  }
+
+  let query = supabase.from(table).select("*").eq("deck_id", deck_id);
+  if (typeof page === "number" && typeof pageSize === "number") {
+    const from = page * pageSize;
+    const to = from + pageSize - 1;
+    query = query.range(from, to);
+  }
+
+  const { data: cards, error: cardsError } = await query;
+  if (cardsError) throw cardsError;
+  if (!cards || cards.length === 0) return [];
+
+  const cardIds = cards.map((c) => c.id);
+  const { data: progressData, error: progressError } = await supabase
+    .from(progressTable)
+    .select("*")
+    .eq("deck_id", deck_id)
+    .eq("user_id", user_id)
+    .in("card_id", cardIds);
+
+  if (progressError) {
+    console.warn("[loadCardsForDeck] Progress fetch failed:", progressError);
+  }
+
+  const progressMap = {};
+  if (progressData) {
+    progressData.forEach((p) => {
+      progressMap[p.card_id] = p;
+    });
+  }
+
+  return cards.map((card) => {
+    const progress = progressMap[card.id] || {
+      user_id,
+      deck_id,
+      card_id: card.id,
+      ease_factor: 2.5,
+      review_interval: 0,
+      repetitions: 0,
+      due_date: null,
+      last_studied: null,
+      status: "new",
+      suspended: false,
+    };
+
+    return {
+      ...card,
+      ...progress,
+      status: getCardStatus(progress),
+      card_id: card.id,
+    };
+  });
+}
+
 export const fetchCards = createAsyncThunk(
   "cards/fetchCards",
   async ({ deck_id, study_mode, user_id }, { rejectWithValue }) => {
     try {
-      if (!deck_id || !study_mode || !user_id) {
-        throw new Error("Missing required parameters");
-      }
-
-      const table = TABLES[study_mode];
-      const progressTable = PROGRESS[study_mode];
-
-      if (!table || !progressTable) {
-        throw new Error(`Invalid study mode: ${study_mode}`);
-      }
-
-      // Fetch cards from the appropriate table
-      const { data: cards, error: cardsError } = await supabase
-        .from(table)
-        .select("*")
-        .eq("deck_id", deck_id);
-
-      if (cardsError) throw cardsError;
-
-      if (!cards || cards.length === 0) {
-        return [];
-      }
-
-      // Fetch progress for these cards
-      // const cardIds = cards.map((c) => c.id);
-      const { data: progressData, error: progressError } = await supabase
-        .from(progressTable)
-        .select("*")
-        .eq("deck_id", deck_id)
-        .eq("user_id", user_id)
-        .limit(200); // Limit to 200 for performance; adjust as needed
-
-      console.log(progressData);
-
-      if (progressError) {
-        console.warn("[fetchCards] Progress fetch failed:", progressError);
-        // Continue without progress data
-      }
-
-      // Create a map of card_id -> progress
-      const progressMap = {};
-      if (progressData) {
-        progressData.forEach((p) => {
-          progressMap[p.card_id] = p;
-        });
-      }
-
-      // Merge cards with their progress
-      const mergedCards = cards.map((card) => {
-        const progress = progressMap[card.id] || {
-          user_id,
-          deck_id,
-          card_id: card.id,
-          ease_factor: 2.5,
-          review_interval: 0,
-          repetitions: 0,
-          due_date: null,
-          last_studied: null,
-          status: "new",
-          suspended: false,
-        };
-
-        const status = getCardStatus(progress);
-
-        return {
-          ...card,
-          ...progress,
-          status: status,
-          card_id: card.id,
-        };
-      });
-
-      return mergedCards;
+      return await loadCardsForDeck({ deck_id, study_mode, user_id });
     } catch (err) {
       console.error("[fetchCards] Error:", err);
+      return rejectWithValue(err.message);
+    }
+  },
+);
+
+export const fetchCardsPage = createAsyncThunk(
+  "cards/fetchCardsPage",
+  async (
+    { deck_id, study_mode, user_id, page = 0, pageSize = 50 },
+    { rejectWithValue },
+  ) => {
+    try {
+      return await loadCardsForDeck({
+        deck_id,
+        study_mode,
+        user_id,
+        page,
+        pageSize,
+      });
+    } catch (err) {
+      console.error("[fetchCardsPage] Error:", err);
       return rejectWithValue(err.message);
     }
   },

@@ -1,106 +1,133 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  fetchCards,
-  selectCards,
-  selectCardsStatus,
-  selectCardsError,
-  clearCards,
-} from "../../../slices/cardSlice";
+  faArrowLeft,
+  faChevronDown,
+  faBan,
+} from "@fortawesome/free-solid-svg-icons";
+
+import { supabase } from "../../../utils/supabaseClient";
+import { fetchCardsPage } from "../../../slices/cardSlice";
 import {
   fetchDeckCounts,
   selectDeckNameById,
   selectDecks,
 } from "../../../slices/deckSlice";
-import { useNavigate } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
-import { supabase } from "../../../utils/supabaseClient";
+import { STATUS_COLOR } from "../../Study/constants/constants";
+import CardDetail from "../components/CardDetail";
 
-// --- CUSTOM TAILWIND COMPONENTS ---
+// --- CONSTANTS ---
+
+const CHUNK_SIZE = 50;
+const STATUS_FILTERS = ["new", "waiting", "due", "mastered", "suspended"];
+const STATUS_LABELS = STATUS_FILTERS.map(
+  (s) => s.charAt(0).toUpperCase() + s.slice(1),
+);
+console.log(STATUS_COLOR, STATUS_LABELS);
+
+// --- SUB-COMPONENTS ---
+
+/**
+ * Card shell — consistent with your theme tokens, slightly elevated with a
+ * ring on hover so it doesn't fight the background.
+ */
 const Card = ({ children, activeTheme, className = "" }) => (
   <div
-    className={`${activeTheme.background.card} border ${activeTheme.border.secondary} shadow-sm rounded-2xl overflow-hidden ${className}`}
+    className={`
+      ${activeTheme.background.card}
+      border ${activeTheme.border.card}
+      rounded-2xl shadow-sm
+      overflow-hidden
+      ${className}
+    `}
   >
     {children}
   </div>
 );
 
 const CardContent = ({ children, className = "" }) => (
-  <div className={`p-4 ${className}`}>{children}</div>
+  <div className={`p-5 ${className}`}>{children}</div>
 );
 
-const Button = ({
-  children,
-  onClick,
-  variant = "outline",
-  activeTheme,
-  className = "",
-}) => {
-  const base =
-    "px-4 py-2 rounded-lg text-sm font-medium transition-all active:scale-95";
-  const styles =
-    variant === "default"
-      ? `${activeTheme.button.accent2} ${activeTheme.text.primary}`
-      : `border ${activeTheme.border.secondary} ${activeTheme.text.secondary} hover:${activeTheme.background.canvas}`;
+/**
+ * Pill-shaped filter button — uses your theme's border/text tokens and
+ * highlights the active filter with the accent gradient.
+ */
+const FilterPill = ({ label, active, dot, onClick, activeTheme }) => (
+  <button
+    onClick={onClick}
+    className={`
+      inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold
+      border transition-all duration-150 active:scale-95 whitespace-nowrap
+      ${
+        active
+          ? `${activeTheme.background.primary} ${activeTheme.text.primary} shadow-sm`
+          : `${activeTheme.border.secondary} border ${activeTheme.text.secondary} ${activeTheme.background.secondary} hover:border-indigo-400`
+      }
+    `}
+  >
+    <span className={`w-1.5 h-1.5 rounded-full ${dot}`} />
+    {label}
+  </button>
+);
+
+/**
+ * Individual card tile in the grid.
+ */
+const CardTile = ({ card, onClick, activeTheme }) => {
+  const status = card.suspended ? "suspended" : card.status;
+  const bgClass =
+    activeTheme.background[STATUS_COLOR[status]] ||
+    activeTheme.background.canvas;
 
   return (
-    <button onClick={onClick} className={`${base} ${styles} ${className}`}>
-      {children}
+    <button
+      onClick={() => onClick(card)}
+      className={`
+        group relative flex flex-col justify-between
+        min-h-[72px] rounded-xl border px-3 py-3
+        text-left text-sm font-medium
+        transition-all duration-150
+        hover:-translate-y-0.5 hover:shadow-md
+        focus:outline-none focus:ring-2 ${activeTheme.ring.focus} focus:ring-offset-1
+        ${bgClass}
+        ${activeTheme.border.card}
+      `}
+    >
+      <span className="line-clamp-3 text-sm leading-snug">{card.front}</span>
+      <span className="mt-2 flex items-center justify-between gap-1">
+        <span
+          className={`
+            inline-flex items-center gap-1 rounded-full px-2 py-0.5
+            text-[9px] font-bold uppercase tracking-wider
+            bg-black/10
+          `}
+        >
+          <span className={`w-1 h-1 rounded-full ${STATUS_COLOR[status]}`} />
+          {status}
+        </span>
+      </span>
     </button>
   );
 };
 
-// --- ICONS (Pure SVG) ---
-const IconChevron = ({ isOpen }) => (
-  <svg
-    className={`w-4 h-4 transition-transform ${
-      isOpen ? "rotate-180" : "-rotate-90"
-    }`}
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M19 9l-7 7-7-7"
-    />
-  </svg>
+/**
+ * Skeleton tile shown while a page is loading.
+ */
+const SkeletonTile = ({ activeTheme }) => (
+  <div
+    className={`
+      min-h-[72px] rounded-xl border
+      ${activeTheme.border.card} ${activeTheme.background.secondary}
+      animate-pulse
+    `}
+  />
 );
 
-const IconX = () => (
-  <svg
-    className="w-6 h-6"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M6 18L18 6M6 6l12 12"
-    />
-  </svg>
-);
-
-// --- CONFIG ---
-const STATUS_COLORS = {
-  new: "bg-gray-100 text-gray-600 border border-gray-200",
-  waiting: "bg-blue-100 text-blue-700 border border-blue-200",
-  due: "bg-yellow-100 text-yellow-800 border border-yellow-200",
-  mastered: "bg-green-100 text-green-700 border border-green-200",
-  suspended: "bg-zinc-200 text-zinc-700 border border-zinc-300",
-};
-
-const CHUNK_SIZE = 50;
-const PROGRESS_TABLES = {
-  A: "card_a_progress",
-  C: "card_c_progress",
-};
+// --- MAIN COMPONENT ---
 
 export default function DeckDetails({ activeTheme }) {
   const { deckId } = useParams();
@@ -112,265 +139,263 @@ export default function DeckDetails({ activeTheme }) {
     selectDecks(state).find((d) => d.deck_id === deckId),
   );
 
-  // Redux State
-  const cards = useSelector(selectCards);
-  const status = useSelector(selectCardsStatus);
-  const error = useSelector(selectCardsError);
-
-  // Local UI State
+  // Local state
   const [filter, setFilter] = useState(null);
-  const [visibleChunks, setVisibleChunks] = useState(1);
   const [expanded, setExpanded] = useState({ 0: true });
   const [selectedCard, setSelectedCard] = useState(null);
   const [userId, setUserId] = useState(null);
-  const [isTogglingSuspension, setIsTogglingSuspension] = useState(false);
-  const studyMode = deck?.study_mode || "A";
+  const [cardsByPage, setCardsByPage] = useState({});
+  const [pageLoading, setPageLoading] = useState({});
+  const [pageError, setPageError] = useState({});
 
+  const studyMode = deck?.study_mode || "A";
+  const totalCardCount = Number(deck?.cards_count || 0);
+  const totalPages = Math.max(0, Math.ceil(totalCardCount / CHUNK_SIZE));
+  const progressTable = `card_${studyMode.toLowerCase()}_progress`;
+
+  // --- Auth ---
   useEffect(() => {
     const loadUser = async () => {
       const { data } = await supabase.auth.getUser();
       setUserId(data?.user?.id ?? null);
     };
-
     loadUser();
   }, []);
 
-  useEffect(() => {
-    if (deckId && userId) {
-      dispatch(
-        fetchCards({
-          deck_id: deckId,
-          study_mode: studyMode,
-          user_id: userId,
-        }),
-      );
-    }
-    return () => dispatch(clearCards());
-  }, [dispatch, deckId, studyMode, userId]);
+  // --- Data fetching ---
+  const fetchPage = React.useCallback(
+    async (pageIndex) => {
+      if (!deckId || !userId || pageIndex < 0 || pageIndex >= totalPages)
+        return;
 
-  // Filtering Logic
-  const filteredCards = useMemo(() => {
-    if (!filter) return cards;
-    return cards.filter((c) => c.status === filter);
-  }, [cards, filter]);
+      setPageLoading((prev) => ({ ...prev, [pageIndex]: true }));
+      setPageError((prev) => ({ ...prev, [pageIndex]: null }));
 
-  // Grouping Logic
-  const chunks = useMemo(() => {
-    const result = [];
-    for (let i = 0; i < filteredCards.length; i += CHUNK_SIZE) {
-      result.push(filteredCards.slice(i, i + CHUNK_SIZE));
-    }
-    return result;
-  }, [filteredCards]);
-
-  const toggleGroup = (idx) => {
-    setExpanded((prev) => ({ ...prev, [idx]: !prev[idx] }));
-  };
-
-  const toggleCardSuspension = async () => {
-    if (!selectedCard || !userId) return;
-
-    const progressTable = PROGRESS_TABLES[studyMode];
-    const suspended = !selectedCard.suspended;
-
-    setIsTogglingSuspension(true);
-    try {
-      const { error } = await supabase.from(progressTable).upsert(
-        {
-          user_id: userId,
-          deck_id: deckId,
-          card_id: selectedCard.card_id,
-          ease_factor: selectedCard.ease_factor ?? 2.5,
-          review_interval: selectedCard.review_interval ?? 0,
-          repetitions: selectedCard.repetitions ?? 0,
-          due_date: selectedCard.due_date ?? null,
-          last_studied: selectedCard.last_studied ?? null,
-          status: selectedCard.suspended ? "waiting" : selectedCard.status,
-          suspended,
-        },
-        { onConflict: "user_id,card_id" },
-      );
-
-      if (error) throw error;
-
-      await Promise.all([
-        dispatch(
-          fetchCards({
+      try {
+        const cards = await dispatch(
+          fetchCardsPage({
             deck_id: deckId,
             study_mode: studyMode,
             user_id: userId,
+            page: pageIndex,
+            pageSize: CHUNK_SIZE,
           }),
-        ),
-        dispatch(fetchDeckCounts({ user_id: userId })),
-      ]);
+        ).unwrap();
 
-      setSelectedCard(null);
-    } catch (err) {
-      console.error("Failed to update card suspension:", err);
-    } finally {
-      setIsTogglingSuspension(false);
-    }
+        setCardsByPage((prev) => ({ ...prev, [pageIndex]: cards }));
+      } catch (err) {
+        setPageError((prev) => ({
+          ...prev,
+          [pageIndex]: err?.message || err || "Failed to load cards",
+        }));
+      } finally {
+        setPageLoading((prev) => ({ ...prev, [pageIndex]: false }));
+      }
+    },
+    [deckId, userId, totalPages, studyMode, dispatch],
+  );
+
+  useEffect(() => {
+    if (!deckId || !userId) return;
+
+    setCardsByPage({});
+    setPageLoading({});
+    setPageError({});
+    setExpanded({ 0: true });
+
+    if (totalPages > 0) fetchPage(0);
+  }, [deckId, userId, studyMode, totalPages, fetchPage]);
+
+  // --- Pages derived state ---
+  const pages = useMemo(() => {
+    return Array.from({ length: totalPages }, (_, idx) => {
+      const pageCards = cardsByPage[idx] || [];
+      const filtered = filter
+        ? pageCards.filter((c) =>
+            filter === "suspended"
+              ? c.suspended
+              : c.status === filter && !c.suspended,
+          )
+        : pageCards;
+
+      const isLastPage = idx === totalPages - 1;
+      const countOnPage = isLastPage
+        ? totalCardCount - idx * CHUNK_SIZE
+        : CHUNK_SIZE;
+
+      return {
+        pageIndex: idx,
+        cards: filtered,
+        loaded: Object.prototype.hasOwnProperty.call(cardsByPage, idx),
+        loading: Boolean(pageLoading[idx]),
+        error: pageError[idx],
+        totalCount: Math.max(0, countOnPage),
+      };
+    });
+  }, [cardsByPage, filter, pageError, pageLoading, totalCardCount, totalPages]);
+
+  // --- Interactions ---
+  const toggleGroup = (idx) => {
+    setExpanded((prev) => {
+      const nextExpanded = !prev[idx];
+      if (
+        nextExpanded &&
+        !Object.prototype.hasOwnProperty.call(cardsByPage, idx) &&
+        !pageLoading[idx]
+      ) {
+        fetchPage(idx);
+      }
+      return { ...prev, [idx]: nextExpanded };
+    });
   };
 
-  if (status === "loading")
-    return (
-      <div className="p-10 text-center animate-pulse">Loading cards...</div>
-    );
-  if (status === "failed")
-    return <div className="p-10 text-center text-red-500">Error: {error}</div>;
-
+  // --- Render ---
   return (
     <div
       className={`min-h-screen ${activeTheme.background.app} ${activeTheme.text.primary} w-full`}
     >
-      <div
-        className={`${activeTheme.background.app} relative max-w-6xl mx-auto p-4 space-y-6`}
-      >
-        {/* 1. Header Area */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/5 pb-6">
-          <div className="flex items-center gap-4">
+      <div className="relative max-w-6xl mx-auto px-4 py-6 space-y-6">
+        {/* ── Header ── */}
+        <div
+          className={`
+            flex flex-col sm:flex-row sm:items-center justify-between gap-4
+            pb-5 border-b ${activeTheme.border.card}
+          `}
+        >
+          <div className="flex items-center gap-3">
             <button
-              onClick={() => navigate(-1)} // Use -1 to keep list scroll position
-              className={`p-2 rounded-full hover:${activeTheme.background.canvas} transition-colors ${activeTheme.text.muted}`}
+              onClick={() => navigate(-1)}
+              className={`
+                w-9 h-9 flex items-center justify-center rounded-full
+                border ${activeTheme.border.secondary}
+                ${activeTheme.text.muted}
+                hover:${activeTheme.background.secondary}
+                transition-colors
+              `}
+              aria-label="Go back"
             >
-              <FontAwesomeIcon icon={faArrowLeft} className="text-lg" />
+              <FontAwesomeIcon icon={faArrowLeft} />
             </button>
             <div>
-              <h1 className={`text-2xl font-bold ${activeTheme.text.primary}`}>
+              <h1
+                className={`text-xl font-bold ${activeTheme.text.primary} leading-tight`}
+              >
                 {deckName || "Deck Details"}
               </h1>
-              <p className={`${activeTheme.text.secondary} text-sm`}>
-                Reviewing cards for {deckName || deckId}
+              <p className={`text-xs mt-0.5 ${activeTheme.text.muted}`}>
+                {totalCardCount} card{totalCardCount !== 1 ? "s" : ""} ·{" "}
+                {totalPages} set{totalPages !== 1 ? "s" : ""}
               </p>
             </div>
           </div>
         </div>
 
-        {/* 2. Filter Bar */}
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-          {["new", "waiting", "due", "mastered", "suspended"].map((s) => (
-            <Button
+        {/* ── Filter Bar ── */}
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+          {STATUS_FILTERS.map((s) => (
+            <FilterPill
               key={s}
+              label={STATUS_LABELS[s]}
+              dot={STATUS_COLOR[s]}
+              active={filter === s}
               activeTheme={activeTheme}
-              variant={filter === s ? "default" : "outline"}
               onClick={() => {
                 setFilter(filter === s ? null : s);
-                setVisibleChunks(1);
+                setExpanded({ 0: true });
               }}
-              className="capitalize whitespace-nowrap"
-            >
-              {s}
-            </Button>
-          ))}
-        </div>
-
-        {/* 3. Card Groups */}
-        <div className="space-y-4">
-          {chunks.slice(0, visibleChunks).map((chunk, idx) => (
-            <Card key={idx} activeTheme={activeTheme}>
-              <CardContent>
-                <button
-                  onClick={() => toggleGroup(idx)}
-                  className={`flex items-center gap-3 w-full text-left font-bold ${activeTheme.text.primary}`}
-                >
-                  <IconChevron isOpen={expanded[idx]} />
-                  <span className="opacity-90">
-                    Chunk {idx + 1}{" "}
-                    <span
-                      className={`font-normal text-xs ml-2 ${activeTheme.text.muted}`}
-                    >
-                      ({chunk.length} cards)
-                    </span>
-                  </span>
-                </button>
-
-                {expanded[idx] && (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 mt-4">
-                    {chunk.map((card) => (
-                      <button
-                        key={card.card_id}
-                        onClick={() => setSelectedCard(card)}
-                        className={`px-3 py-2 text-xs font-semibold rounded-lg truncate text-left transition-all border border-transparent hover:border-white/10 ${activeTheme.background.canvas} ${activeTheme.text.secondary} hover:shadow-lg`}
-                      >
-                        {card.front}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* 4. Side Panel (Drawer) Overlay */}
-        {selectedCard && (
-          <>
-            <div
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
-              onClick={() => setSelectedCard(null)}
             />
-            <div
-              className={`fixed inset-y-0 right-0 w-full sm:w-[450px] ${activeTheme.background.card} shadow-2xl z-50 p-8 flex flex-col border-l ${activeTheme.border.secondary}`}
-            >
-              <button
-                onClick={() => setSelectedCard(null)}
-                className={`self-end p-2 rounded-full hover:${activeTheme.background.canvas} ${activeTheme.text.secondary}`}
-              >
-                <IconX />
-              </button>
+          ))}
+        </div>
 
-              <div className="mt-8 space-y-8">
-                <section>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-2 block">
-                    Front
-                  </label>
-                  <p
-                    className={`text-3xl font-bold ${activeTheme.text.primary}`}
-                  >
-                    {selectedCard.front}
-                  </p>
-                </section>
+        {/* ── Page Groups ── */}
+        <div className="space-y-3">
+          {totalPages === 0 && (
+            <p className={`text-sm ${activeTheme.text.muted} py-8 text-center`}>
+              No cards in this deck yet.
+            </p>
+          )}
 
-                <section>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-2 block">
-                    Back / Meaning
-                  </label>
-                  <p
-                    className={`text-xl leading-relaxed ${activeTheme.text.secondary}`}
+          {pages.map(
+            ({ pageIndex, cards, loaded, loading, error, totalCount }) => (
+              <Card key={pageIndex} activeTheme={activeTheme}>
+                <CardContent>
+                  {/* Accordion header */}
+                  <button
+                    onClick={() => toggleGroup(pageIndex)}
+                    className={`
+                    flex items-center justify-between w-full text-left
+                    ${activeTheme.text.primary}
+                  `}
                   >
-                    {selectedCard.back || "No definition provided."}
-                  </p>
-                </section>
+                    <span className="flex items-center gap-2 font-semibold text-sm">
+                      <FontAwesomeIcon
+                        icon={faChevronDown}
+                        className={`
+                        text-xs transition-transform duration-200
+                        ${expanded[pageIndex] ? "rotate-0" : "-rotate-90"}
+                        ${activeTheme.text.muted}
+                      `}
+                      />
+                      Set {pageIndex + 1}
+                    </span>
+                    <span className={`text-xs ${activeTheme.text.muted}`}>
+                      {totalCount} card{totalCount !== 1 ? "s" : ""}
+                    </span>
+                  </button>
 
-                <div className="pt-8 border-t border-white/5 flex justify-between items-center">
-                  <span
-                    className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tighter ${
-                      STATUS_COLORS[selectedCard.status] || STATUS_COLORS.new
-                    }`}
-                  >
-                    {selectedCard.status}
-                  </span>
-                  <span className={`text-[11px] ${activeTheme.text.muted}`}>
-                    ID: {selectedCard.card_id}
-                  </span>
-                </div>
-                <Button
-                  activeTheme={activeTheme}
-                  variant={selectedCard.suspended ? "default" : "outline"}
-                  onClick={toggleCardSuspension}
-                  className="w-full"
-                >
-                  {isTogglingSuspension
-                    ? "Updating..."
-                    : selectedCard.suspended
-                      ? "Reactivate card"
-                      : "Deactivate card"}
-                </Button>
-              </div>
-            </div>
-          </>
-        )}
+                  {/* Accordion body */}
+                  {expanded[pageIndex] && (
+                    <div className="mt-4">
+                      {loading ? (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+                          {Array.from({ length: 10 }).map((_, i) => (
+                            <SkeletonTile key={i} activeTheme={activeTheme} />
+                          ))}
+                        </div>
+                      ) : error ? (
+                        <div className="flex items-center gap-2 text-red-400 text-sm py-3">
+                          <FontAwesomeIcon icon={faBan} />
+                          {error}
+                        </div>
+                      ) : loaded && cards.length > 0 ? (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+                          {cards.map((card) => (
+                            <CardTile
+                              key={card.card_id}
+                              card={card}
+                              onClick={setSelectedCard}
+                              activeTheme={activeTheme}
+                            />
+                          ))}
+                        </div>
+                      ) : loaded ? (
+                        <p className={`text-sm ${activeTheme.text.muted} py-3`}>
+                          {filter
+                            ? `No "${filter}" cards in this set.`
+                            : "No cards in this set."}
+                        </p>
+                      ) : (
+                        <p className={`text-sm ${activeTheme.text.muted} py-3`}>
+                          Expand to load this set.
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ),
+          )}
+        </div>
       </div>
+
+      {/* ── Card Detail Drawer ── */}
+      {selectedCard && (
+        <CardDetail
+          card={selectedCard}
+          setSelectedCard={setSelectedCard}
+          activeTheme={activeTheme}
+        />
+      )}
     </div>
   );
 }
