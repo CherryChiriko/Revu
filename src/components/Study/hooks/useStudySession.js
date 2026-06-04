@@ -33,6 +33,7 @@ export default function useStudySession({ deck, navMode }) {
   const [status, setStatus] = useState("idle");
   const [phaseIndex, setPhaseIndex] = useState(0);
   const [cardIndex, setCardIndex] = useState(0);
+  const [sessionOffset, setSessionOffset] = useState(0);
   const [sessionFinished, setSessionFinished] = useState(false);
   const [sessionUpdates, setSessionUpdates] = useState([]);
   const [sessionSummary, setSessionSummary] = useState(null);
@@ -56,10 +57,12 @@ export default function useStudySession({ deck, navMode }) {
       allCards.map((c) => ({ id: c.card_id, status: c.status })),
     );
 
-    const sessionLimit = Math.min(modeLimit, filteredCards.length);
+    const start = Math.max(0, sessionOffset);
+    const sessionSlice = filteredCards.slice(start, start + modeLimit);
+    const sessionLimit = Math.min(modeLimit, sessionSlice.length);
 
-    return { cards: filteredCards.slice(0, sessionLimit), limit: sessionLimit };
-  }, [deck?.id, allCards, isReviewMode, modeLimit]);
+    return { cards: sessionSlice.slice(0, sessionLimit), limit: sessionLimit };
+  }, [deck?.id, allCards, isReviewMode, modeLimit, sessionOffset]);
 
   // ----------------------
   // Status
@@ -92,17 +95,26 @@ export default function useStudySession({ deck, navMode }) {
   // ----------------------
   // Session Control
   // ----------------------
-  const restartSession = useCallback(() => {
-    setSessionFinished(false);
-    setPhaseIndex(0);
-    setCardIndex(0);
-    setSessionUpdates([]);
-    sessionStartedAtRef.current = Date.now();
-  }, []);
+  const restartSession = useCallback(
+    (advance = false) => {
+      setSessionFinished(false);
+      setPhaseIndex(0);
+      setCardIndex(0);
+      setSessionUpdates([]);
+      sessionStartedAtRef.current = Date.now();
+
+      if (advance) {
+        setSessionOffset((offset) => offset + modeLimit);
+      } else {
+        setSessionOffset(0);
+      }
+    },
+    [modeLimit],
+  );
 
   useEffect(() => {
-    restartSession();
-  }, [deck?.id]);
+    restartSession(false);
+  }, [deck?.id, restartSession]);
 
   const exitStudy = useCallback(() => {
     navigate("/decks");
@@ -122,7 +134,7 @@ export default function useStudySession({ deck, navMode }) {
       return;
     }
     setSessionFinished(true);
-  }, [cardIndex, limit, phaseIndex, totalPhases]);
+  }, [cardIndex, currentCard, limit, phaseIndex, totalPhases]);
 
   // ----------------------
   // Handle rating
@@ -264,6 +276,7 @@ export default function useStudySession({ deck, navMode }) {
     currentCard,
     dispatch,
     isReviewMode,
+    sessionSummary,
   ]);
 
   // ----------------------

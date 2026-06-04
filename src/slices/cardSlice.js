@@ -43,23 +43,36 @@ async function loadCardsForDeck({
   if (!cards || cards.length === 0) return [];
 
   const cardIds = cards.map((c) => c.id);
-  const { data: progressData, error: progressError } = await supabase
-    .from(progressTable)
-    .select("*")
-    .eq("deck_id", deck_id)
-    .eq("user_id", user_id)
-    .in("card_id", cardIds);
+  const progressData = [];
+  const chunkSize = 100;
 
-  if (progressError) {
-    console.warn("[loadCardsForDeck] Progress fetch failed:", progressError);
+  for (let i = 0; i < cardIds.length; i += chunkSize) {
+    const chunk = cardIds.slice(i, i + chunkSize);
+    const { data, error } = await supabase
+      .from(progressTable)
+      .select("*")
+      .eq("deck_id", deck_id)
+      .eq("user_id", user_id)
+      .in("card_id", chunk);
+
+    if (error) {
+      console.warn(
+        "[loadCardsForDeck] Progress fetch failed for chunk:",
+        { chunkSize: chunk.length, offset: i },
+        error,
+      );
+      continue;
+    }
+
+    if (data?.length) {
+      progressData.push(...data);
+    }
   }
 
   const progressMap = {};
-  if (progressData) {
-    progressData.forEach((p) => {
-      progressMap[p.card_id] = p;
-    });
-  }
+  progressData.forEach((p) => {
+    progressMap[p.card_id] = p;
+  });
 
   return cards.map((card) => {
     const progress = progressMap[card.id] || {

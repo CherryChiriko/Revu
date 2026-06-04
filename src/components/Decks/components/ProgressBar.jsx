@@ -39,11 +39,6 @@ export const ProgressBar = ({
 
   return (
     <div className="w-full">
-      {/* FIXED CONTAINER: 
-        Adding 'rounded-full' and 'overflow-hidden' right here on the parent bar 
-        automatically clips all child segments to the exact rounded container bounds.
-        No more complex first-child/last-child index tracking loops needed.
-      */}
       <div
         className={`w-full h-2 rounded-full overflow-hidden flex ${trackClass}`}
       >
@@ -71,8 +66,7 @@ export const ProgressBar = ({
               <span
                 className={`${activeTheme?.text?.muted || "text-gray-500"} text-[11px] font-medium leading-none`}
               >
-                <span className={activeTheme?.text?.primary}>{item.count}</span>{" "}
-                {item.status}
+                {item.count} {item.status}
               </span>
             </div>
           ))}

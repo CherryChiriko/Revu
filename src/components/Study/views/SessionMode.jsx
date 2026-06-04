@@ -67,7 +67,7 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
     setPreviousCardId(currentCard?.id);
     setIsTransitioning(true);
     setSessionResetCount((count) => count + 1);
-    resetSession();
+    resetSession(true);
   }, [currentCard?.id, resetSession]);
 
   if (sessionFinished) {

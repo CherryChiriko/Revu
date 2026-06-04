@@ -184,6 +184,13 @@ const deckSlice = createSlice({
         const persistedId =
           state.activeDeckId || localStorage.getItem("activeDeckId");
 
+        const persistedMatch = persistedId
+          ? sorted.find((d) => String(d.deck_id) === String(persistedId))
+          : null;
+        const bestDeck = sorted[0] || null;
+        const persistedHasStudyCards =
+          persistedMatch && (persistedMatch.due > 0 || persistedMatch.new > 0);
+
         // Debug information to help trace why a particular deck becomes active
         try {
           console.debug(
@@ -194,44 +201,45 @@ const deckSlice = createSlice({
             ")",
           );
           console.debug(
-            "[deckSlice] fetchDecks.fulfilled - sorted decks (deck_id:due):",
-            sorted.map((d) => ({ id: d.deck_id, due: d.due })),
+            "[deckSlice] fetchDecks.fulfilled - sorted decks (deck_id:due,new):",
+            sorted.map((d) => ({ id: d.deck_id, due: d.due, new: d.new })),
+          );
+          console.debug(
+            "[deckSlice] fetchDecks.fulfilled - persisted deck info:",
+            persistedMatch
+              ? {
+                  id: persistedMatch.deck_id,
+                  due: persistedMatch.due,
+                  new: persistedMatch.new,
+                }
+              : null,
           );
         } catch (e) {
           /* ignore debug failures */
         }
 
-        if (persistedId) {
-          // Use string coercion to avoid type mismatches between stored ids and fetched ids
-          const match = sorted.find(
-            (d) => String(d.deck_id) === String(persistedId),
-          );
-          if (match) {
-            state.activeDeckId = persistedId;
-            try {
-              console.debug(
-                "[deckSlice] Keeping persisted activeDeckId:",
-                persistedId,
-              );
-            } catch (e) {}
-          } else {
-            state.activeDeckId = sorted[0]?.deck_id || null;
-            localStorage.setItem("activeDeckId", state.activeDeckId);
-            try {
-              console.debug(
-                "[deckSlice] persistedId not found in fetched decks, selecting:",
-                state.activeDeckId,
-              );
-            } catch (e) {}
-          }
+        if (persistedHasStudyCards) {
+          state.activeDeckId = String(persistedMatch.deck_id);
+          localStorage.setItem("activeDeckId", state.activeDeckId);
+          localStorage.setItem("activeDeckIdDate", getTodayISO());
+          try {
+            console.debug(
+              "[deckSlice] Keeping persisted activeDeckId with study cards:",
+              state.activeDeckId,
+            );
+          } catch (e) {}
         } else {
-          state.activeDeckId = sorted[0]?.deck_id || null;
+          state.activeDeckId = bestDeck?.deck_id || null;
           if (state.activeDeckId) {
             localStorage.setItem("activeDeckId", state.activeDeckId);
+            localStorage.setItem("activeDeckIdDate", getTodayISO());
+          } else {
+            localStorage.removeItem("activeDeckId");
+            localStorage.removeItem("activeDeckIdDate");
           }
           try {
             console.debug(
-              "[deckSlice] No persistedId, selected first prioritized deck:",
+              "[deckSlice] Selected prioritized deck:",
               state.activeDeckId,
             );
           } catch (e) {}
