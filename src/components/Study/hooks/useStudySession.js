@@ -9,10 +9,14 @@ import {
 } from "../../../slices/activitySlice";
 import { updateProgress } from "../../../slices/progressSlice";
 import { fetchDailyStreakStats } from "../../../slices/streakSlice";
+import {
+  selectReviewLimit,
+  selectLearnLimit,
+} from "../../../slices/settingsSlice";
 import { computeSM2 } from "../../../utils/srs";
 import { supabase } from "../../../utils/supabaseClient";
 import { getTodayISO } from "../../../utils/dateHelper";
-import { PHASES, LEARN_LIMIT, REVIEW_LIMIT } from "../constants/constants";
+import { PHASES } from "../constants/constants";
 import { createSelector } from "@reduxjs/toolkit";
 
 // ----------------------
@@ -28,7 +32,9 @@ export default function useStudySession({ deck, navMode }) {
   const navigate = useNavigate();
 
   const isReviewMode = navMode === "review";
-  const modeLimit = isReviewMode ? REVIEW_LIMIT : LEARN_LIMIT;
+  const reviewLimit = useSelector(selectReviewLimit);
+  const learnLimit = useSelector(selectLearnLimit);
+  const modeLimit = isReviewMode ? reviewLimit : learnLimit;
 
   const [status, setStatus] = useState("idle");
   const [phaseIndex, setPhaseIndex] = useState(0);
@@ -197,8 +203,8 @@ export default function useStudySession({ deck, navMode }) {
               cards_learned: cardsLearned,
             },
           ],
-          p_review_limit: REVIEW_LIMIT,
-          p_learn_limit: LEARN_LIMIT,
+          p_review_limit: reviewLimit,
+          p_learn_limit: learnLimit,
           p_user_timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         });
 
