@@ -11,16 +11,19 @@ import { getTodayISO } from "../utils/dateHelper";
 -------------------------------------------- */
 export const fetchDailyStreakStats = createAsyncThunk(
   "streak/fetchDailyStats",
-  async (_, { rejectWithValue }) => {
+  async ({ user_id } = {}, { rejectWithValue }) => {
     try {
-      const { data: userData, error: userError } =
-        await supabase.auth.getUser();
+      let userId = user_id;
+      if (!userId) {
+        const { data: userData, error: userError } =
+          await supabase.auth.getUser();
 
-      if (userError || !userData?.user) {
-        throw new Error("Not authenticated");
+        if (userError || !userData?.user) {
+          throw new Error("Not authenticated");
+        }
+        userId = userData.user.id;
       }
 
-      const userId = userData.user.id;
       const today = getTodayISO();
 
       const [deckRes, userRes] = await Promise.all([
@@ -101,15 +104,6 @@ const streakSlice = createSlice({
         streakState: row.streak_state,
       };
     },
-
-    // updateGlobalStreakFromRealtime(state, action) {
-    //   const row = action.payload;
-    //   state.global = {
-    //     streak: row.global_streak,
-    //     maxStreak: row.max_global_streak,
-    //     streakState: row.streak_state,
-    //   };
-    // },
   },
 
   extraReducers: (builder) => {
@@ -211,10 +205,7 @@ export const selectIsStreakLoading = createSelector(
 /* -------------------------------------------
    Actions
 -------------------------------------------- */
-export const {
-  clearStreak,
-  updateDeckStreakFromRealtime,
-  // updateGlobalStreakFromRealtime,
-} = streakSlice.actions;
+export const { clearStreak, updateDeckStreakFromRealtime } =
+  streakSlice.actions;
 
 export default streakSlice.reducer;

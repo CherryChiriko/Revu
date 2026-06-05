@@ -145,9 +145,9 @@ export const Heatmap = ({ activeTheme }) => {
                   key={idx}
                   title={`${c.iso}: ${c.value}%`}
                   className={`w-7 h-7 rounded-sm flex items-center justify-center text-xs font-medium
-  ${isToday ? `border-2 ${activeTheme.border.card}` : ""} ${
-    c.isFuture ? `border-2 ${activeTheme.border.muted}` : ""
-  } ${activeTheme.text.activeButton}`}
+                  ${isToday ? `border-2 ${activeTheme.border.card}` : ""} ${
+                    c.isFuture ? `border-2 ${activeTheme.border.muted}` : ""
+                  } ${activeTheme.text.activeButton}`}
                   style={{
                     background: getColor(c.value, c.isFuture),
                   }}

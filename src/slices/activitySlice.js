@@ -38,14 +38,17 @@ const initialState = {
 -------------------------------------------- */
 export const fetchDailyActivity = createAsyncThunk(
   "activity/fetchDaily",
-  async (_, { rejectWithValue }) => {
+  async ({ user_id } = {}, { rejectWithValue }) => {
     try {
-      const { data: userData, error: userError } =
-        await supabase.auth.getUser();
-      if (userError || !userData?.user) {
-        throw new Error("Not authenticated");
+      let userId = user_id;
+      if (!userId) {
+        const { data: userData, error: userError } =
+          await supabase.auth.getUser();
+        if (userError || !userData?.user) {
+          throw new Error("Not authenticated");
+        }
+        userId = userData.user.id;
       }
-      const userId = userData.user.id;
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - 60);
       const cutoffStr = cutoffDate.toISOString().slice(0, 10);
@@ -99,12 +102,8 @@ export const activitySlice = createSlice({
     },
 
     updateDayFromRealtime: (state, action) => {
-      const {
-        date,
-        cards_reviewed,
-        cards_learned,
-        time_studied_seconds,
-      } = action.payload;
+      const { date, cards_reviewed, cards_learned, time_studied_seconds } =
+        action.payload;
       state.days[date] = {
         date,
         cardsReviewed: cards_reviewed || 0,

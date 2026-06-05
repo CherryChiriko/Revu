@@ -233,8 +233,10 @@ export default function useStudySession({ deck, navMode }) {
             }),
           ).unwrap(),
           dispatch(fetchDeckCounts({ user_id: currentCard.user_id })).unwrap(),
-          dispatch(fetchDailyStreakStats()).unwrap(),
-          dispatch(fetchDailyActivity()),
+          dispatch(
+            fetchDailyStreakStats({ user_id: currentCard.user_id }),
+          ).unwrap(),
+          dispatch(fetchDailyActivity({ user_id: currentCard.user_id })),
         ]);
 
         console.log(

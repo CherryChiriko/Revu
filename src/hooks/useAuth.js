@@ -1,7 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "../utils/supabaseClient";
+import { useDispatch } from "react-redux";
+import { resetAllUserState } from "../app/store";
 
 export default function useAuth() {
+  const dispatch = useDispatch();
+
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [authLoading, setAuthLoading] = useState(false);
@@ -34,6 +38,17 @@ export default function useAuth() {
     } = supabase.auth.onAuthStateChange((event, data) => {
       if (!mounted) return;
 
+      console.log("[useAuth] onAuthStateChange", {
+        event,
+        userId: data?.session?.user?.id,
+        sessionExists: !!data?.session,
+      });
+
+      // Clear stale user data BEFORE setting the new session
+      if (event === "SIGNED_OUT" || event === "SIGNED_IN") {
+        console.log("[useAuth] dispatching resetAllUserState for event", event);
+        dispatch(resetAllUserState());
+      }
       // Always update session from the callback data first
       setSession(data?.session ?? null);
 
@@ -93,7 +108,7 @@ export default function useAuth() {
           options: {
             data: { username },
           },
-        }
+        },
       );
 
       if (signUpError) throw signUpError;
@@ -195,7 +210,7 @@ export default function useAuth() {
         email,
         {
           redirectTo: `${window.location.origin}/reset-password`,
-        }
+        },
       );
 
       if (resetError) throw resetError;
@@ -212,7 +227,14 @@ export default function useAuth() {
 
   // LOGOUT
   const logout = useCallback(async () => {
-    await supabase.auth.signOut();
+    setSession(null);
+    setLoading(false);
+    setAuthLoading(false);
+
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      throw error;
+    }
   }, []);
 
   // DELETE ACCOUNT

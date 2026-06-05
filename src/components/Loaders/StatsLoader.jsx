@@ -6,9 +6,11 @@ import { supabase } from "../../utils/supabaseClient";
 
 export default function StatsLoader({ session, authLoading }) {
   const dispatch = useDispatch();
+  const userId = session?.user?.id || null;
 
   useEffect(() => {
-    if (authLoading || !session) return;
+    console.log("[StatsLoader] authLoading", authLoading, "userId", userId);
+    if (authLoading || !userId) return;
 
     const run = async () => {
       try {
@@ -17,7 +19,7 @@ export default function StatsLoader({ session, authLoading }) {
 
         // Supply both arguments required by your canonical SQL migration script
         const { error } = await supabase.rpc("ensure_today_stats_for_user", {
-          p_user_id: session.user.id,
+          p_user_id: userId,
           p_user_timezone: userTimezone,
         });
 
@@ -30,8 +32,12 @@ export default function StatsLoader({ session, authLoading }) {
         }
 
         // Proceed with Redux state updates once metrics rows are successfully initialized
-        dispatch(fetchDailyStreakStats());
-        dispatch(fetchDailyActivity());
+        console.log(
+          "[StatsLoader] dispatching daily stats fetches for user",
+          userId,
+        );
+        dispatch(fetchDailyStreakStats({ user_id: userId }));
+        dispatch(fetchDailyActivity({ user_id: userId }));
       } catch (err) {
         console.error(
           "[StatsLoader] Failed to safely load current day statistics:",

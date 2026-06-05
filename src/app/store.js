@@ -1,11 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import themeReducer from "../slices/themeSlice";
-import deckReducer from "../slices/deckSlice";
+import deckReducer, { clearDecks } from "../slices/deckSlice";
 import cardReducer from "../slices/cardSlice";
-import streakReducer from "../slices/streakSlice";
+import streakReducer, { clearStreak } from "../slices/streakSlice";
 import userReducer from "../slices/userSlice";
 import progressReducer from "../slices/progressSlice";
-import activityReducer from "../slices/activitySlice";
+import activityReducer, { resetActivity } from "../slices/activitySlice";
 import settingsReducer from "../slices/settingsSlice";
 import { getTodayISO } from "../utils/dateHelper";
 
@@ -30,6 +30,13 @@ const checkMidnightReset = () => {
 
 // Execute the check immediately upon application initialization
 checkMidnightReset();
+
+export const resetAllUserState = () => (dispatch) => {
+  console.log("[store] resetAllUserState called");
+  dispatch(clearDecks());
+  dispatch(clearStreak());
+  dispatch(resetActivity());
+};
 
 export const store = configureStore({
   reducer: {

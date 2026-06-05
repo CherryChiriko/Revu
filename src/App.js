@@ -4,10 +4,15 @@ import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { selectActiveTheme } from "./slices/themeSlice";
 import { clearUser, fetchUserProfile } from "./slices/userSlice";
 import {
+  clearDecks,
   selectActiveDeck,
   selectDeckStatus,
   selectDeckError,
 } from "./slices/deckSlice";
+import { clearCards } from "./slices/cardSlice";
+import { clearProgress } from "./slices/progressSlice";
+import { clearStreak } from "./slices/streakSlice";
+import { resetActivity } from "./slices/activitySlice";
 
 import useAuth from "./hooks/useAuth";
 import useDeckLiveSync from "./hooks/useDeckLiveSync";
@@ -43,6 +48,7 @@ function App() {
   const status = useSelector(selectDeckStatus);
   const error = useSelector(selectDeckError);
   const activeDeck = useSelector(selectActiveDeck);
+  const previousUserIdRef = React.useRef(null);
 
   const publicPaths = ["/reset-password"];
   const isPublicPath = publicPaths.includes(location.pathname);
@@ -52,11 +58,46 @@ function App() {
   useAppBoot(session);
 
   React.useEffect(() => {
-    if (session?.user?.id) {
-      dispatch(fetchUserProfile(session.user.id));
-    } else {
+    const currentUserId = session?.user?.id || null;
+    console.log(
+      "[App] session user id changed",
+      currentUserId,
+      "prev",
+      previousUserIdRef.current,
+    );
+
+    if (!currentUserId) {
+      console.log(
+        "[App] clearing user-specific redux state on logout or missing session",
+      );
       dispatch(clearUser());
+      dispatch(clearDecks());
+      dispatch(clearCards());
+      dispatch(clearProgress());
+      dispatch(clearStreak());
+      dispatch(resetActivity());
+    } else if (
+      previousUserIdRef.current &&
+      previousUserIdRef.current !== currentUserId
+    ) {
+      console.log(
+        "[App] user changed, clearing stale state between accounts",
+        previousUserIdRef.current,
+        currentUserId,
+      );
+      dispatch(clearUser());
+      dispatch(clearDecks());
+      dispatch(clearCards());
+      dispatch(clearProgress());
+      dispatch(clearStreak());
+      dispatch(resetActivity());
     }
+
+    if (currentUserId) {
+      dispatch(fetchUserProfile(currentUserId));
+    }
+
+    previousUserIdRef.current = currentUserId;
   }, [dispatch, session?.user?.id]);
 
   function setPrimeTheme(isDark) {
@@ -137,40 +178,47 @@ function App() {
 
   // All good: decks loaded + user authenticated
   return (
-    <div
-      style={{
-        backgroundColor: activeTheme.background.app,
-        color: activeTheme.text.primary,
-        minHeight: "100vh",
-      }}
-    >
-      <CardsLoader activeDeck={activeDeck} />
-      <Navbar />
-      <main>
-        <ScrollToTop />
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/decks" element={<DeckListView />} />
-          <Route
-            path="/decks/import"
-            element={<ImportView activeTheme={activeTheme} />}
-          />
-          <Route
-            path="/decks/:deckId"
-            element={<DeckDetails activeTheme={activeTheme} />}
-          />
-          <Route path="/study" element={<StudySession />} />
-          <Route path="/activity" element={<ActivityPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route
-            path="/reset-password"
-            element={<ResetPasswordPage activeTheme={activeTheme} />}
-          />
+    <>
+      <DecksLoader session={session} authLoading={authLoading} />
+      <StatsLoader session={session} authLoading={authLoading} />
+      <div
+        style={{
+          backgroundColor: activeTheme.background.app,
+          color: activeTheme.text.primary,
+          minHeight: "100vh",
+        }}
+      >
+        <CardsLoader activeDeck={activeDeck} userId={session?.user?.id} />
+        <Navbar />
+        <main>
+          <ScrollToTop />
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/decks" element={<DeckListView />} />
+            <Route
+              path="/decks/import"
+              element={<ImportView activeTheme={activeTheme} />}
+            />
+            <Route
+              path="/decks/:deckId"
+              element={<DeckDetails activeTheme={activeTheme} />}
+            />
+            <Route path="/study" element={<StudySession />} />
+            <Route path="/activity" element={<ActivityPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route
+              path="/reset-password"
+              element={<ResetPasswordPage activeTheme={activeTheme} />}
+            />
 
-          <Route path="*" element={<NotFound404 activeTheme={activeTheme} />} />
-        </Routes>
-      </main>
-    </div>
+            <Route
+              path="*"
+              element={<NotFound404 activeTheme={activeTheme} />}
+            />
+          </Routes>
+        </main>
+      </div>
+    </>
   );
 }
 

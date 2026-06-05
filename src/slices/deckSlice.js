@@ -45,19 +45,22 @@ const countsFromDeck = (deck) => ({
 /** Fetch decks */
 export const fetchDecks = createAsyncThunk(
   "decks/fetchDecks",
-  async (_, { rejectWithValue }) => {
+  async ({ user_id } = {}, { rejectWithValue }) => {
     try {
-      const { data: userData, error: userError } =
-        await supabase.auth.getUser();
-
-      if (userError || !userData?.user) {
-        throw new Error("Not authenticated");
+      let userId = user_id;
+      if (!userId) {
+        const { data: userData, error: userError } =
+          await supabase.auth.getUser();
+        if (userError || !userData?.user) {
+          throw new Error("Not authenticated");
+        }
+        userId = userData.user.id;
       }
 
       const { data, error } = await supabase
         .from("decks")
         .select("*")
-        .eq("user_id", userData.user.id)
+        .eq("user_id", userId)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -150,6 +153,17 @@ const deckSlice = createSlice({
         localStorage.removeItem("activeDeckId");
         localStorage.removeItem("activeDeckIdDate");
       }
+    },
+    clearDecks(state) {
+      state.decks = [];
+      state.deckCounts = {};
+      state.activeDeckId = null;
+      state.status = "idle";
+      state.error = null;
+      state.countsLoading = false;
+      state.countsError = null;
+      localStorage.removeItem("activeDeckId");
+      localStorage.removeItem("activeDeckIdDate");
     },
     updateDeckFromRealtime(state, action) {
       const deck = action.payload;
@@ -266,7 +280,8 @@ const deckSlice = createSlice({
   },
 });
 
-export const { setActiveDeck, updateDeckFromRealtime } = deckSlice.actions;
+export const { setActiveDeck, updateDeckFromRealtime, clearDecks } =
+  deckSlice.actions;
 
 export const selectDecks = (state) => state.decks.decks;
 export const selectActiveDeck = (state) => {
