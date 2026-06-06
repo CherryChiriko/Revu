@@ -132,7 +132,32 @@ function App() {
   }
 
   // Render DecksLoader to trigger fetch (but show loading UI)
+  const isSettingsPath = location.pathname === "/settings";
+  const shouldLoadDeckData = !!session && !isSettingsPath;
+  const shouldLoadStatsData = !!session;
+
   if (status === "loading" || status === "idle") {
+    if (isSettingsPath && session) {
+      return (
+        <>
+          <StatsLoader session={session} authLoading={authLoading} />
+          <div
+            style={{
+              backgroundColor: activeTheme.background.app,
+              color: activeTheme.text.primary,
+              minHeight: "100vh",
+            }}
+          >
+            <Navbar />
+            <main>
+              <ScrollToTop />
+              <SettingsPage />
+            </main>
+          </div>
+        </>
+      );
+    }
+
     return (
       <>
         <DecksLoader session={session} authLoading={authLoading} />
@@ -179,8 +204,12 @@ function App() {
   // All good: decks loaded + user authenticated
   return (
     <>
-      <DecksLoader session={session} authLoading={authLoading} />
-      <StatsLoader session={session} authLoading={authLoading} />
+      {shouldLoadDeckData && (
+        <DecksLoader session={session} authLoading={authLoading} />
+      )}
+      {shouldLoadStatsData && (
+        <StatsLoader session={session} authLoading={authLoading} />
+      )}
       <div
         style={{
           backgroundColor: activeTheme.background.app,

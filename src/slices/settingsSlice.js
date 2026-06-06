@@ -21,7 +21,8 @@ const initialState = {
   // ── Avatar ────────────────────────────────────────────────
   profileIcon: "R",
   profileColor: "#6366f1",
-  avatarUrl: null, // remote URL when user uploads a photo
+  avatarUrl: null, // active uploaded photo URL (null = emoji/initial)
+  avatarHistory: [], // [{ url, path, used_at }] max 5, desc by used_at
 
   // ── Study flow ────────────────────────────────────────────
   autoflipModeA: false,
@@ -52,6 +53,8 @@ const settingsSlice = createSlice({
       if (p.learn_limit != null) state.learnLimit = p.learn_limit;
       if (p.streak_goal != null) state.streakGoal = p.streak_goal;
       if (p.avatar_url != null) state.avatarUrl = p.avatar_url;
+      if (Array.isArray(p.avatar_history))
+        state.avatarHistory = p.avatar_history;
     },
 
     /** Clear all settings on logout */

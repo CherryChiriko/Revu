@@ -20,6 +20,10 @@ const Navbar = () => {
 
   const gradient = `bg-gradient-to-r ${activeTheme.gradients.from} ${activeTheme.gradients.to}`;
   const username = profile?.username || "Settings";
+  const avatarUrl = settings.avatarUrl;
+  const avatarIcon = avatarUrl
+    ? null
+    : settings.profileIcon || username[0]?.toUpperCase() || "R";
 
   return (
     <>
@@ -57,10 +61,22 @@ const Navbar = () => {
           <Link
             to="/settings"
             title={username}
-            className={`ml-2 w-10 h-10 rounded-xl flex items-center justify-center text-sm font-black text-white shadow-md ring-2 ring-white/10 hover:scale-[1.03] transition-transform`}
-            style={{ backgroundColor: settings.profileColor }}
+            className={`ml-2 w-10 h-10 rounded-xl flex items-center justify-center text-sm font-black text-white shadow-md ring-2 ring-white/10 hover:scale-[1.03] transition-transform overflow-hidden`}
+            style={{
+              backgroundColor: avatarUrl
+                ? "transparent"
+                : settings.profileColor,
+            }}
           >
-            {settings.profileIcon}
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt={`${username} avatar`}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              avatarIcon
+            )}
           </Link>
         </div>
       </nav>
@@ -94,10 +110,22 @@ const Navbar = () => {
           <Link
             to="/settings"
             title={username}
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black text-white shadow-md"
-            style={{ backgroundColor: settings.profileColor }}
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black text-white shadow-md overflow-hidden"
+            style={{
+              backgroundColor: avatarUrl
+                ? "transparent"
+                : settings.profileColor,
+            }}
           >
-            {settings.profileIcon}
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt={`${username} avatar`}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              avatarIcon
+            )}
           </Link>
           <button
             className={`${activeTheme.text.primary} transition-colors duration-200`}
