@@ -7,7 +7,6 @@ import { AccountEdit } from "./components/AccountEdit";
 import { AvatarSection } from "./components/AvatarSection";
 import { StudyLimitsSection } from "./components/StudyLimits";
 import { ThemeSection } from "./components/ThemeSection";
-import { HeatmapSection } from "./components/HeatmapSection";
 import { StudyFlowSection } from "./components/StudyFlowSection";
 import { DisplaySection } from "./components/DisplaySection";
 import { AccountSection } from "./components/AccountSection";
@@ -22,22 +21,17 @@ export function SettingsPage({
 }) {
   return (
     <>
-      <AccountSection profile={profile} activeTheme={activeTheme} />
-
-      {/* ── Row 3: Avatar · Study limits · Theme ────────────────────── */}
+      {/* ── Row 3: Avatar · Account · Theme ────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <AccountSection profile={profile} activeTheme={activeTheme} />
+
         <AvatarSection
           profile={profile}
           settings={settings}
           activeTheme={activeTheme}
           dispatch={dispatch}
         />
-        <StudyLimitsSection
-          profile={profile}
-          settings={settings}
-          activeTheme={activeTheme}
-          dispatch={dispatch}
-        />
+
         <ThemeSection
           activeTheme={activeTheme}
           allThemes={allThemes}
@@ -48,7 +42,8 @@ export function SettingsPage({
 
       {/* ── Row 4: Heatmap · Study flow · Display ───────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <HeatmapSection
+        <StudyLimitsSection
+          profile={profile}
           settings={settings}
           activeTheme={activeTheme}
           dispatch={dispatch}

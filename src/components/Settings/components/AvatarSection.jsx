@@ -6,21 +6,19 @@ import { SettingCard } from "../SettingsTemplates";
 import { updateLocalProfile } from "../../../slices/userSlice";
 import { updateSettings } from "../../../slices/settingsSlice";
 
-import { faImage } from "@fortawesome/free-solid-svg-icons";
+import { faImage, faChevronDown } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { persistAvatarState } from "../hooks/useSettings";
 
 import { RowLabel, AvatarThumb } from "../SettingsTemplates";
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
 
-// 5 background colour options for the initials avatar
 const INITIAL_COLORS = ["#6366f1", "#0ea5e9", "#14b8a6", "#f97316", "#e11d48"];
-
-// Exactly 5 preset emojis
 const PRESET_EMOJIS = ["🐉", "🦊", "🐼", "🦁", "🐸"];
-
 const MAX_AVATAR_BYTES = 2 * 1024 * 1024; // 2 MB
 const MAX_HISTORY = 5;
 
@@ -29,21 +27,25 @@ export function AvatarSection({ profile, settings, activeTheme, dispatch }) {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState(null);
 
+  // Track collapsed state for each section key
+  const [collapsedSections, setCollapsedSections] = useState({
+    recent: true,
+    presets: true,
+    initials: true,
+  });
+
   const history = useMemo(
     () => settings.avatarHistory ?? [],
     [settings.avatarHistory],
-  ); // [{ url, path, used_at }]
+  );
   const activeUrl = settings.avatarUrl;
   const initial = (profile?.username?.[0] ?? "R").toUpperCase();
 
-  // Determine which "type" is currently active for the preview
   const activeIsEmoji =
     !activeUrl && PRESET_EMOJIS.includes(settings.profileIcon);
-  // otherwise it's an initial
 
-  // ── Helpers ────────────────────────────────────────────────────────────────
+  // ── Callbacks ──────────────────────────────────────────────────────────────
 
-  /** Write updated history + activeUrl both to Redux and Supabase */
   const applyAvatarState = useCallback(
     (newHistory, newActiveUrl, newProfileIcon = null) => {
       const updates = {
@@ -63,7 +65,6 @@ export function AvatarSection({ profile, settings, activeTheme, dispatch }) {
     [profile, dispatch],
   );
 
-  /** Touch an existing history entry (move to front / update used_at) */
   const touchHistoryEntry = useCallback(
     (entry) => {
       const rest = history.filter((h) => h.path !== entry.path);
@@ -73,7 +74,6 @@ export function AvatarSection({ profile, settings, activeTheme, dispatch }) {
     [history, applyAvatarState],
   );
 
-  // ── Upload ─────────────────────────────────────────────────────────────────
   const handleFileChange = useCallback(
     async (e) => {
       const file = e.target.files?.[0];
@@ -89,7 +89,6 @@ export function AvatarSection({ profile, settings, activeTheme, dispatch }) {
 
       try {
         const ext = file.name.split(".").pop().toLowerCase();
-        // Unique filename so each upload is its own object in Storage
         const path = `${profile.id}/avatar_${Date.now()}.${ext}`;
 
         const { error: upErr } = await supabase.storage
@@ -104,14 +103,12 @@ export function AvatarSection({ profile, settings, activeTheme, dispatch }) {
 
         const newEntry = { url, path, used_at: new Date().toISOString() };
 
-        // Build new history: prepend, sort by used_at desc, cap at MAX_HISTORY
         const merged = [newEntry, ...history.filter((h) => h.path !== path)];
         const sorted = merged.sort((a, b) =>
           b.used_at.localeCompare(a.used_at),
         );
         const trimmed = sorted.slice(0, MAX_HISTORY);
 
-        // If we evicted an entry, delete its file from Storage
         const evicted = sorted.slice(MAX_HISTORY);
         if (evicted.length > 0) {
           await supabase.storage
@@ -130,14 +127,11 @@ export function AvatarSection({ profile, settings, activeTheme, dispatch }) {
     [profile, history, applyAvatarState],
   );
 
-  // ── Remove a history entry ─────────────────────────────────────────────────
   const handleRemoveHistoryEntry = useCallback(
     async (entry) => {
-      // Delete file from Storage
       await supabase.storage.from("avatars").remove([entry.path]);
 
       const newHistory = history.filter((h) => h.path !== entry.path);
-      // If the removed entry was active, fall back to the next in history or null
       const newActiveUrl =
         activeUrl === entry.url ? (newHistory[0]?.url ?? null) : activeUrl;
 
@@ -146,37 +140,99 @@ export function AvatarSection({ profile, settings, activeTheme, dispatch }) {
     [history, activeUrl, applyAvatarState],
   );
 
-  // ── Select emoji preset ────────────────────────────────────────────────────
-  const handleSelectEmoji = useCallback(
-    (emoji) => {
-      dispatch(updateSettings({ avatarUrl: null, profileIcon: emoji }));
-      dispatch(updateLocalProfile({ avatar_url: null }));
-      if (profile?.id) persistAvatarState(profile.id, history, null);
-    },
-    [profile, history, dispatch],
-  );
+  const toggleSection = useCallback((sectionKey) => {
+    setCollapsedSections((prev) => ({
+      ...prev,
+      [sectionKey]: !prev[sectionKey],
+    }));
+  }, []);
 
-  // ── Select initial colour ──────────────────────────────────────────────────
-  const handleSelectInitialColor = useCallback(
-    (color) => {
-      dispatch(
-        updateSettings({
-          avatarUrl: null,
-          profileIcon: initial,
-          profileColor: color,
-        }),
-      );
-      dispatch(updateLocalProfile({ avatar_url: null }));
-      if (profile?.id) persistAvatarState(profile.id, history, null);
-    },
-    [profile, history, initial, dispatch],
-  );
+  // ── Configuration Array ────────────────────────────────────────────────────
+
+  const sectionsConfig = useMemo(() => {
+    return [
+      {
+        key: "recent",
+        title: "Recent uploads",
+        isEmpty: history.length === 0,
+        items: history,
+        renderItem: (entry) => (
+          <AvatarThumb
+            key={entry.path}
+            url={entry.url}
+            active={activeUrl === entry.url}
+            onClick={() => touchHistoryEntry(entry)}
+            onRemove={() => handleRemoveHistoryEntry(entry)}
+            activeTheme={activeTheme}
+          />
+        ),
+      },
+      {
+        key: "presets",
+        title: "Preset icons",
+        isEmpty: false,
+        items: PRESET_EMOJIS,
+        renderItem: (emoji) => (
+          <AvatarThumb
+            key={emoji}
+            emoji={emoji}
+            active={!activeUrl && settings.profileIcon === emoji}
+            onClick={() => {
+              dispatch(updateSettings({ avatarUrl: null, profileIcon: emoji }));
+              dispatch(updateLocalProfile({ avatar_url: null }));
+              if (profile?.id) persistAvatarState(profile.id, history, null);
+            }}
+            activeTheme={activeTheme}
+          />
+        ),
+      },
+      {
+        key: "initials",
+        title: "Initial",
+        isEmpty: false,
+        items: INITIAL_COLORS,
+        renderItem: (color) => (
+          <AvatarThumb
+            key={color}
+            initial={initial}
+            color={color}
+            active={
+              !activeUrl && !activeIsEmoji && settings.profileColor === color
+            }
+            onClick={() => {
+              dispatch(
+                updateSettings({
+                  avatarUrl: null,
+                  profileIcon: initial,
+                  profileColor: color,
+                }),
+              );
+              dispatch(updateLocalProfile({ avatar_url: null }));
+              if (profile?.id) persistAvatarState(profile.id, history, null);
+            }}
+            activeTheme={activeTheme}
+          />
+        ),
+      },
+    ];
+  }, [
+    history,
+    settings,
+    activeUrl,
+    activeIsEmoji,
+    initial,
+    activeTheme,
+    profile,
+    dispatch,
+    touchHistoryEntry,
+    handleRemoveHistoryEntry,
+  ]);
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <SettingCard icon={faImage} title="Avatar" activeTheme={activeTheme}>
       {/* ── Active avatar preview + upload button ── */}
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center gap-4 mb-5">
         <div
           className="w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0 flex items-center justify-center text-2xl font-black text-white shadow-lg"
           style={{
@@ -217,56 +273,55 @@ export function AvatarSection({ profile, settings, activeTheme, dispatch }) {
         />
       </div>
 
-      {/* ── Row 1: Recent uploads ── */}
-      <RowLabel activeTheme={activeTheme}>Recent uploads</RowLabel>
-      {history.length === 0 ? (
-        <p className={`${activeTheme.text.secondary} text-xs mb-4 italic`}>
-          No uploads yet — use the button above.
-        </p>
-      ) : (
-        <div className="grid grid-cols-5 gap-2 mb-5">
-          {history.map((entry) => (
-            <AvatarThumb
-              key={entry.path}
-              url={entry.url}
-              active={activeUrl === entry.url}
-              onClick={() => touchHistoryEntry(entry)}
-              onRemove={() => handleRemoveHistoryEntry(entry)}
-              activeTheme={activeTheme}
-            />
-          ))}
-        </div>
-      )}
+      {/* ── Dynamic Layout Sections ── */}
+      <div className="flex flex-col gap-3">
+        {sectionsConfig.map((section) => {
+          const isCollapsed = collapsedSections[section.key];
 
-      {/* ── Row 2: Preset emojis ── */}
-      <RowLabel activeTheme={activeTheme}>Preset icons</RowLabel>
-      <div className="grid grid-cols-5 gap-2 mb-5">
-        {PRESET_EMOJIS.map((emoji) => (
-          <AvatarThumb
-            key={emoji}
-            emoji={emoji}
-            active={!activeUrl && settings.profileIcon === emoji}
-            onClick={() => handleSelectEmoji(emoji)}
-            activeTheme={activeTheme}
-          />
-        ))}
-      </div>
+          return (
+            <div key={section.key}>
+              {/* Header / Toggle Trigger */}
+              {!section.isEmpty && (
+                <button
+                  type="button"
+                  onClick={() => toggleSection(section.key)}
+                  className="flex items-center justify-between w-full text-left group mb-2 focus:outline-none"
+                >
+                  <RowLabel
+                    activeTheme={activeTheme}
+                    className="!mb-0 pointer-events-none"
+                  >
+                    {section.title}
+                  </RowLabel>
+                  <FontAwesomeIcon
+                    icon={faChevronDown}
+                    className={`text-xs transition-transform duration-200 ${
+                      activeTheme.text.secondary
+                    } ${isCollapsed ? "-rotate-90" : ""}`}
+                  />
+                </button>
+              )}
 
-      {/* ── Row 3: Initial on flat colour ── */}
-      <RowLabel activeTheme={activeTheme}>Initial</RowLabel>
-      <div className="grid grid-cols-5 gap-2">
-        {INITIAL_COLORS.map((color) => (
-          <AvatarThumb
-            key={color}
-            initial={initial}
-            color={color}
-            active={
-              !activeUrl && !activeIsEmoji && settings.profileColor === color
-            }
-            onClick={() => handleSelectInitialColor(color)}
-            activeTheme={activeTheme}
-          />
-        ))}
+              {/* Collapsible Content */}
+              {/* {!isCollapsed && (
+                <div className="transition-all duration-200">
+                  {!section.isEmpty && (
+                    <div className="grid grid-cols-5 gap-2">
+                      {section.items.map((item) => section.renderItem(item))}
+                    </div>
+                  )}
+                </div>
+              )} */}
+              {!isCollapsed && (
+                <div className="transition-all duration-200">
+                  <div className="grid grid-cols-5 gap-2">
+                    {section.items.map((item) => section.renderItem(item))}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     </SettingCard>
   );

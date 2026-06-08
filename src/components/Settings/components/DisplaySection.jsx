@@ -8,6 +8,7 @@ import {
   faCalendarDays,
   faLayerGroup,
   faRotate,
+  faChartSimple,
 } from "@fortawesome/free-solid-svg-icons";
 // ─────────────────────────────────────────────────────────────────────────────
 // Section: Display defaults
@@ -15,6 +16,7 @@ import {
 
 export function DisplaySection({ settings, activeTheme, dispatch }) {
   const set = (key, value) => dispatch(updateSettings({ [key]: value }));
+  // const set = (metric) => dispatch(updateSettings({ heatmapMetric: metric }));
 
   return (
     <SettingCard icon={faLayerGroup} title="Defaults" activeTheme={activeTheme}>
@@ -66,6 +68,42 @@ export function DisplaySection({ settings, activeTheme, dispatch }) {
               Compact list
             </SegmentButton>
           </div>
+        </div>
+
+        <div>
+          <div className="font-semibold mb-2">
+            <FontAwesomeIcon icon={faChartSimple} className="mr-2" />
+            Heatmap
+          </div>
+          <div
+            className={`p-1 rounded-xl ${activeTheme.background.canvas} flex gap-1`}
+          >
+            <SegmentButton
+              active={settings.heatmapMetric === "consistency"}
+              onClick={() => set("consistency")}
+              activeTheme={activeTheme}
+            >
+              Consistency
+            </SegmentButton>
+            <SegmentButton
+              active={settings.heatmapMetric === "studied"}
+              onClick={() => set("studied")}
+              activeTheme={activeTheme}
+            >
+              Cards studied
+            </SegmentButton>
+            <SegmentButton
+              active={settings.heatmapMetric === "learned"}
+              onClick={() => set("learned")}
+              activeTheme={activeTheme}
+            >
+              Cards learned
+            </SegmentButton>
+          </div>
+          <p className={`${activeTheme.text.muted} text-xs mt-3`}>
+            Consistency is the default — fluency is won by showing up daily, not
+            by chasing big sessions.
+          </p>
         </div>
       </div>
     </SettingCard>

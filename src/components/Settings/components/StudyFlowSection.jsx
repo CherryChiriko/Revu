@@ -21,8 +21,8 @@ export function StudyFlowSection({ settings, activeTheme, dispatch }) {
         <Toggle
           checked={settings.autoflipModeA}
           onChange={(v) => set("autoflipModeA", v)}
-          label="Autoflip cards in mode A"
-          description="Reveal the answer automatically during fast recall."
+          label="Autoflip cards"
+          description="Cards flip automatically after a set time."
           activeTheme={activeTheme}
         />
         <LabelledSlider

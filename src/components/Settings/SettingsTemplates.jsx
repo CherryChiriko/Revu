@@ -26,7 +26,7 @@ export function Toggle({ checked, onChange, label, description, activeTheme }) {
     <label className="flex items-center justify-between gap-4 cursor-pointer">
       <span>
         <span className="block font-semibold">{label}</span>
-        <span className={`${activeTheme.text.secondary} text-sm`}>
+        <span className={`${activeTheme.text.muted} text-xs mt-3`}>
           {description}
         </span>
       </span>

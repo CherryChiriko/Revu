@@ -103,7 +103,7 @@ export function StudyLimitsSection({
             onChange={(v) => set("streakGoal", v)}
             activeTheme={activeTheme}
           />
-          <p className={`${activeTheme.text.secondary} text-xs mt-2`}>
+          <p className={`${activeTheme.text.muted} text-xs mt-3`}>
             Complete at least this many reviews <em>or</em> new cards in a
             session to count it toward your daily streak.
           </p>
