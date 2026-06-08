@@ -2,7 +2,12 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { selectActiveTheme } from "./slices/themeSlice";
-import { clearUser, fetchUserProfile } from "./slices/userSlice";
+import {
+  clearUser,
+  fetchUserProfile,
+  selectUserProfile,
+} from "./slices/userSlice";
+import { selectSettings } from "./slices/settingsSlice";
 import {
   clearDecks,
   selectActiveDeck,
@@ -25,7 +30,11 @@ import DeckListView from "./components/Decks/views/DeckListView";
 import DeckDetails from "./components/Decks/views/DeckDetails";
 import ImportView from "./components/Import/ImportView";
 import StudySession from "./components/Study/views/StudySession";
-import SettingsPage from "./components/Settings/SettingsPage";
+import {
+  SettingsPage,
+  SettingsAccountPage,
+} from "./components/Settings/SettingsPage";
+import SettingsView from "./components/Settings/views/SettingsView";
 import ActivityPage from "./components/Activity/ActivityPage";
 import LoginPage from "./components/LoginPage";
 import NotFound404 from "./components/404";
@@ -44,6 +53,10 @@ function App() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const activeTheme = useSelector(selectActiveTheme);
+  const profile = useSelector(selectUserProfile);
+  const settings = useSelector(selectSettings);
+  const allThemes = useSelector((state) => state.theme.allThemes);
+  const currentThemeName = useSelector((state) => state.theme.currentThemeName);
   const { session, loading: authLoading } = useAuth();
   const status = useSelector(selectDeckStatus);
   const error = useSelector(selectDeckError);
@@ -132,9 +145,37 @@ function App() {
   }
 
   // Render DecksLoader to trigger fetch (but show loading UI)
-  const isSettingsPath = location.pathname === "/settings";
+  const isSettingsPath = location.pathname.startsWith("/settings");
   const shouldLoadDeckData = !!session && !isSettingsPath;
   const shouldLoadStatsData = !!session;
+
+  const settingsRoutes = (
+    <Route path="/settings" element={<SettingsView />}>
+      <Route
+        index
+        element={
+          <SettingsPage
+            profile={profile}
+            settings={settings}
+            activeTheme={activeTheme}
+            allThemes={allThemes}
+            currentThemeName={currentThemeName}
+            dispatch={dispatch}
+          />
+        }
+      />
+      <Route
+        path="account"
+        element={
+          <SettingsAccountPage
+            profile={profile}
+            activeTheme={activeTheme}
+            dispatch={dispatch}
+          />
+        }
+      />
+    </Route>
+  );
 
   if (status === "loading" || status === "idle") {
     if (isSettingsPath && session) {
@@ -151,7 +192,7 @@ function App() {
             <Navbar />
             <main>
               <ScrollToTop />
-              <SettingsPage />
+              <Routes>{settingsRoutes}</Routes>
             </main>
           </div>
         </>
@@ -234,7 +275,7 @@ function App() {
             />
             <Route path="/study" element={<StudySession />} />
             <Route path="/activity" element={<ActivityPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
+            {settingsRoutes}
             <Route
               path="/reset-password"
               element={<ResetPasswordPage activeTheme={activeTheme} />}

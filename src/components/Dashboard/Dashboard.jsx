@@ -1,5 +1,5 @@
 import React, { useMemo, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { selectActiveTheme } from "../../slices/themeSlice";
 import { selectGlobalStreak } from "../../slices/streakSlice";
 import {
@@ -9,7 +9,6 @@ import {
 } from "../../slices/deckSlice";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import useAuth from "../../hooks/useAuth";
 import {
   faBookOpen,
   faFire,
@@ -28,10 +27,8 @@ import { Toast } from "primereact/toast";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const activeTheme = useSelector(selectActiveTheme);
   const toast = useRef(null);
-  const { session } = useAuth();
 
   const decks = useSelector(selectDecks);
 
@@ -138,7 +135,7 @@ const Dashboard = () => {
                 <p className="font-semibold mb-3">No decks yet</p>
                 <button
                   onClick={() => navigate("/decks")}
-                  className={`px-6 py-2 rounded-full font-semibold ${activeTheme.button.primaryBg}`}
+                  className={`px-6 py-2 rounded-full font-semibold ${activeTheme.button.primary}`}
                 >
                   Create Deck
                 </button>
