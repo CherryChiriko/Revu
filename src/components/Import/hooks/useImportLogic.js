@@ -1,10 +1,10 @@
 import { useState, useEffect, useMemo } from "react";
-import { supabase } from "../../utils/supabaseClient";
+import { supabase } from "../../../utils/supabaseClient";
 import { generateReading } from "./generateReading";
 import Papa from "papaparse";
 import * as XLSX from "xlsx";
 import { useDispatch } from "react-redux";
-import { fetchDecks } from "../../slices/deckSlice";
+import { fetchDecks } from "../../../slices/deckSlice";
 
 export const useImportLogic = () => {
   const dispatch = useDispatch(); // 👈 Initialize dispatch

@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "../General/ui/Header";
 
 // Hooks & Sub-components
-import { useImportLogic } from "./useImportLogic";
+import { useImportLogic } from "./hooks/useImportLogic";
 import Step1 from "./Step1";
 import Step2 from "./Step2";
 import Step3 from "./Step3";

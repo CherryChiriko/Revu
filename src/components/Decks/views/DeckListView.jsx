@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { selectActiveTheme } from "../../../slices/themeSlice";
@@ -14,8 +14,8 @@ import {
   faList,
 } from "@fortawesome/free-solid-svg-icons";
 import Header from "../../General/ui/Header";
-
 import { Toast } from "primereact/toast";
+import QuickCreate from "../../Import/QuickCreate";
 
 export default function DeckListView() {
   const activeTheme = useSelector(selectActiveTheme);
@@ -37,7 +37,6 @@ export default function DeckListView() {
     totalPages,
   } = controller;
 
-  // grid classes depending on view mode
   const gridClasses =
     viewMode === "grid"
       ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
@@ -46,12 +45,9 @@ export default function DeckListView() {
   const variant = viewMode === "grid" ? "full" : "compact";
 
   const navigate = useNavigate();
-
-  const handleImportClick = () => {
-    navigate("import");
-  };
-
   const toast = useRef(null);
+
+  const [isQuickCreateOpen, setIsQuickCreateOpen] = useState(false);
 
   return (
     <div
@@ -63,8 +59,9 @@ export default function DeckListView() {
           description="Create, edit, and manage your flashcard decks"
         />
       </div>
+
       <div className="max-w-screen-xl mx-auto px-4 md:px-8 py-8">
-        {/* header area */}
+        {/* ── Toolbar ── */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 space-y-4 md:space-y-0 md:space-x-4">
           <div className="flex items-center space-x-4 w-full md:max-w-3xl">
             <div className="relative w-full">
@@ -142,16 +139,16 @@ export default function DeckListView() {
             <button
               className={`flex items-center ${activeTheme.button.accent2} font-semibold py-2 px-3 rounded-lg`}
               title="Import"
-              onClick={handleImportClick}
+              onClick={() => navigate("import")}
             >
-              {" "}
               <FontAwesomeIcon icon={faUpload} className="h-5 w-5 mr-2" />
               Import
             </button>
 
             <button
               className={`flex items-center ${activeTheme.button.accent2} font-semibold py-2 px-3 rounded-lg`}
-              title="Create deck"
+              title="Quick Create"
+              onClick={() => setIsQuickCreateOpen(true)}
             >
               <FontAwesomeIcon icon={faPlus} className="h-5 w-5 mr-2" />
               Quick Create
@@ -159,7 +156,7 @@ export default function DeckListView() {
           </div>
         </div>
 
-        {/* main grid/list */}
+        {/* ── Deck grid / list ── */}
         {currentDecks.length > 0 ? (
           <DeckCard
             decks={currentDecks}
@@ -204,7 +201,7 @@ export default function DeckListView() {
           <Toast ref={toast} position="top-center" />
         </div>
 
-        {/* pagination */}
+        {/* ── Pagination ── */}
         {totalPages > 1 && (
           <div className="flex justify-center items-center mt-4 space-x-2">
             <button
@@ -227,6 +224,13 @@ export default function DeckListView() {
           </div>
         )}
       </div>
+
+      {/* ── Quick Create modal ── */}
+      <QuickCreate
+        activeTheme={activeTheme}
+        isOpen={isQuickCreateOpen}
+        onClose={() => setIsQuickCreateOpen(false)}
+      />
     </div>
   );
 }
