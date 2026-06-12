@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from "react";
+import React, { useMemo, useRef, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { selectActiveTheme } from "../../slices/themeSlice";
 import { selectGlobalStreak } from "../../slices/streakSlice";
@@ -15,6 +15,7 @@ import {
   faClock,
   faBullseye,
   faArrowRight,
+  faArrowLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import RevuLogo from "../../assets/revu2.png";
 
@@ -31,6 +32,17 @@ const Dashboard = () => {
   const toast = useRef(null);
 
   const decks = useSelector(selectDecks);
+  const [deckPage, setDeckPage] = useState(1);
+  const decksPerPage = 4;
+  const totalDeckPages = Math.max(1, Math.ceil(decks.length / decksPerPage));
+  const pageDecks = decks.slice(
+    (deckPage - 1) * decksPerPage,
+    deckPage * decksPerPage,
+  );
+
+  useEffect(() => {
+    setDeckPage((prevPage) => Math.min(prevPage, totalDeckPages));
+  }, [totalDeckPages]);
 
   const gradient = `bg-gradient-to-r ${activeTheme.gradients.from} ${activeTheme.gradients.to}`;
 
@@ -143,12 +155,42 @@ const Dashboard = () => {
             ) : (
               <>
                 <DeckCard
-                  decks={decks.slice(0, 4)}
+                  decks={pageDecks}
                   activeTheme={activeTheme}
                   variant="compact"
                   gridClasses={"grid grid-cols-1 md:grid-cols-2 gap-4"}
                   toast={toast}
                 />
+
+                {totalDeckPages > 1 && (
+                  <div className="flex items-center justify-between mt-4 gap-2">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setDeckPage((prev) => Math.max(1, prev - 1))
+                      }
+                      disabled={deckPage <= 1}
+                      className={`flex items-center justify-center w-10 h-10 rounded-full ${activeTheme.button.secondary} ${activeTheme.text.secondary} ${deckPage <= 1 ? "opacity-50 cursor-not-allowed" : "hover:shadow-lg"}`}
+                    >
+                      <FontAwesomeIcon icon={faArrowLeft} />
+                    </button>
+                    <div className={`${activeTheme.text.secondary} text-sm`}>
+                      Page {deckPage} of {totalDeckPages}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setDeckPage((prev) =>
+                          Math.min(totalDeckPages, prev + 1),
+                        )
+                      }
+                      disabled={deckPage >= totalDeckPages}
+                      className={`flex items-center justify-center w-10 h-10 rounded-full ${activeTheme.button.secondary} ${activeTheme.text.secondary} ${deckPage >= totalDeckPages ? "opacity-50 cursor-not-allowed" : "hover:shadow-lg"}`}
+                    >
+                      <FontAwesomeIcon icon={faArrowRight} />
+                    </button>
+                  </div>
+                )}
                 <Toast ref={toast} position="top-center" />
               </>
             )}

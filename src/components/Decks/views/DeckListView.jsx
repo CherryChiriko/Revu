@@ -12,6 +12,8 @@ import {
   faSort,
   faThLarge,
   faList,
+  faArrowLeft,
+  faArrowRight,
 } from "@fortawesome/free-solid-svg-icons";
 import Header from "../../General/ui/Header";
 import { Toast } from "primereact/toast";
@@ -203,23 +205,25 @@ export default function DeckListView() {
 
         {/* ── Pagination ── */}
         {totalPages > 1 && (
-          <div className="flex justify-center items-center mt-4 space-x-2">
+          <div className="flex justify-center items-center mt-4 gap-2">
             <button
               onClick={() => setPage(currentPage - 1)}
               disabled={currentPage <= 1}
-              className={`${activeTheme.button.secondary} ${activeTheme.text.secondary} px-4 py-1 rounded-lg`}
+              className={`${activeTheme.button.secondary} ${activeTheme.text.secondary} p-3 rounded-full ${currentPage <= 1 ? "opacity-50 cursor-not-allowed" : "hover:shadow-lg"}`}
             >
-              Previous
+              <FontAwesomeIcon icon={faArrowLeft} />
             </button>
-            <span className={`${activeTheme.text.secondary} text-sm px-3`}>
+            <span
+              className={`${activeTheme.text.secondary} text-sm font-semibold`}
+            >
               Page {currentPage}/{totalPages}
             </span>
             <button
               onClick={() => setPage(currentPage + 1)}
               disabled={currentPage >= totalPages}
-              className={`${activeTheme.button.secondary} ${activeTheme.text.secondary} px-4 py-1 rounded-lg`}
+              className={`${activeTheme.button.secondary} ${activeTheme.text.secondary} p-3 rounded-full ${currentPage >= totalPages ? "opacity-50 cursor-not-allowed" : "hover:shadow-lg"}`}
             >
-              Next
+              <FontAwesomeIcon icon={faArrowRight} />
             </button>
           </div>
         )}
