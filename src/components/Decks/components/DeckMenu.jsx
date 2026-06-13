@@ -22,50 +22,59 @@ export function DeckMenu({ activeTheme, onEdit, onDelete }) {
 
   return (
     <div className="relative" ref={menuRef}>
+      {/* Trigger Button */}
       <button
         onClick={(e) => {
           e.stopPropagation();
           setIsOpen(!isOpen);
         }}
         className={`w-8 h-8 flex items-center justify-center rounded-full transition-all 
-          hover:bg-black/10 active:scale-90 ${activeTheme.text.secondary}`}
+          hover:bg-black/5 dark:hover:bg-white/10 active:scale-95 ${activeTheme.text.secondary}`}
       >
         <FontAwesomeIcon icon={faEllipsisVertical} />
       </button>
 
+      {/* Dropdown Menu */}
       {isOpen && (
-        // Updated styles inside DeckMenu.jsx
         <div
-          className={`absolute right-0 mt-2 w-36 rounded-xl shadow-2xl border z-[100] 
-  overflow-hidden animate-in fade-in zoom-in duration-75 origin-top-right
-  bg-[#1a2233]/95 backdrop-blur-md border-white/10`} // Using a dark theme neutral
+          className={`absolute right-0 mt-2 w-40 rounded-xl shadow-xl border overflow-hidden 
+            animate-in fade-in zoom-in-95 duration-100 origin-top-right z-[100]
+            ${activeTheme.background.secondary} ${activeTheme.border.secondary}`}
         >
-          <div className="py-1">
+          <div className="p-1.5 flex flex-col gap-0.5">
+            {/* Edit Button */}
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 setIsOpen(false);
                 onEdit();
               }}
-              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors
-        hover:bg-white/5 text-gray-200"
+              className={`w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors
+                ${activeTheme.text.primary} ${activeTheme.link.hoverBg} ${activeTheme.link.hoverText}`}
             >
-              <FontAwesomeIcon icon={faPen} className="text-gray-400 w-3" />
+              <FontAwesomeIcon
+                icon={faPen}
+                className={`w-3.5 h-3.5 ${activeTheme.text.secondary}`}
+              />
               <span>Edit</span>
             </button>
 
-            <div className="h-[1px] bg-white/5 my-1 mx-2" />
+            {/* Divider Line */}
+            <hr
+              className={`border-t my-1 ${activeTheme.border.muted || "border-gray-200 dark:border-gray-700"}`}
+            />
 
+            {/* Delete Button */}
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 setIsOpen(false);
                 onDelete();
               }}
-              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors
-        hover:bg-red-500/10 text-red-400 font-medium"
+              className={`w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors
+                ${activeTheme.text.danger} hover:bg-red-500/10`}
             >
-              <FontAwesomeIcon icon={faTrash} className="w-3" />
+              <FontAwesomeIcon icon={faTrash} className="w-3.5 h-3.5" />
               <span>Delete</span>
             </button>
           </div>

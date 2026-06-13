@@ -110,22 +110,22 @@ export const useQuickCreateLogic = (onClose) => {
       if (progressError) throw progressError;
 
       // Bump deck counts (new_count, cards_count, active_cards_count)
-      const { error: deckUpdateError } = await supabase.rpc(
-        "increment_deck_new_card",
-        { p_deck_id: selectedDeckId },
-      );
+      // const { error: deckUpdateError } = await supabase.rpc(
+      //   "increment_deck_new_card",
+      //   { p_deck_id: selectedDeckId },
+      // );
 
       // Fallback to manual update if RPC doesn't exist yet
-      if (deckUpdateError) {
-        await supabase
-          .from("decks")
-          .update({
-            new_count: (selectedDeck.new ?? 0) + 1,
-            cards_count: (selectedDeck.cards_count ?? 0) + 1,
-            active_cards_count: (selectedDeck.active_cards_count ?? 0) + 1,
-          })
-          .eq("id", selectedDeckId);
-      }
+      // if (deckUpdateError) {
+      //   await supabase
+      //     .from("decks")
+      //     .update({
+      //       new_count: (selectedDeck.new ?? 0) + 1,
+      //       cards_count: (selectedDeck.cards_count ?? 0) + 1,
+      //       active_cards_count: (selectedDeck.active_cards_count ?? 0) + 1,
+      //     })
+      //     .eq("id", selectedDeckId);
+      // }
 
       await dispatch(fetchDecks()).unwrap();
       setSuccess(true);
