@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { selectActiveTheme } from "./slices/themeSlice";
@@ -52,16 +52,19 @@ function App() {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const activeTheme = useSelector(selectActiveTheme);
   const profile = useSelector(selectUserProfile);
   const settings = useSelector(selectSettings);
   const allThemes = useSelector((state) => state.theme.allThemes);
   const currentThemeName = useSelector((state) => state.theme.currentThemeName);
+
   const { session, loading: authLoading } = useAuth();
+
   const status = useSelector(selectDeckStatus);
   const error = useSelector(selectDeckError);
   const activeDeck = useSelector(selectActiveDeck);
-  const previousUserIdRef = React.useRef(null);
+  const previousUserIdRef = useRef(null);
 
   const publicPaths = ["/reset-password"];
   const isPublicPath = publicPaths.includes(location.pathname);
@@ -70,19 +73,12 @@ function App() {
   useGlobalStatsLiveSync(!!session);
   useAppBoot(session);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const currentUserId = session?.user?.id || null;
-    console.log(
-      "[App] session user id changed",
-      currentUserId,
-      "prev",
-      previousUserIdRef.current,
-    );
 
+    // Only alter user slices if a real structural identity transition has happened
     if (!currentUserId) {
-      console.log(
-        "[App] clearing user-specific redux state on logout or missing session",
-      );
+      console.log("[App] No active session. Purging local user state.");
       dispatch(clearUser());
       dispatch(clearDecks());
       dispatch(clearCards());
@@ -94,9 +90,7 @@ function App() {
       previousUserIdRef.current !== currentUserId
     ) {
       console.log(
-        "[App] user changed, clearing stale state between accounts",
-        previousUserIdRef.current,
-        currentUserId,
+        "[App] User ID switched. Purging residual account cache data safely.",
       );
       dispatch(clearUser());
       dispatch(clearDecks());
@@ -113,21 +107,16 @@ function App() {
     previousUserIdRef.current = currentUserId;
   }, [dispatch, session?.user?.id]);
 
-  function setPrimeTheme(isDark) {
+  useEffect(() => {
     const themeLink = document.getElementById("primereact-theme");
-    if (!themeLink) return;
-
-    themeLink.href = isDark
-      ? "/themes/lara-dark-indigo/theme.css"
-      : "/themes/lara-light-blue/theme.css";
-  }
-
-  React.useEffect(() => {
-    setPrimeTheme(activeTheme.isDark);
+    if (themeLink) {
+      themeLink.href = activeTheme.isDark
+        ? "/themes/lara-dark-indigo/theme.css"
+        : "/themes/lara-light-blue/theme.css";
+    }
     document.documentElement.classList.toggle("dark", activeTheme.isDark);
   }, [activeTheme.isDark]);
 
-  // Auth check
   if (authLoading) {
     return (
       <div
@@ -144,7 +133,6 @@ function App() {
     return <LoginPage activeTheme={activeTheme} />;
   }
 
-  // Render DecksLoader to trigger fetch (but show loading UI)
   const isSettingsPath = location.pathname.startsWith("/settings");
   const shouldLoadDeckData = !!session && !isSettingsPath;
   const shouldLoadStatsData = !!session;
@@ -177,6 +165,7 @@ function App() {
     </Route>
   );
 
+  // If status is idle/loading, keep context loaders rendered but prevent absolute component tree destruction loops
   if (status === "loading" || status === "idle") {
     if (isSettingsPath && session) {
       return (
@@ -230,7 +219,6 @@ function App() {
           className={`${activeTheme.text.primary} space-y-4 text-center text-xl`}
         >
           <p>Error loading decks: {error}</p>
-
           <button
             onClick={() => window.location.reload()}
             className={`px-6 py-2 rounded ${activeTheme.button.accent2}`}
@@ -242,7 +230,6 @@ function App() {
     );
   }
 
-  // All good: decks loaded + user authenticated
   return (
     <>
       {shouldLoadDeckData && (
@@ -280,7 +267,6 @@ function App() {
               path="/reset-password"
               element={<ResetPasswordPage activeTheme={activeTheme} />}
             />
-
             <Route
               path="*"
               element={<NotFound404 activeTheme={activeTheme} />}

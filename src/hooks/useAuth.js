@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "../utils/supabaseClient";
 import { useDispatch } from "react-redux";
 import { resetAllUserState } from "../app/store";
@@ -12,7 +12,9 @@ export default function useAuth() {
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
 
-  // Load initial session + subscribe to changes
+  // Keep track of the current user to prevent redundant state wipes on token refresh
+  const currentUserIdRef = useRef(null);
+
   useEffect(() => {
     let mounted = true;
 
@@ -20,7 +22,9 @@ export default function useAuth() {
       try {
         const { data } = await supabase.auth.getSession();
         if (mounted) {
-          setSession(data?.session ?? null);
+          const initialSession = data?.session ?? null;
+          setSession(initialSession);
+          currentUserIdRef.current = initialSession?.user?.id || null;
           setLoading(false);
         }
       } catch (err) {
@@ -38,32 +42,40 @@ export default function useAuth() {
     } = supabase.auth.onAuthStateChange((event, data) => {
       if (!mounted) return;
 
+      const nextSession = data?.session ?? null;
+      const nextUserId = nextSession?.user?.id || null;
+
       console.log("[useAuth] onAuthStateChange", {
         event,
-        userId: data?.session?.user?.id,
-        sessionExists: !!data?.session,
+        userId: nextUserId,
+        sessionExists: !!nextSession,
       });
 
-      // Clear stale user data BEFORE setting the new session
-      if (event === "SIGNED_OUT" || event === "SIGNED_IN") {
-        console.log("[useAuth] dispatching resetAllUserState for event", event);
+      // 💥 THE FIX: Only reset the Redux store if the authentication state actually transitioned to a completely different user identity.
+      if (event === "SIGNED_OUT") {
+        console.log("[useAuth] User signed out. Clearing store.");
         dispatch(resetAllUserState());
+        currentUserIdRef.current = null;
+      } else if (event === "SIGNED_IN") {
+        if (nextUserId && nextUserId !== currentUserIdRef.current) {
+          console.log(
+            "[useAuth] Genuine new login detected. Resetting store for new user context.",
+          );
+          dispatch(resetAllUserState());
+          currentUserIdRef.current = nextUserId;
+        }
       }
-      // Always update session from the callback data first
-      setSession(data?.session ?? null);
 
-      // For SIGNED_IN, data.session might be undefined due to timing
-      // We'll do a follow-up check if needed
-      if (event === "SIGNED_IN" && !data.session) {
+      // Update local state safely
+      setSession(nextSession);
+
+      if (event === "SIGNED_IN" && !nextSession) {
         supabase.auth.getSession().then(({ data: sessionData }) => {
           if (mounted) {
             setSession(sessionData.session ?? null);
+            currentUserIdRef.current = sessionData.session?.user?.id || null;
           }
         });
-      }
-
-      if (event === "SIGNED_OUT") {
-        setSession(null);
       }
     });
 
@@ -71,7 +83,7 @@ export default function useAuth() {
       mounted = false;
       subscription?.unsubscribe();
     };
-  }, []);
+  }, [dispatch]);
 
   // SIGNUP
   const signup = useCallback(async (username, email, password) => {
@@ -80,16 +92,13 @@ export default function useAuth() {
     setSuccessMessage(null);
 
     try {
-      // Validation
       if (!username || !email || !password) {
         throw new Error("All fields are required");
       }
-
       if (password.length < 6) {
         throw new Error("Password must be at least 6 characters");
       }
 
-      // Check username uniqueness
       const { data: existingUser } = await supabase
         .from("profiles")
         .select("id")
@@ -100,21 +109,17 @@ export default function useAuth() {
         throw new Error("Username already exists");
       }
 
-      // Create auth user
       const { data: authData, error: signUpError } = await supabase.auth.signUp(
         {
           email,
           password,
-          options: {
-            data: { username },
-          },
+          options: { data: { username } },
         },
       );
 
       if (signUpError) throw signUpError;
       if (!authData.user) throw new Error("Failed to create user");
 
-      // Create profile record
       const { error: profileError } = await supabase.from("profiles").insert([
         {
           id: authData.user.id,
@@ -129,7 +134,6 @@ export default function useAuth() {
 
       setSuccessMessage("Account created successfully! Logging you in...");
 
-      // Auto-login after signup
       const { data: loginData, error: loginError } =
         await supabase.auth.signInWithPassword({
           email,
@@ -139,7 +143,6 @@ export default function useAuth() {
       if (loginError) throw loginError;
       if (!loginData.session) throw new Error("Login failed after signup");
 
-      // Session update will trigger via onAuthStateChange
       return true;
     } catch (err) {
       setError(err.message || "Signup failed");
@@ -160,7 +163,6 @@ export default function useAuth() {
         throw new Error("Username and password are required");
       }
 
-      // Lookup email by username
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("email")
@@ -171,7 +173,6 @@ export default function useAuth() {
         throw new Error("Invalid username or password");
       }
 
-      // Login with email + password
       const { data: authData, error: signInError } =
         await supabase.auth.signInWithPassword({
           email: profile.email,
@@ -184,8 +185,6 @@ export default function useAuth() {
       }
 
       setSuccessMessage("Login successful!");
-
-      // Session update will trigger via onAuthStateChange
       return true;
     } catch (err) {
       setError(err.message || "Login failed");
@@ -195,7 +194,7 @@ export default function useAuth() {
     }
   }, []);
 
-  // RESET PASSWORD (send email)
+  // RESET PASSWORD
   const resetPassword = useCallback(async (email) => {
     setAuthLoading(true);
     setError(null);
@@ -228,13 +227,10 @@ export default function useAuth() {
   // LOGOUT
   const logout = useCallback(async () => {
     setSession(null);
+    currentUserIdRef.current = null;
     setLoading(false);
     setAuthLoading(false);
-
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      throw error;
-    }
+    await supabase.auth.signOut();
   }, []);
 
   // DELETE ACCOUNT
@@ -246,12 +242,10 @@ export default function useAuth() {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-
       if (!user) {
         throw new Error("No user logged in");
       }
 
-      // Delete profile
       const { error: profileDeleteError } = await supabase
         .from("profiles")
         .delete()
@@ -259,10 +253,7 @@ export default function useAuth() {
 
       if (profileDeleteError) throw profileDeleteError;
 
-      // Sign out
-      const { error: signOutError } = await supabase.auth.signOut();
-      if (signOutError) throw signOutError;
-
+      await supabase.auth.signOut();
       setSuccessMessage("Account deleted successfully");
       return true;
     } catch (err) {
@@ -275,8 +266,8 @@ export default function useAuth() {
 
   return {
     session,
-    loading, // initial session check
-    authLoading, // login/signup/delete in progress
+    loading,
+    authLoading,
     error,
     successMessage,
     login,

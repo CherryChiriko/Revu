@@ -24,7 +24,7 @@ const normalizeDeck = (deck) => {
   return {
     ...deck,
     deck_id: id,
-    id: id, // Ensure both variants are identical to prevent lookup failure
+    id: id,
     due: deck.due_count ?? 0,
     waiting: deck.waiting_count ?? 0,
     new: deck.new_count ?? 0,
@@ -88,7 +88,6 @@ export const fetchDeckCounts = createAsyncThunk(
 
       const deckCounts = {};
       for (const deck of data || []) {
-        // Enforce alignment with the main id property key string type
         const idKey = deck.id;
         deckCounts[idKey] = countsFromDeck(deck);
       }
@@ -146,7 +145,6 @@ const deckSlice = createSlice({
 
       if (id) {
         const today = getTodayISO();
-
         localStorage.setItem("activeDeckId", id);
         localStorage.setItem("activeDeckIdDate", today);
       } else {
@@ -179,6 +177,19 @@ const deckSlice = createSlice({
         state.deckCounts[targetId] = countsFromDeck(state.decks[index]);
       }
     },
+    /**
+     * Optimistically update deck metadata (name, description, tags) in Redux
+     * after a successful Supabase write. Accepts { id, ...fields }.
+     */
+    updateDeckLocally(state, action) {
+      const { id, ...fields } = action.payload;
+      const index = state.decks.findIndex(
+        (d) => d.deck_id === id || d.id === id,
+      );
+      if (index !== -1) {
+        state.decks[index] = { ...state.decks[index], ...fields };
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -205,7 +216,6 @@ const deckSlice = createSlice({
         const persistedHasStudyCards =
           persistedMatch && (persistedMatch.due > 0 || persistedMatch.new > 0);
 
-        // Debug information to help trace why a particular deck becomes active
         try {
           console.debug(
             "[deckSlice] fetchDecks.fulfilled - persistedId:",
@@ -280,8 +290,12 @@ const deckSlice = createSlice({
   },
 });
 
-export const { setActiveDeck, updateDeckFromRealtime, clearDecks } =
-  deckSlice.actions;
+export const {
+  setActiveDeck,
+  updateDeckFromRealtime,
+  clearDecks,
+  updateDeckLocally,
+} = deckSlice.actions;
 
 export const selectDecks = (state) => state.decks.decks;
 export const selectActiveDeck = (state) => {
