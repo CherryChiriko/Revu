@@ -31,51 +31,48 @@ async function loadCardsForDeck({
     throw new Error(`Invalid study mode: ${study_mode}`);
   }
 
-  let query = supabase.from(table).select("*").eq("deck_id", deck_id);
+  // 🌟 FIX: Choose the correct explicit relationship token based on study_mode
+  // This satisfies Supabase's PGRST201 requirement
+  const relationToken =
+    study_mode === "A"
+      ? `${progressTable}!card_a_progress_card_id_fkey`
+      : `${progressTable}!card_c_progress_card_id_fkey`; // Assuming naming conventions match across schemas
+
+  let query = supabase
+    .from(table)
+    .select(
+      `
+      *,
+      progress: ${relationToken} (
+        user_id,
+        deck_id,
+        card_id,
+        ease_factor,
+        review_interval,
+        repetitions,
+        due_date,
+        last_studied,
+        status,
+        suspended
+      )
+    `,
+    )
+    .eq("deck_id", deck_id)
+    .eq(`${progressTable}.user_id`, user_id)
+    .order("created_at", { ascending: true });
+
   if (typeof page === "number" && typeof pageSize === "number") {
     const from = page * pageSize;
     const to = from + pageSize - 1;
     query = query.range(from, to);
   }
 
-  const { data: cards, error: cardsError } = await query;
+  const { data: mixedCards, error: cardsError } = await query;
   if (cardsError) throw cardsError;
-  if (!cards || cards.length === 0) return [];
+  if (!mixedCards || mixedCards.length === 0) return [];
 
-  const cardIds = cards.map((c) => c.id);
-  const progressData = [];
-  const chunkSize = 100;
-
-  for (let i = 0; i < cardIds.length; i += chunkSize) {
-    const chunk = cardIds.slice(i, i + chunkSize);
-    const { data, error } = await supabase
-      .from(progressTable)
-      .select("*")
-      .eq("deck_id", deck_id)
-      .eq("user_id", user_id)
-      .in("card_id", chunk);
-
-    if (error) {
-      console.warn(
-        "[loadCardsForDeck] Progress fetch failed for chunk:",
-        { chunkSize: chunk.length, offset: i },
-        error,
-      );
-      continue;
-    }
-
-    if (data?.length) {
-      progressData.push(...data);
-    }
-  }
-
-  const progressMap = {};
-  progressData.forEach((p) => {
-    progressMap[p.card_id] = p;
-  });
-
-  return cards.map((card) => {
-    const progress = progressMap[card.id] || {
+  return mixedCards.map((card) => {
+    const progress = card.progress?.[0] || {
       user_id,
       deck_id,
       card_id: card.id,
@@ -88,8 +85,11 @@ async function loadCardsForDeck({
       suspended: false,
     };
 
+    const cleanCard = { ...card };
+    delete cleanCard.progress;
+
     return {
-      ...card,
+      ...cleanCard,
       ...progress,
       status: getCardStatus(progress),
       card_id: card.id,
@@ -147,14 +147,11 @@ const cardSlice = createSlice({
       const { cardId, updates } = action.payload;
 
       if (cardId !== -1) {
-        // 1. Calculate the final updated card object immutably
         const updatedCard = {
           ...state.cards[cardId],
           ...updates,
           status: "waiting",
         };
-
-        // 2. Replace the card immutably and update array reference
         state.cards[cardId] = updatedCard;
       }
     },
