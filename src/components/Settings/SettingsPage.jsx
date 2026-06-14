@@ -54,6 +54,7 @@ export function SettingsPage({
           dispatch={dispatch}
         />
         <DisplaySection
+          profile={profile}
           settings={settings}
           activeTheme={activeTheme}
           dispatch={dispatch}

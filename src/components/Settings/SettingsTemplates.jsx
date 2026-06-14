@@ -1,22 +1,69 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
+
 // ─────────────────────────────────────────────────────────────────────────────
-// Primitive UI pieces (kept inline so the file is self-contained)
+// SettingCard — wraps a settings section.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function SettingCard({ icon, title, children, activeTheme }) {
+export function SettingCard({
+  icon,
+  title,
+  children,
+  activeTheme,
+  onSave,
+  saveState,
+}) {
+  const hasSave = Boolean(onSave);
+
+  const btnText =
+    {
+      idle: "Save",
+      saving: "Saving…",
+      saved: "Saved",
+      error: "Try again",
+    }[saveState] ?? "Save";
+
   return (
     <section
-      className={`${activeTheme.background.secondary} border ${activeTheme.border.card} rounded-2xl p-5 shadow-lg`}
+      className={`flex flex-col ${activeTheme.background.secondary} border ${activeTheme.border.card} rounded-2xl shadow-lg overflow-hidden`}
     >
-      <div className="flex items-center gap-3 mb-5">
-        <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+      {/* Header */}
+      <div className="flex items-center gap-3 px-5 pt-5 pb-4">
+        <div
+          className={`w-10 h-10 rounded-xl ${activeTheme.background.track} flex items-center justify-center shrink-0`}
+        >
           <FontAwesomeIcon icon={icon} className="w-4 h-4" />
         </div>
         <h2 className="text-lg font-bold">{title}</h2>
       </div>
-      {children}
+
+      {/* Body — grows to fill available space */}
+      <div className="flex-1 px-5 pb-4 space-y-6">{children}</div>
+
+      {/* Save button — only rendered when onSave is provided */}
+      {hasSave && (
+        <div className={`px-5 py-5`}>
+          <button
+            type="button"
+            onClick={onSave}
+            disabled={saveState === "saving"}
+            className={`w-full py-2 rounded-lg font-semibold text-sm transition-colors disabled:opacity-50
+              ${
+                saveState === "saved"
+                  ? "bg-emerald-600/20 text-emerald-400"
+                  : saveState === "error"
+                    ? "bg-red-600/20 text-red-400"
+                    : activeTheme.button.accent2
+              }`}
+          >
+            {saveState === "saved" && (
+              <FontAwesomeIcon icon={faCheck} className="mr-1.5" />
+            )}
+            {btnText}
+          </button>
+        </div>
+      )}
     </section>
   );
 }
@@ -69,7 +116,6 @@ export function SegmentButton({ active, children, onClick, activeTheme }) {
   );
 }
 
-/** Labelled slider with live value display */
 export function LabelledSlider({
   icon,
   label,
@@ -109,19 +155,17 @@ export function FieldRow({
   label,
   inputProps,
   onSave,
-  saveLabel,
   status,
   error,
   success,
   activeTheme,
 }) {
-  const btnText =
-    {
-      idle: saveLabel,
-      saving: "Saving…",
-      saved: "Saved ✓",
-      error: "Try again",
-    }[status] ?? saveLabel;
+  const btnText = {
+    idle: "Save",
+    saving: "Saving…",
+    saved: "Saved",
+    error: "Try again",
+  }[status];
   return (
     <div className={`rounded-xl p-4 ${activeTheme.background.canvas}`}>
       <label
@@ -152,13 +196,12 @@ export function FieldRow({
           {btnText}
         </button>
       </div>
-      {error && <p className="text-red-400 text-xs mt-1.5">{error}</p>}
+      {error && <p className="text-red-400   text-xs mt-1.5">{error}</p>}
       {success && <p className="text-emerald-400 text-xs mt-1.5">{success}</p>}
     </div>
   );
 }
 
-// ── Row label ─────────────────────────────────────────────────────────────────
 export function RowLabel({ children, activeTheme }) {
   return (
     <p
@@ -196,8 +239,6 @@ export function AvatarThumb({
           <span className="text-lg font-black">{initial}</span>
         )}
       </button>
-
-      {/* Remove button — only shown when onRemove is provided */}
       {onRemove && (
         <button
           type="button"
@@ -206,8 +247,7 @@ export function AvatarThumb({
             onRemove();
           }}
           aria-label="Remove"
-          className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white text-xs
-            flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow"
+          className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow"
         >
           ✕
         </button>

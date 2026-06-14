@@ -4,7 +4,7 @@ import { selectDecks } from "../../../slices/deckSlice";
 import { selectDefaultDeckView } from "../../../slices/settingsSlice";
 
 export default function useListController({
-  initialView = "grid",
+  initialView = "large",
   initialSort = "lastStudied-desc",
   initialLanguage = "All Languages",
   initialPage = 1,
@@ -24,7 +24,7 @@ export default function useListController({
   // unique languages (depend on decks)
   const uniqueLanguages = useMemo(() => {
     const langs = Array.from(
-      new Set(decks.map((d) => d.language).filter(Boolean))
+      new Set(decks.map((d) => d.language).filter(Boolean)),
     );
     return ["All Languages", ...langs];
   }, [decks]);
@@ -104,7 +104,7 @@ export default function useListController({
         return Math.min(Math.max(1, v), totalPages);
       });
     },
-    [totalPages]
+    [totalPages],
   );
 
   const toggleViewMode = useCallback((mode) => {

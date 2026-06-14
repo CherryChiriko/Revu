@@ -22,11 +22,11 @@ export const fetchUserProfile = createAsyncThunk(
       console.error("fetchUserProfile error:", err);
       return rejectWithValue(err.message || "Failed to fetch profile");
     }
-  }
+  },
 );
 
 const userSlice = createSlice({
-  name: "user",
+  name: "users",
   initialState: {
     profile: null,
     status: "idle",

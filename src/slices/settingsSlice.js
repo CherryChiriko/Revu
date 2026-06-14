@@ -27,8 +27,8 @@ const initialState = {
   autoflipSpeed: 3.0,
   characterAnimationSpeed: 1.0,
   // ── Display ───────────────────────────────────────────────
-  dateFormat: "dd/mm/yyyy",
-  defaultDeckView: "grid",
+  dateFormat: "monday",
+  defaultDeckView: "large",
 };
 
 const settingsSlice = createSlice({

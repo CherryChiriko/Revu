@@ -40,11 +40,11 @@ export default function DeckListView() {
   } = controller;
 
   const gridClasses =
-    viewMode === "grid"
+    viewMode === "large"
       ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
       : "grid grid-cols-1 md:grid-cols-4 gap-3";
 
-  const variant = viewMode === "grid" ? "full" : "compact";
+  const variant = viewMode === "large" ? "full" : "compact";
 
   const navigate = useNavigate();
   const toast = useRef(null);
@@ -115,20 +115,20 @@ export default function DeckListView() {
               className={`border flex rounded-xl p-1 ${activeTheme.background.canvas}`}
             >
               <button
-                onClick={() => toggleViewMode("grid")}
+                onClick={() => toggleViewMode("large")}
                 className={`p-2 rounded-lg ${
-                  viewMode === "grid"
+                  viewMode === "large"
                     ? activeTheme.button.secondary
-                    : activeTheme.background.card
+                    : activeTheme.background.canvas
                 } ${activeTheme.text.secondary}`}
                 title="Large Card View"
               >
                 <FontAwesomeIcon icon={faThLarge} />
               </button>
               <button
-                onClick={() => toggleViewMode("list")}
+                onClick={() => toggleViewMode("compact")}
                 className={`p-2 rounded-lg ${
-                  viewMode === "list"
+                  viewMode === "compact"
                     ? activeTheme.button.secondary
                     : activeTheme.background.canvas
                 } ${activeTheme.text.secondary}`}
@@ -158,7 +158,7 @@ export default function DeckListView() {
           </div>
         </div>
 
-        {/* ── Deck grid / list ── */}
+        {/* ── Deck large / compact ── */}
         {currentDecks.length > 0 ? (
           <DeckCard
             decks={currentDecks}
