@@ -15,7 +15,7 @@ const CharacterSample = ({ activeTheme }) => {
     displayState: "animation",
     onQuizComplete: () => {},
     activeTheme,
-    strokeColor: "rgb(212,212,212)",
+    strokeColor: `${activeTheme.isDark ? "rgb(212,212,212)" : "rgb(55, 65, 81)"}`,
     revealed: true,
     width: 100,
     height: 100,
@@ -168,10 +168,19 @@ const Step1 = ({ activeTheme, logic, onNext }) => {
                     className={`${activeTheme.text.primary}`}
                   />
                 ) : (
-                  <FontAwesomeIcon
-                    icon={faCircle}
-                    className={`${activeTheme.text.primary}`}
-                  />
+                  <div
+                    className={`
+      flex items-center justify-center rounded-full w-5 h-5 border
+      ${activeTheme.border.card}
+    `}
+                  >
+                    {!activeTheme.isDark && (
+                      <FontAwesomeIcon
+                        icon={faCircle}
+                        className={`text-[10px] ${activeTheme.text.activeButton}`}
+                      />
+                    )}
+                  </div>
                 )}
               </div>
 

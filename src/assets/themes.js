@@ -85,7 +85,7 @@ const themes = [
       accent1: "bg-sky-400",
       accent2: "bg-purple-400",
       accent3: "bg-indigo-400",
-      danger: "bg-[#2c0b0e]",
+      danger: "bg-red-50",
       muted: "bg-gray-100",
     },
 

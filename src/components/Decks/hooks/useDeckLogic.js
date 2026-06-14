@@ -1,12 +1,10 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchDecks, setActiveDeck } from "../../../slices/deckSlice";
 import { selectDeckStreakById } from "../../../slices/streakSlice";
 import { supabase } from "../../../utils/supabaseClient";
-import DeckConfirmationDialog from "../components/DeckConfirmationDialog";
 
-// Safe fallback object outside the hook so its reference remains completely static
 const DEFAULT_COUNTS = {
   new: 0,
   due: 0,
@@ -19,11 +17,13 @@ export default function useDeckLogic(id, cards_count, { toast, activeTheme }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  // ── Delete modal state ─────────────────────────────────────────────────────
+  const [pendingDeleteDeck, setPendingDeleteDeck] = useState(null);
+
   const counts = useSelector(
     (state) => state.decks.deckCounts[id] ?? DEFAULT_COUNTS,
   );
 
-  // 2. Do the exact same thing for streaks if selectDeckStreakById is structured similarly
   const streakData = useSelector(selectDeckStreakById(id));
   const { streak, maxStreak, isStreakActive } = streakData || {
     streak: 0,
@@ -44,8 +44,6 @@ export default function useDeckLogic(id, cards_count, { toast, activeTheme }) {
   const deleteDeck = useCallback(
     async (deckData) => {
       try {
-        toast?.current?.clear();
-
         if (!deckData || !deckData.study_mode) {
           throw new Error("Deck data is missing or invalid");
         }
@@ -66,28 +64,24 @@ export default function useDeckLogic(id, cards_count, { toast, activeTheme }) {
 
         if (decksError) throw decksError;
 
+        setPendingDeleteDeck(null);
         await dispatch(fetchDecks());
 
-        if (toast?.current?.show) {
-          toast.current.show({
-            severity: "success",
-            summary: "Deck deleted",
-            detail: `"${deckData?.name || "Deck"}" was removed`,
-            life: 3000,
-            className: `shadow-2xl`,
-          });
-        }
+        toast?.current?.show({
+          severity: "success",
+          summary: "Deck deleted",
+          detail: `"${deckData?.name || "Deck"}" was removed`,
+          life: 3000,
+        });
       } catch (err) {
         console.error("Delete failed", err);
-        if (toast?.current?.show) {
-          toast.current.show({
-            severity: "error",
-            summary: "Delete failed",
-            detail: err.message || "Could not delete deck",
-            life: 4000,
-            className: `shadow-2xl`,
-          });
-        }
+        setPendingDeleteDeck(null);
+        toast?.current?.show({
+          severity: "error",
+          summary: "Delete failed",
+          detail: err.message || "Could not delete deck",
+          life: 4000,
+        });
       }
     },
     [dispatch, id, toast],
@@ -96,8 +90,6 @@ export default function useDeckLogic(id, cards_count, { toast, activeTheme }) {
   const handleAction = useCallback(
     (e, type, deckData = null) => {
       if (e && e.stopPropagation) e.stopPropagation();
-
-      // Explicitly sets the active deck context when interacting with this deck card
       dispatch(setActiveDeck(id));
 
       if (type === "learn" || type === "review") {
@@ -105,40 +97,12 @@ export default function useDeckLogic(id, cards_count, { toast, activeTheme }) {
         return;
       }
 
-      if (type === "edit") {
-        // openEditModal();
-      }
-
       if (type === "delete") {
         if (!deckData) return;
-
-        toast?.current?.show({
-          severity: "warn",
-          sticky: true,
-          className: `space-y-3 rounded-2xl border ${activeTheme.border.card} ${activeTheme.background.danger} p-4 shadow-2xl`,
-          content: (
-            <DeckConfirmationDialog
-              deckName={deckData?.name}
-              activeTheme={activeTheme}
-              isToast
-              onConfirm={() => deleteDeck(deckData)}
-              onCancel={() => {
-                toast?.current?.clear();
-                if (toast?.current?.show) {
-                  toast.current.show({
-                    severity: "info",
-                    summary: "Cancelled",
-                    detail: "Deletion cancelled",
-                    life: 2000,
-                  });
-                }
-              }}
-            />
-          ),
-        });
+        setPendingDeleteDeck(deckData);
       }
     },
-    [dispatch, id, navigate, toast, activeTheme, deleteDeck],
+    [dispatch, id, navigate],
   );
 
   return useMemo(
@@ -153,6 +117,9 @@ export default function useDeckLogic(id, cards_count, { toast, activeTheme }) {
       streak,
       maxStreak,
       isStreakActive,
+      pendingDeleteDeck,
+      onConfirmDelete: () => deleteDeck(pendingDeleteDeck),
+      onCancelDelete: () => setPendingDeleteDeck(null),
     }),
     [
       showLearn,
@@ -165,6 +132,8 @@ export default function useDeckLogic(id, cards_count, { toast, activeTheme }) {
       streak,
       maxStreak,
       isStreakActive,
+      pendingDeleteDeck,
+      deleteDeck,
     ],
   );
 }

@@ -2,6 +2,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { supabase } from "../utils/supabaseClient";
 import { getCardStatus } from "../utils/cardUtils";
+import { CHUNK_SIZE } from "../utils/constants";
 
 const TABLES = {
   A: "cards_a",
@@ -101,7 +102,13 @@ export const fetchCards = createAsyncThunk(
   "cards/fetchCards",
   async ({ deck_id, study_mode, user_id }, { rejectWithValue }) => {
     try {
-      return await loadCardsForDeck({ deck_id, study_mode, user_id });
+      return await loadCardsForDeck({
+        deck_id,
+        study_mode,
+        user_id,
+        page: 0,
+        pageSize: CHUNK_SIZE,
+      });
     } catch (err) {
       console.error("[fetchCards] Error:", err);
       return rejectWithValue(err.message);

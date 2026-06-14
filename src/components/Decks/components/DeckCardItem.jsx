@@ -2,6 +2,7 @@ import React from "react";
 import useDeckLogic from "../hooks/useDeckLogic";
 import FullVariant from "./variants/FullVariant";
 import CompactVariant from "./variants/CompactVariant";
+import DeckDelete from "./DeckDelete";
 
 function DeckCardItem({ deck, activeTheme, variant, toast }) {
   const logic = useDeckLogic(deck.id, deck.cards_count || 0, {
@@ -33,9 +34,18 @@ function DeckCardItem({ deck, activeTheme, variant, toast }) {
   }
 
   return (
-    <div className={base} onClick={logic.handleCardClick}>
-      <Content deck={deck} activeTheme={activeTheme} logic={logic} />
-    </div>
+    <>
+      <div className={base} onClick={logic.handleCardClick}>
+        <Content deck={deck} activeTheme={activeTheme} logic={logic} />
+      </div>
+
+      <DeckDelete
+        deckData={logic.pendingDeleteDeck}
+        activeTheme={activeTheme}
+        onConfirm={logic.onConfirmDelete}
+        onCancel={logic.onCancelDelete}
+      />
+    </>
   );
 }
 

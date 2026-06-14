@@ -19,11 +19,10 @@ import {
   selectDecks,
   updateDeckLocally, // Imported from your actions
 } from "../../../slices/deckSlice";
-import { STATUS_COLOR } from "../../Study/constants/constants";
 import CardDetail from "../components/CardDetail";
 import { DeckMenu } from "../components/DeckMenu"; // Ensure path matches your setup
+import { CHUNK_SIZE } from "../../../utils/constants";
 
-const CHUNK_SIZE = 50;
 const STATUS_FILTERS = ["new", "waiting", "due", "mastered", "suspended"];
 
 const STATUS_TILE = {
