@@ -196,7 +196,7 @@ function App() {
           className={`${activeTheme.background.app} min-h-screen flex items-center justify-center`}
         >
           <p className={`${activeTheme.text.primary} text-xl animate-pulse`}>
-            Loading decks...
+            Loading...
           </p>
         </div>
       </>

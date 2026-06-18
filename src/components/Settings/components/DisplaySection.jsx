@@ -23,6 +23,13 @@ export function DisplaySection({ profile, settings, activeTheme, dispatch }) {
       p_heatmap_metric: settings.heatmapMetric,
     });
     if (error) throw error;
+    dispatch(
+      updateSettings({
+        dateFormat: settings.dateFormat,
+        defaultDeckView: settings.defaultDeckView,
+        heatmapMetric: settings.heatmapMetric,
+      }),
+    );
   });
 
   return (

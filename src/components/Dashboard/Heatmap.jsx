@@ -8,31 +8,35 @@ import {
 import {
   selectDailyGoal,
   selectHeatmapMetric,
+  selectSettings, // 🌟 Added to pull the generic settings state for dateFormat
 } from "../../slices/settingsSlice";
 import { getTodayISO } from "../../utils/dateHelper";
 
-// Weekday labels (Mon-Sun)
-const WEEKDAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-const TODAY_ISO = getTodayISO();
-
-// Generate calendar grid aligned to weeks
-function generateCalendarGrid(dataMap, weeksToShow = 4) {
+// Generate calendar grid dynamically aligned to week preference
+function generateCalendarGrid(dataMap, weeksToShow = 4, weekStart = "monday") {
   const today = new Date();
-  // Create a clean midnight comparative boundary matching your system's timezone
   const baseTodayMidnight = new Date(
     today.getFullYear(),
     today.getMonth(),
     today.getDate(),
   );
 
-  const dayOfWeek = today.getDay(); // 0 = Sun
-  // Days until end of week (Sunday)
-  const daysUntilSunday = dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
+  const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+
+  // Calculate days needed to stretch to the end of the current visible row
+  let daysUntilEndOfWeek = 0;
+  if (weekStart === "sunday") {
+    // Week ends on Saturday (6)
+    daysUntilEndOfWeek = 6 - dayOfWeek;
+  } else {
+    // Week ends on Sunday (0)
+    daysUntilEndOfWeek = dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
+  }
 
   const endDate = new Date(today);
-  endDate.setDate(today.getDate() + daysUntilSunday);
+  endDate.setDate(today.getDate() + daysUntilEndOfWeek);
 
-  // Start = weeksToShow*7 - 1 days before endDate
+  // Start back from the end of the grid row space
   const startDate = new Date(endDate);
   startDate.setDate(endDate.getDate() - (weeksToShow * 7 - 1));
 
@@ -67,6 +71,19 @@ export const Heatmap = ({ activeTheme }) => {
   const activityDays = useSelector(selectActivityDays);
   const consistencyHeatmapData = useSelector(selectHeatmapData);
 
+  // 🌟 Read the week start preference. Defaults to 'monday' if not loaded.
+  const settings = useSelector(selectSettings);
+  const weekStart = settings?.dateFormat || "monday";
+
+  const TODAY_ISO = useMemo(() => getTodayISO(), []);
+
+  // 🌟 Dynamically rotate labels depending on choice
+  const weekdayLabels = useMemo(() => {
+    return weekStart === "sunday"
+      ? ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+      : ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  }, [weekStart]);
+
   const heatmapData = useMemo(() => {
     if (heatmapMetric === "consistency") return consistencyHeatmapData;
 
@@ -91,7 +108,10 @@ export const Heatmap = ({ activeTheme }) => {
     return m;
   }, [heatmapData]);
 
-  const cells = generateCalendarGrid(dataMap, 4);
+  // 🌟 Regenerate calendar layout row grid cells whenever week preference switches
+  const cells = useMemo(() => {
+    return generateCalendarGrid(dataMap, 4, weekStart);
+  }, [dataMap, weekStart]);
 
   const getColor = (value, isFuture) => {
     const max_value = 100;
@@ -105,11 +125,14 @@ export const Heatmap = ({ activeTheme }) => {
     return COLORS[Math.min(nonzero_steps - 1, Math.max(0, raw)) + 1];
   };
 
-  // Split into weeks
-  const weeks = [];
-  for (let i = 0; i < cells.length; i += 7) {
-    weeks.push(cells.slice(i, i + 7));
-  }
+  // Split into structural weeks
+  const weeks = useMemo(() => {
+    const w = [];
+    for (let i = 0; i < cells.length; i += 7) {
+      w.push(cells.slice(i, i + 7));
+    }
+    return w;
+  }, [cells]);
 
   return (
     <div className="space-y-3">
@@ -124,19 +147,18 @@ export const Heatmap = ({ activeTheme }) => {
         </div>
       </div>
 
-      {/* Weekday header - FIRST ROW */}
+      {/* Weekday header - Dynamically Ordered */}
       <div className="grid grid-cols-7 gap-1 text-xs opacity-60">
-        {WEEKDAY_LABELS.map((label, idx) => (
+        {weekdayLabels.map((label, idx) => (
           <div key={idx} className="w-7 text-center">
             {label}
           </div>
         ))}
       </div>
 
-      {/* Calendar weeks - Content below the header */}
+      {/* Calendar weeks */}
       <div className="space-y-1">
         {weeks.map((week, wIdx) => (
-          // IMPORTANT: Use the same grid classes here to align perfectly
           <div key={wIdx} className="grid grid-cols-7 gap-1">
             {week.map((c, idx) => {
               const isToday = c.iso === TODAY_ISO;
