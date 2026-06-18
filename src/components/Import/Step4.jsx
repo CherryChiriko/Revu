@@ -1,23 +1,103 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faUpload,
   faExclamationCircle,
-  faDownload,
   faArrowRight,
   faArrowLeft,
-  faCheckCircle,
-  faFileExcel,
   faEye,
+  faLayerGroup,
 } from "@fortawesome/free-solid-svg-icons";
 
 const Step4 = ({ activeTheme, logic, onNext, onBack }) => {
+  // ── Existing deck mode: show summary only ─────────────────────────────────
+  if (logic.importMode === "existing") {
+    return (
+      <>
+        <div className="mb-6">
+          <h2
+            className={`text-2xl font-bold flex items-center gap-2 ${activeTheme.text.primary}`}
+          >
+            <FontAwesomeIcon icon={faEye} className="w-5 h-5" />
+            Step 3: Confirm import
+          </h2>
+          <p className={`${activeTheme.text.secondary} text-sm mt-2`}>
+            Review what will be added before proceeding.
+          </p>
+        </div>
+
+        <div
+          className={`rounded-xl border ${activeTheme.border.card} ${activeTheme.background.canvas} divide-y ${activeTheme.border.card}`}
+        >
+          <div className="px-5 py-4 flex items-center gap-3">
+            <FontAwesomeIcon
+              icon={faLayerGroup}
+              className={`${activeTheme.text.muted} w-4 h-4`}
+            />
+            <div>
+              <p
+                className={`text-xs font-semibold uppercase tracking-wider ${activeTheme.text.muted}`}
+              >
+                Target deck
+              </p>
+              <p className={`font-semibold ${activeTheme.text.primary}`}>
+                {logic.targetDeck?.name}
+              </p>
+              <p className={`text-xs ${activeTheme.text.muted}`}>
+                Mode {logic.targetDeck?.study_mode} ·{" "}
+                {logic.targetDeck?.cards_count ?? 0} cards currently
+              </p>
+            </div>
+          </div>
+          <div className="px-5 py-4">
+            <p
+              className={`text-xs font-semibold uppercase tracking-wider ${activeTheme.text.muted}`}
+            >
+              Cards to append
+            </p>
+            <p
+              className={`text-2xl font-extrabold mt-1 ${activeTheme.text.primary}`}
+            >
+              {logic.allCards.length}
+            </p>
+            <p className={`text-xs ${activeTheme.text.muted} mt-1`}>
+              from {logic.selectedFile?.name}
+            </p>
+          </div>
+          <div className="px-5 py-4">
+            <p className={`text-xs ${activeTheme.text.muted}`}>
+              ✓ Existing cards and their study progress will not be affected.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex justify-between mt-6">
+          <button
+            onClick={onBack}
+            className={`px-4 py-2 rounded-lg font-semibold`}
+          >
+            <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
+            Back
+          </button>
+          <button
+            onClick={onNext}
+            disabled={logic.allCards.length === 0}
+            className={`px-4 py-2 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed
+              bg-gradient-to-r ${activeTheme.gradients.from} ${activeTheme.gradients.to} text-white`}
+          >
+            Add {logic.allCards.length} cards
+            <FontAwesomeIcon icon={faArrowRight} className="ml-2" />
+          </button>
+        </div>
+      </>
+    );
+  }
+
+  // ── New deck mode: original deck settings form ────────────────────────────
   const getLanguageOptions = () => {
     switch (logic.selectedType) {
       case 1:
         return [...logic.existingLanguages, "Add new language..."];
       case 2:
-        // return ["Chinese", "Japanese"];
         return ["Chinese"];
       default:
         return ["Add new language..."];
@@ -28,7 +108,6 @@ const Step4 = ({ activeTheme, logic, onNext, onBack }) => {
   return (
     <>
       <div className="space-y-6">
-        {/* Header */}
         <div className="mb-4">
           <h2
             className={`text-2xl font-bold flex items-center gap-2 ${activeTheme.text.primary}`}
@@ -42,7 +121,6 @@ const Step4 = ({ activeTheme, logic, onNext, onBack }) => {
         </div>
 
         <div className="space-y-6">
-          {/* Deck Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label
@@ -51,7 +129,6 @@ const Step4 = ({ activeTheme, logic, onNext, onBack }) => {
               >
                 Deck Name <span className="text-red-500">*</span>
               </label>
-
               <input
                 id="name"
                 type="text"
@@ -66,13 +143,13 @@ const Step4 = ({ activeTheme, logic, onNext, onBack }) => {
                 placeholder="Enter deck name"
                 className={`block w-full ${activeTheme.background.canvas} ${activeTheme.text.secondary} rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 ${activeTheme.ring.input}`}
               />
+              {logic.isNameTaken && (
+                <div className="flex items-center gap-2 text-red-500 text-sm">
+                  <FontAwesomeIcon icon={faExclamationCircle} />
+                  <span>{logic.uploadError}</span>
+                </div>
+              )}
             </div>
-            {logic.isNameTaken && (
-              <div className="flex items-center gap-2 text-red-500 text-sm">
-                <FontAwesomeIcon icon={faExclamationCircle} />
-                <span>{logic.uploadError}</span>
-              </div>
-            )}
 
             <div className="space-y-2">
               <label
@@ -84,7 +161,6 @@ const Step4 = ({ activeTheme, logic, onNext, onBack }) => {
                   <span className="text-red-500">*</span>
                 )}
               </label>
-
               {logic.isAddingLanguage ? (
                 <div className="relative">
                   <input
@@ -113,22 +189,19 @@ const Step4 = ({ activeTheme, logic, onNext, onBack }) => {
                   value={logic.deckSettings.language || ""}
                   onChange={(e) => {
                     const val = e.target.value;
-                    if (val === "Add new language...") {
+                    if (val === "Add new language...")
                       logic.setIsAddingLanguage(true);
-                    } else {
+                    else
                       logic.setDeckSettings({
                         ...logic.deckSettings,
                         language: val,
                       });
-                    }
                   }}
                   className={`block w-full ${activeTheme.background.canvas} ${activeTheme.text.secondary} rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 ${activeTheme.ring.input}`}
                 >
-                  {/* Add a placeholder option if nothing is selected yet */}
                   <option value="" disabled>
                     Select a language
                   </option>
-
                   {languageOptions.map((lang) => (
                     <option key={lang} value={lang}>
                       {lang}
@@ -182,18 +255,19 @@ const Step4 = ({ activeTheme, logic, onNext, onBack }) => {
               className={`block w-full ${activeTheme.background.canvas} ${activeTheme.text.secondary} rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 ${activeTheme.ring.input}`}
             />
           </div>
-          {/* Import Summary */}
-          <div className={`text-red-500  rounded-lg p-4`}>
+
+          <div
+            className={`rounded-lg p-4 border ${activeTheme.border.card} ${activeTheme.background.canvas}`}
+          >
             <h4 className={`font-semibold mb-2 ${activeTheme.text.primary}`}>
               Import Summary
             </h4>
             <div className={`text-sm ${activeTheme.text.secondary} space-y-1`}>
               <p>• File: {logic.selectedFile?.name}</p>
-              <p>• Cards to import: {logic.fileContent.length}</p>
+              <p>• Cards to import: {logic.allCards.length}</p>
             </div>
           </div>
 
-          {/* Navigation */}
           <div className="flex justify-between mt-6">
             <button
               onClick={onBack}

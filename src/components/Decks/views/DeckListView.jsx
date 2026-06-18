@@ -8,16 +8,16 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSearch,
   faUpload,
-  faPlus,
   faSort,
   faThLarge,
   faList,
-  faArrowLeft,
-  faArrowRight,
 } from "@fortawesome/free-solid-svg-icons";
 import Header from "../../General/ui/Header";
 import { Toast } from "primereact/toast";
-import QuickCreate from "../../Import/QuickCreate";
+
+import QuickCreateMenu from "./QuickCreateMenu";
+import QuickCreateModal from "../../Import/QuickCreateModal";
+import CloneDeckModal from "../../Import/CloneDeckModal";
 
 export default function DeckListView() {
   const activeTheme = useSelector(selectActiveTheme);
@@ -40,16 +40,17 @@ export default function DeckListView() {
   } = controller;
 
   const gridClasses =
-    viewMode === "large"
+    viewMode === "grid"
       ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
       : "grid grid-cols-1 md:grid-cols-4 gap-3";
 
-  const variant = viewMode === "large" ? "full" : "compact";
-
+  const variant = viewMode === "grid" ? "full" : "compact";
   const navigate = useNavigate();
   const toast = useRef(null);
 
-  const [isQuickCreateOpen, setIsQuickCreateOpen] = useState(false);
+  // ── Modal state ───────────────────────────────────────────────────────────
+  const [isNewDeckOpen, setIsNewDeckOpen] = useState(false);
+  const [isCloneOpen, setIsCloneOpen] = useState(false);
 
   return (
     <div
@@ -66,6 +67,7 @@ export default function DeckListView() {
         {/* ── Toolbar ── */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 space-y-4 md:space-y-0 md:space-x-4">
           <div className="flex items-center space-x-4 w-full md:max-w-3xl">
+            {/* Search */}
             <div className="relative w-full">
               <FontAwesomeIcon
                 icon={faSearch}
@@ -79,6 +81,7 @@ export default function DeckListView() {
               />
             </div>
 
+            {/* Language filter */}
             <select
               value={selectedLanguage}
               onChange={(e) => setSelectedLanguage(e.target.value)}
@@ -91,6 +94,7 @@ export default function DeckListView() {
               ))}
             </select>
 
+            {/* Sort */}
             <div className="relative">
               <FontAwesomeIcon
                 icon={faSort}
@@ -110,25 +114,26 @@ export default function DeckListView() {
             </div>
           </div>
 
-          <div className="flex space-x-4 w-full md:w-auto justify-end">
+          <div className="flex space-x-4 w-full md:w-auto justify-end items-center">
+            {/* View toggle */}
             <div
               className={`border flex rounded-xl p-1 ${activeTheme.background.canvas}`}
             >
               <button
-                onClick={() => toggleViewMode("large")}
+                onClick={() => toggleViewMode("grid")}
                 className={`p-2 rounded-lg ${
-                  viewMode === "large"
+                  viewMode === "grid"
                     ? activeTheme.button.secondary
-                    : activeTheme.background.canvas
+                    : activeTheme.background.card
                 } ${activeTheme.text.secondary}`}
                 title="Large Card View"
               >
                 <FontAwesomeIcon icon={faThLarge} />
               </button>
               <button
-                onClick={() => toggleViewMode("compact")}
+                onClick={() => toggleViewMode("list")}
                 className={`p-2 rounded-lg ${
-                  viewMode === "compact"
+                  viewMode === "list"
                     ? activeTheme.button.secondary
                     : activeTheme.background.canvas
                 } ${activeTheme.text.secondary}`}
@@ -138,6 +143,7 @@ export default function DeckListView() {
               </button>
             </div>
 
+            {/* Import */}
             <button
               className={`flex items-center ${activeTheme.button.accent2} font-semibold py-2 px-3 rounded-lg`}
               title="Import"
@@ -147,18 +153,16 @@ export default function DeckListView() {
               Import
             </button>
 
-            <button
-              className={`flex items-center ${activeTheme.button.accent2} font-semibold py-2 px-3 rounded-lg`}
-              title="Quick Create"
-              onClick={() => setIsQuickCreateOpen(true)}
-            >
-              <FontAwesomeIcon icon={faPlus} className="h-5 w-5 mr-2" />
-              Quick Create
-            </button>
+            {/* Quick Create dropdown */}
+            <QuickCreateMenu
+              activeTheme={activeTheme}
+              onNewDeck={() => setIsNewDeckOpen(true)}
+              onCloneDeck={() => setIsCloneOpen(true)}
+            />
           </div>
         </div>
 
-        {/* ── Deck large / compact ── */}
+        {/* ── Deck grid / list ── */}
         {currentDecks.length > 0 ? (
           <DeckCard
             decks={currentDecks}
@@ -199,41 +203,42 @@ export default function DeckListView() {
           </div>
         )}
 
-        <div>
-          <Toast ref={toast} position="top-center" />
-        </div>
+        <Toast ref={toast} position="top-center" />
 
         {/* ── Pagination ── */}
         {totalPages > 1 && (
-          <div className="flex justify-center items-center mt-4 gap-2">
+          <div className="flex justify-center items-center mt-4 space-x-2">
             <button
               onClick={() => setPage(currentPage - 1)}
               disabled={currentPage <= 1}
-              className={`${activeTheme.button.secondary} ${activeTheme.text.secondary} p-3 rounded-full ${currentPage <= 1 ? "opacity-50 cursor-not-allowed" : "hover:shadow-lg"}`}
+              className={`${activeTheme.button.secondary} ${activeTheme.text.secondary} px-4 py-1 rounded-lg`}
             >
-              <FontAwesomeIcon icon={faArrowLeft} />
+              Previous
             </button>
-            <span
-              className={`${activeTheme.text.secondary} text-sm font-semibold`}
-            >
+            <span className={`${activeTheme.text.secondary} text-sm px-3`}>
               Page {currentPage}/{totalPages}
             </span>
             <button
               onClick={() => setPage(currentPage + 1)}
               disabled={currentPage >= totalPages}
-              className={`${activeTheme.button.secondary} ${activeTheme.text.secondary} p-3 rounded-full ${currentPage >= totalPages ? "opacity-50 cursor-not-allowed" : "hover:shadow-lg"}`}
+              className={`${activeTheme.button.secondary} ${activeTheme.text.secondary} px-4 py-1 rounded-lg`}
             >
-              <FontAwesomeIcon icon={faArrowRight} />
+              Next
             </button>
           </div>
         )}
       </div>
 
-      {/* ── Quick Create modal ── */}
-      <QuickCreate
+      {/* ── Modals ── */}
+      <QuickCreateModal
         activeTheme={activeTheme}
-        isOpen={isQuickCreateOpen}
-        onClose={() => setIsQuickCreateOpen(false)}
+        isOpen={isNewDeckOpen}
+        onClose={() => setIsNewDeckOpen(false)}
+      />
+      <CloneDeckModal
+        activeTheme={activeTheme}
+        isOpen={isCloneOpen}
+        onClose={() => setIsCloneOpen(false)}
       />
     </div>
   );
