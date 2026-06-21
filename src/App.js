@@ -28,7 +28,7 @@ import Navbar from "./components/Navbar/Navbar";
 import Dashboard from "./components/Dashboard/Dashboard";
 import DeckListView from "./components/Decks/views/DeckListView";
 import DeckDetails from "./components/Decks/views/DeckDetails";
-import ImportView from "./components/Import/ImportView";
+import ImportView from "./components/Import/views/ImportView";
 import StudySession from "./components/Study/views/StudySession";
 import {
   SettingsPage,

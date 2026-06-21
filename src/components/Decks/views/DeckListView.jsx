@@ -16,8 +16,9 @@ import Header from "../../General/ui/Header";
 import { Toast } from "primereact/toast";
 
 import QuickCreateMenu from "./QuickCreateMenu";
-import QuickCreateModal from "../../Import/QuickCreateModal";
+import QuickCreate from "../../Import/views/QuickCreateView";
 import CloneDeckModal from "../../Import/CloneDeckModal";
+import QuickCreateView from "../../Import/views/QuickCreateView";
 
 export default function DeckListView() {
   const activeTheme = useSelector(selectActiveTheme);
@@ -49,8 +50,7 @@ export default function DeckListView() {
   const toast = useRef(null);
 
   // ── Modal state ───────────────────────────────────────────────────────────
-  const [isNewDeckOpen, setIsNewDeckOpen] = useState(false);
-  const [isCloneOpen, setIsCloneOpen] = useState(false);
+  const [mode, setMode] = useState(null);
 
   return (
     <div
@@ -156,8 +156,8 @@ export default function DeckListView() {
             {/* Quick Create dropdown */}
             <QuickCreateMenu
               activeTheme={activeTheme}
-              onNewDeck={() => setIsNewDeckOpen(true)}
-              onCloneDeck={() => setIsCloneOpen(true)}
+              onNewDeck={() => setMode("new")}
+              onCloneDeck={() => setMode("clone")}
             />
           </div>
         </div>
@@ -229,16 +229,10 @@ export default function DeckListView() {
         )}
       </div>
 
-      {/* ── Modals ── */}
-      <QuickCreateModal
+      <QuickCreateView
         activeTheme={activeTheme}
-        isOpen={isNewDeckOpen}
-        onClose={() => setIsNewDeckOpen(false)}
-      />
-      <CloneDeckModal
-        activeTheme={activeTheme}
-        isOpen={isCloneOpen}
-        onClose={() => setIsCloneOpen(false)}
+        mode={mode}
+        onClose={() => setMode(null)}
       />
     </div>
   );

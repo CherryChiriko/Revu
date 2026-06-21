@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { selectActiveTheme } from "../../slices/themeSlice";
+import { selectActiveTheme } from "../../../slices/themeSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheckCircle,
@@ -8,15 +8,14 @@ import {
   faArrowLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
-import Header from "../General/ui/Header";
 
-import { useImportLogic } from "./hooks/useImportLogic";
-import Step0 from "./Step0";
-import Step1 from "./Step1";
-import Step2 from "./Step2";
-import Step3 from "./Step3";
-import Step4 from "./Step4";
-import FinalStep from "./FinalStep";
+import { useImportLogic } from "../hooks/useImportLogic";
+import Step0 from "../steps/Step0";
+import Step1 from "../steps/Step1";
+import Step2 from "../steps/Step2";
+import Step3 from "../steps/Step3";
+import Step4 from "../steps/Step4";
+import FinalStep from "../steps/FinalStep";
 
 const NEW_STEPS = [1, 2, 3, 4, 5];
 const EXISTING_STEPS = [2, 3, 4, 5];

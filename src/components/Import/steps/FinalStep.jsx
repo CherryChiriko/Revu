@@ -1,7 +1,7 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload } from "@fortawesome/free-solid-svg-icons";
-import { Bar } from "../General/ui/Bar";
+import { Bar } from "../../General/ui/Bar";
 
 const FinalStep = ({ activeTheme, logic }) => {
   const currentProgress = logic.processingProgress?.current ?? 0;

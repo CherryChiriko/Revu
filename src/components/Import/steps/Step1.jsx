@@ -7,7 +7,7 @@ import {
   faSquarePlus,
 } from "@fortawesome/free-solid-svg-icons";
 
-import { useHanziWriter } from "../Study/hooks/useHanziWriter";
+import { useHanziWriter } from "../../Study/hooks/useHanziWriter";
 
 const CharacterSample = ({ activeTheme }) => {
   const { containerRef } = useHanziWriter({

@@ -21,12 +21,6 @@ const TYPE_ICONS = {
   missed: faFire,
 };
 
-const AccentStripe = ({ activeTheme }) => (
-  <div
-    className={`h-1 w-full bg-gradient-to-r ${activeTheme.gradients.from} via-indigo-500 ${activeTheme.gradients.to}`}
-  />
-);
-
 const inputCls = (activeTheme) =>
   `w-full rounded-xl py-2.5 px-3.5 text-sm border outline-none focus:ring-2 transition-all
    ${activeTheme.background.canvas} ${activeTheme.text.primary}
@@ -330,12 +324,10 @@ export default function CloneDeckModal({
         className={`w-full max-w-md rounded-2xl shadow-xl overflow-hidden border
         ${activeTheme.background.secondary} ${activeTheme.border.card}`}
       >
-        <AccentStripe activeTheme={activeTheme} />
-
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-5 pb-3">
           <div className="flex items-center gap-2">
-            {/* Back to path picker if coming from QuickCreateModal */}
+            {/* Back to path picker if coming from QuickCreate */}
             {onBack && !logic.success && (
               <button
                 onClick={onBack}
