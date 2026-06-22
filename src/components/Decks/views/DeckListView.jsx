@@ -1,6 +1,6 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { selectActiveTheme } from "../../../slices/themeSlice";
 import useListController from "../hooks/useListController";
 import DeckCard from "../components/DeckCard";
@@ -16,13 +16,14 @@ import Header from "../../General/ui/Header";
 import { Toast } from "primereact/toast";
 
 import QuickCreateMenu from "./QuickCreateMenu";
-import QuickCreate from "../../Import/views/QuickCreateView";
-import CloneDeckModal from "../../Import/CloneDeckModal";
 import QuickCreateView from "../../Import/views/QuickCreateView";
 
 export default function DeckListView() {
   const activeTheme = useSelector(selectActiveTheme);
   const controller = useListController();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const toast = useRef(null);
 
   const {
     searchTerm,
@@ -46,11 +47,25 @@ export default function DeckListView() {
       : "grid grid-cols-1 md:grid-cols-4 gap-3";
 
   const variant = viewMode === "grid" ? "full" : "compact";
-  const navigate = useNavigate();
-  const toast = useRef(null);
 
   // ── Modal state ───────────────────────────────────────────────────────────
   const [mode, setMode] = useState(null);
+
+  // ── Highlight new deck ───────────────────────────────────────────────────────────
+
+  const [highlightedId, setHighlightedId] = useState(
+    location.state?.highlightedDeckId || null,
+  );
+  useEffect(() => {
+    if (highlightedId) {
+      // Clear navigation state history immediately so it doesn't re-flash on component adjustments
+      navigate(location.pathname, { replace: true, state: {} });
+
+      // Turn off highlight indicator after 4 seconds
+      const timer = setTimeout(() => setHighlightedId(null), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [highlightedId, navigate, location.pathname]);
 
   return (
     <div
@@ -170,6 +185,7 @@ export default function DeckListView() {
             variant={variant}
             gridClasses={gridClasses}
             toast={toast}
+            highlightedId={highlightedId}
           />
         ) : (
           <div

@@ -23,25 +23,28 @@ const EXISTING_STEPS = [2, 3, 4, 5];
 const ImportView = () => {
   const activeTheme = useSelector(selectActiveTheme);
   const navigate = useNavigate();
-
-  // 🌟 FIX: Invoked cleanly and unconditionally at the top level rules scope
   const logic = useImportLogic();
 
-  // Trigger processing when reaching step 5
   React.useEffect(() => {
-    if (logic.currentStep === 5) {
-      if (logic.importMode === "existing") {
-        logic.uploadToExisting();
-      } else {
-        logic.createDeck();
-      }
-    }
-  }, [logic.currentStep, logic]); // Added logic to the dependency array safely
+    if (logic.isProcessing || logic.uploadError) return;
+    if (!logic.importResultDeckId) return;
+
+    navigate("/decks", {
+      replace: true,
+      state: { highlightedDeckId: logic.importResultDeckId },
+    });
+  }, [
+    logic.isProcessing,
+    logic.uploadError,
+    logic.importResultDeckId,
+    navigate,
+  ]);
 
   const progressSteps =
     logic.importMode === "existing" ? EXISTING_STEPS : NEW_STEPS;
 
   const renderStep = () => {
+    console.log("current step ", logic.currentStep);
     switch (logic.currentStep) {
       case 0:
         return (
@@ -92,6 +95,7 @@ const ImportView = () => {
       case 5:
         return <FinalStep activeTheme={activeTheme} logic={logic} />;
       default:
+        console.log("default");
         return null;
     }
   };

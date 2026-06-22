@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { supabase } from "../../../utils/supabaseClient";
 import { generateReading } from "./generateReading";
 import Papa from "papaparse";
@@ -14,7 +14,7 @@ export const useImportLogic = () => {
   const [targetDeckId, setTargetDeckId] = useState("");
 
   const targetDeck =
-    allDecks.find((d) => String(d.deck_id) === String(targetDeckId)) ?? null;
+    allDecks.find((d) => String(d.id) === String(targetDeckId)) ?? null;
 
   const existingStudyType = targetDeck?.study_mode === "C" ? 2 : 1;
 
@@ -32,6 +32,36 @@ export const useImportLogic = () => {
   });
   const [existingLanguages, setExistingLanguages] = useState([]);
   const [isAddingLanguage, setIsAddingLanguage] = useState(false);
+  const [importResultDeckId, setImportResultDeckId] = useState(null);
+  const [createdDeckId, setCreatedDeckId] = useState(null);
+  const hasTriggeredRef = useRef(false);
+
+  useEffect(() => {
+    if (currentStep !== 5) {
+      hasTriggeredRef.current = false;
+      return;
+    }
+
+    // Already started
+    if (hasTriggeredRef.current || isProcessing) return;
+
+    hasTriggeredRef.current = true;
+
+    const runImport = async () => {
+      try {
+        if (importMode === "existing") {
+          await uploadToExisting();
+        } else {
+          await createDeck();
+        }
+      } catch (e) {
+        console.error(e);
+        hasTriggeredRef.current = false;
+      }
+    };
+
+    runImport();
+  }, [currentStep]);
 
   useEffect(() => {
     const fetchLanguages = async () => {
@@ -419,6 +449,7 @@ export const useImportLogic = () => {
         .single();
 
       if (deckError) throw deckError;
+      setCreatedDeckId(newDeck.id);
 
       try {
         await uploadCards(newDeck.id, targetTable);
@@ -428,6 +459,8 @@ export const useImportLogic = () => {
       }
 
       await dispatch(fetchDecks()).unwrap();
+      setImportResultDeckId(newDeck.id);
+      return newDeck.id;
     } catch (err) {
       console.error("Import failed:", err);
       setUploadError(err.message || "Error during upload.");
@@ -447,6 +480,8 @@ export const useImportLogic = () => {
     try {
       await uploadCards(targetDeckId, targetTable);
       await dispatch(fetchDecks()).unwrap();
+      setImportResultDeckId(targetDeckId);
+      return targetDeckId;
     } catch (err) {
       console.error("Upload to existing failed:", err);
       setUploadError(err.message || "Error during upload.");
@@ -493,6 +528,8 @@ export const useImportLogic = () => {
     processingProgress,
     allCards,
     createDeck,
+    createdDeckId,
+    importResultDeckId,
     uploadToExisting,
   };
 };

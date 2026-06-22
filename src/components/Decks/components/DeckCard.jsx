@@ -7,6 +7,7 @@ export default function DeckCard({
   variant,
   gridClasses,
   toast,
+  highlightedId,
 }) {
   return (
     <div className={gridClasses}>
@@ -17,6 +18,7 @@ export default function DeckCard({
           activeTheme={activeTheme}
           variant={variant}
           toast={toast}
+          highlightedId={highlightedId}
         />
       ))}
     </div>
