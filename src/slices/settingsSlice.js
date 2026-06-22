@@ -12,13 +12,13 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   // ── Study limits ──────────────────────────────────────────
-  reviewLimit: 20,
-  learnLimit: 20,
-  streakGoal: 20,
+  reviewLimit: 25,
+  learnLimit: 5,
+  streakGoal: 25,
   // ── Heatmap ───────────────────────────────────────────────
   heatmapMetric: "consistency", // consistency | studied | learned
   // ── Avatar ────────────────────────────────────────────────
-  profileIcon: "R",
+  profileIcon: "", // hydrated from profile username after login
   profileColor: "#6366f1",
   avatarUrl: null,
   avatarHistory: [],
@@ -48,10 +48,13 @@ const settingsSlice = createSlice({
       if (p.review_limit != null) state.reviewLimit = p.review_limit;
       if (p.learn_limit != null) state.learnLimit = p.learn_limit;
       if (p.streak_goal != null) state.streakGoal = p.streak_goal;
-      // Avatar
+      // Avatar / profile icon — derive initial from username if no icon set
       if (p.avatar_url != null) state.avatarUrl = p.avatar_url;
       if (Array.isArray(p.avatar_history))
         state.avatarHistory = p.avatar_history;
+      if (p.username && !state.profileIcon) {
+        state.profileIcon = p.username.slice(0, 1).toUpperCase();
+      }
       // Display prefs
       if (p.date_format != null) state.dateFormat = p.date_format;
       if (p.default_deck_view != null)

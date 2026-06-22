@@ -41,12 +41,70 @@ import NotFound404 from "./components/404";
 
 import ScrollToTop from "./components/General/routing/ScrollToTop";
 import DecksLoader from "./components/Loaders/DecksLoader";
-import CardsLoader from "./components/Loaders/CardsLoader";
 import StatsLoader from "./components/Loaders/StatsLoader";
 import ResetPasswordPage from "./components/ResetPasswordPage";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+
+// ─── Stable route tree ────────────────────────────────────────────────────────
+// Defined OUTSIDE App so React never sees a new component type on re-render.
+// If this were inside App, every App re-render would produce a new component
+// reference, forcing React to unmount and remount the entire route tree
+// (including StudySession), resetting all state.
+const AppRoutes = ({
+  profile,
+  settings,
+  activeTheme,
+  allThemes,
+  currentThemeName,
+  dispatch,
+}) => (
+  <Routes>
+    <Route path="/" element={<Dashboard />} />
+    <Route path="/decks" element={<DeckListView />} />
+    <Route
+      path="/decks/import"
+      element={<ImportView activeTheme={activeTheme} />}
+    />
+    <Route
+      path="/decks/:deckId"
+      element={<DeckDetails activeTheme={activeTheme} />}
+    />
+    <Route path="/study" element={<StudySession />} />
+    <Route path="/activity" element={<ActivityPage />} />
+    <Route path="/settings" element={<SettingsView />}>
+      <Route
+        index
+        element={
+          <SettingsPage
+            profile={profile}
+            settings={settings}
+            activeTheme={activeTheme}
+            allThemes={allThemes}
+            currentThemeName={currentThemeName}
+            dispatch={dispatch}
+          />
+        }
+      />
+      <Route
+        path="account"
+        element={
+          <SettingsAccountPage
+            profile={profile}
+            activeTheme={activeTheme}
+            dispatch={dispatch}
+          />
+        }
+      />
+    </Route>
+    <Route
+      path="/reset-password"
+      element={<ResetPasswordPage activeTheme={activeTheme} />}
+    />
+    <Route path="*" element={<NotFound404 activeTheme={activeTheme} />} />
+  </Routes>
+);
 
 function App() {
   const location = useLocation();
@@ -63,7 +121,6 @@ function App() {
 
   const status = useSelector(selectDeckStatus);
   const error = useSelector(selectDeckError);
-  const activeDeck = useSelector(selectActiveDeck);
   const previousUserIdRef = useRef(null);
 
   const publicPaths = ["/reset-password"];
@@ -76,7 +133,6 @@ function App() {
   useEffect(() => {
     const currentUserId = session?.user?.id || null;
 
-    // Only alter user slices if a real structural identity transition has happened
     if (!currentUserId) {
       console.log("[App] No active session. Purging local user state.");
       dispatch(clearUser());
@@ -117,6 +173,16 @@ function App() {
     document.documentElement.classList.toggle("dark", activeTheme.isDark);
   }, [activeTheme.isDark]);
 
+  // Shared props passed down to routes
+  const routeProps = {
+    profile,
+    settings,
+    activeTheme,
+    allThemes,
+    currentThemeName,
+    dispatch,
+  };
+
   if (authLoading) {
     return (
       <div
@@ -137,35 +203,7 @@ function App() {
   const shouldLoadDeckData = !!session && !isSettingsPath;
   const shouldLoadStatsData = !!session;
 
-  const settingsRoutes = (
-    <Route path="/settings" element={<SettingsView />}>
-      <Route
-        index
-        element={
-          <SettingsPage
-            profile={profile}
-            settings={settings}
-            activeTheme={activeTheme}
-            allThemes={allThemes}
-            currentThemeName={currentThemeName}
-            dispatch={dispatch}
-          />
-        }
-      />
-      <Route
-        path="account"
-        element={
-          <SettingsAccountPage
-            profile={profile}
-            activeTheme={activeTheme}
-            dispatch={dispatch}
-          />
-        }
-      />
-    </Route>
-  );
-
-  // If status is idle/loading, keep context loaders rendered but prevent absolute component tree destruction loops
+  // Deck data still loading — show spinner but keep routes mounted for settings
   if (status === "loading" || status === "idle") {
     if (isSettingsPath && session) {
       return (
@@ -181,7 +219,7 @@ function App() {
             <Navbar />
             <main>
               <ScrollToTop />
-              <Routes>{settingsRoutes}</Routes>
+              <AppRoutes {...routeProps} />
             </main>
           </div>
         </>
@@ -245,33 +283,10 @@ function App() {
           minHeight: "100vh",
         }}
       >
-        <CardsLoader activeDeck={activeDeck} userId={session?.user?.id} />
         <Navbar />
         <main>
           <ScrollToTop />
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/decks" element={<DeckListView />} />
-            <Route
-              path="/decks/import"
-              element={<ImportView activeTheme={activeTheme} />}
-            />
-            <Route
-              path="/decks/:deckId"
-              element={<DeckDetails activeTheme={activeTheme} />}
-            />
-            <Route path="/study" element={<StudySession />} />
-            <Route path="/activity" element={<ActivityPage />} />
-            {settingsRoutes}
-            <Route
-              path="/reset-password"
-              element={<ResetPasswordPage activeTheme={activeTheme} />}
-            />
-            <Route
-              path="*"
-              element={<NotFound404 activeTheme={activeTheme} />}
-            />
-          </Routes>
+          <AppRoutes {...routeProps} />
         </main>
       </div>
     </>

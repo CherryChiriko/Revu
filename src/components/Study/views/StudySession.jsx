@@ -4,10 +4,14 @@ import { useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { selectActiveTheme } from "../../../slices/themeSlice";
 import { selectActiveDeck, selectDecks } from "../../../slices/deckSlice";
+import { selectUserProfile } from "../../../slices/userSlice";
 import useStudySession from "../hooks/useStudySession";
 import SessionMode from "./SessionMode";
 
 const StudySession = () => {
+  const renderCount = React.useRef(0);
+  renderCount.current++;
+  console.log("[StudySession] render #", renderCount.current);
   React.useEffect(() => {
     console.log("[StudySession] MOUNTED");
     return () => console.log("[StudySession] UNMOUNTED");
@@ -22,7 +26,12 @@ const StudySession = () => {
 
   const navMode = params ?? (activeDeck?.due > 0 ? "review" : "learn");
 
-  const session = useStudySession({ deck: activeDeck, navMode });
+  const profile = useSelector(selectUserProfile);
+  const session = useStudySession({
+    deck: activeDeck,
+    navMode,
+    userId: profile?.id,
+  });
   const { status, cards, error } = session;
 
   if (!allDecks || allDecks.length === 0) {

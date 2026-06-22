@@ -1,7 +1,12 @@
 import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { selectCards, fetchCards } from "../../../slices/cardSlice";
+import {
+  selectCards,
+  selectCardsStatus,
+  fetchCards,
+  fetchMoreCards,
+} from "../../../slices/cardSlice";
 import { fetchDeckCounts } from "../../../slices/deckSlice";
 import {
   logStudySession,
@@ -27,57 +32,122 @@ const selectCardsForDeck = createSelector(
   (allCards, deckId) => allCards.filter((c) => c.deck_id === deckId),
 );
 
-export default function useStudySession({ deck, navMode }) {
+export default function useStudySession({ deck, navMode, userId }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const isReviewMode = navMode === "review";
+  const sessionMode = isReviewMode ? "review" : "learn";
+
   const reviewLimit = useSelector(selectReviewLimit);
   const learnLimit = useSelector(selectLearnLimit);
   const modeLimit = isReviewMode ? reviewLimit : learnLimit;
+  const BATCH_SIZE = Math.max(20, modeLimit * 2);
+  const PREFETCH_THRESHOLD = modeLimit;
 
-  const [status, setStatus] = useState("idle");
   const [phaseIndex, setPhaseIndex] = useState(0);
   const [cardIndex, setCardIndex] = useState(0);
   const [sessionOffset, setSessionOffset] = useState(0);
   const [sessionFinished, setSessionFinished] = useState(false);
   const [sessionUpdates, setSessionUpdates] = useState([]);
   const [sessionSummary, setSessionSummary] = useState(null);
+
   const sessionStartedAtRef = useRef(Date.now());
+  const userIdRef = useRef(userId || null);
+  const batchPageRef = useRef(1);
+  const isFetchingMoreRef = useRef(false);
+  // Track which deck+mode we've already fetched for — prevents re-fetching on every render
+  const fetchedKeyRef = useRef(null);
 
   // ----------------------
-  // Cards
+  // Sync userId ref
+  // ----------------------
+  useEffect(() => {
+    if (userId) userIdRef.current = userId;
+  }, [userId]);
+
+  // ----------------------
+  // Initial card fetch
+  // Only fires when deck+sessionMode actually changes, not on every render
+  // ----------------------
+  useEffect(() => {
+    if (!deck?.id || !userId) return;
+
+    const fetchKey = `${deck.id}:${sessionMode}`;
+    if (fetchedKeyRef.current === fetchKey) return; // already fetched for this combo
+    fetchedKeyRef.current = fetchKey;
+
+    batchPageRef.current = 1;
+    isFetchingMoreRef.current = false;
+
+    dispatch(
+      fetchCards({
+        deck_id: deck.id,
+        study_mode: deck.study_mode,
+        user_id: userId,
+        sessionMode,
+        page: 0,
+        pageSize: BATCH_SIZE,
+      }),
+    );
+  }, [deck?.id, sessionMode, userId, dispatch, BATCH_SIZE]);
+
+  // ----------------------
+  // Cards from Redux
   // ----------------------
   const allCards = useSelector((state) =>
     selectCardsForDeck(state, deck?.id || -1),
   );
+  const cardsStatus = useSelector(selectCardsStatus);
+
+  // Track userId from loaded cards as a fallback for when session ends
+  useEffect(() => {
+    if (allCards[0]?.user_id) {
+      userIdRef.current = allCards[0].user_id;
+    }
+  }, [allCards]);
 
   const { cards, limit } = useMemo(() => {
     if (!deck?.id || allCards.length === 0) return { cards: [], limit: 0 };
 
-    const filteredCards = allCards.filter(
-      (c) => c.status === (isReviewMode ? "due" : "new"),
-    );
-    console.log(
-      "[useStudySession] allCards statuses:",
-      allCards.map((c) => ({ id: c.card_id, status: c.status })),
-    );
-
     const start = Math.max(0, sessionOffset);
-    const sessionSlice = filteredCards.slice(start, start + modeLimit);
+    const sessionSlice = allCards.slice(start, start + modeLimit);
     const sessionLimit = Math.min(modeLimit, sessionSlice.length);
 
     return { cards: sessionSlice.slice(0, sessionLimit), limit: sessionLimit };
-  }, [deck?.id, allCards, isReviewMode, modeLimit, sessionOffset]);
+  }, [deck?.id, allCards, modeLimit, sessionOffset]);
 
   // ----------------------
-  // Status
+  // Derive status from Redux cards status — not from card count
+  // This prevents "loading" forever when a deck genuinely has 0 eligible cards
+  // ----------------------
+  const status = cardsStatus === "idle" ? "loading" : cardsStatus;
+
+  // ----------------------
+  // Prefetch next batch when nearing the end
   // ----------------------
   useEffect(() => {
-    if (!deck?.id) return setStatus("idle");
-    if (allCards.length === 0) return setStatus("loading");
-    setStatus("succeeded");
-  }, [deck?.id, allCards]);
+    if (cards.length === 0 || !deck?.id || !userIdRef.current) return;
+
+    const cardsRemaining = cards.length - cardIndex;
+    if (cardsRemaining > PREFETCH_THRESHOLD || isFetchingMoreRef.current)
+      return;
+
+    isFetchingMoreRef.current = true;
+    dispatch(
+      fetchMoreCards({
+        deck_id: deck.id,
+        study_mode: deck.study_mode,
+        user_id: userIdRef.current,
+        sessionMode,
+        page: batchPageRef.current,
+        pageSize: BATCH_SIZE,
+      }),
+    ).then(() => {
+      batchPageRef.current += 1;
+      isFetchingMoreRef.current = false;
+    });
+  }, [cardIndex, cards.length]); // intentionally narrow — refs handle the rest
 
   // ----------------------
   // Phases
@@ -90,7 +160,6 @@ export default function useStudySession({ deck, navMode }) {
     [isReviewMode, deck?.study_mode],
   );
   const totalPhases = phases.length;
-
   const currentPhase = useMemo(() => phases[phaseIndex], [phases, phaseIndex]);
   const currentCard = cards[cardIndex];
 
@@ -107,7 +176,10 @@ export default function useStudySession({ deck, navMode }) {
       setPhaseIndex(0);
       setCardIndex(0);
       setSessionUpdates([]);
+      setSessionSummary(null);
       sessionStartedAtRef.current = Date.now();
+      batchPageRef.current = 1;
+      isFetchingMoreRef.current = false;
 
       if (advance) {
         setSessionOffset((offset) => offset + modeLimit);
@@ -118,7 +190,11 @@ export default function useStudySession({ deck, navMode }) {
     [modeLimit],
   );
 
+  // Reset session state when deck changes (not on every render)
+  const prevDeckIdRef = useRef(null);
   useEffect(() => {
+    if (!deck?.id || deck.id === prevDeckIdRef.current) return;
+    prevDeckIdRef.current = deck.id;
     restartSession(false);
   }, [deck?.id, restartSession]);
 
@@ -127,9 +203,6 @@ export default function useStudySession({ deck, navMode }) {
   }, [navigate]);
 
   const advanceCard = useCallback(() => {
-    console.log("[advanceCard]", { cardIndex, phaseIndex, limit, totalPhases });
-    console.trace("[advanceCard] call stack"); // shows exactly who called it
-    console.log("[advanceCard BEFORE]", currentCard);
     if (cardIndex + 1 < limit) {
       setCardIndex((i) => i + 1);
       return;
@@ -140,14 +213,14 @@ export default function useStudySession({ deck, navMode }) {
       return;
     }
     setSessionFinished(true);
-  }, [cardIndex, currentCard, limit, phaseIndex, totalPhases]);
+  }, [cardIndex, limit, phaseIndex, totalPhases]);
 
   // ----------------------
   // Handle rating
   // ----------------------
   const handleRate = useCallback(
     (rating) => {
-      if (!currentCard || !currentPhase.allowRating) return;
+      if (!currentCard || !currentPhase?.allowRating) return;
 
       const updates = computeSM2(currentCard, rating);
       const updatedCard = {
@@ -159,46 +232,53 @@ export default function useStudySession({ deck, navMode }) {
         ...updates,
       };
 
-      // Optimistically add to session updates
       setSessionUpdates((prev) => [...prev, updatedCard]);
-
       advanceCard();
     },
-    [currentCard, currentPhase.allowRating, advanceCard],
+    [currentCard, currentPhase?.allowRating, advanceCard],
   );
 
   // ----------------------
-  // Batch update progress and streaks
+  // Batch update on session finish
+  // Uses refs — currentCard is undefined by this point
   // ----------------------
   useEffect(() => {
     if (!sessionFinished || sessionUpdates.length === 0) return;
 
+    const resolvedUserId = userIdRef.current;
+    if (!resolvedUserId) {
+      console.error("[runUpdates] No userId available, aborting.");
+      return;
+    }
+
+    // Snapshot everything we need before any async work
+    const updatesSnapshot = [...sessionUpdates];
+    const deckSnapshot = deck;
+    const sessionModeSnapshot = sessionMode;
+    const batchSizeSnapshot = BATCH_SIZE;
+
     const runUpdates = async () => {
       try {
-        console.log("[runUpdates] starting, sessionUpdates:", sessionUpdates);
-        const cardsStudied = sessionUpdates.length;
+        const cardsStudied = updatesSnapshot.length;
         const cardsReviewed = isReviewMode ? cardsStudied : 0;
         const cardsLearned = isReviewMode ? 0 : cardsStudied;
 
-        if (!sessionSummary) {
-          setSessionSummary({
-            learned: cardsLearned,
-            reviewed: cardsReviewed,
-          });
-        }
+        setSessionSummary({ learned: cardsLearned, reviewed: cardsReviewed });
 
         // 1. Update progress in Redux + DB
-        const result = await dispatch(
-          updateProgress({ sessionUpdates, study_mode: deck.study_mode }),
+        await dispatch(
+          updateProgress({
+            sessionUpdates: updatesSnapshot,
+            study_mode: deckSnapshot.study_mode,
+          }),
         ).unwrap();
-        console.log("[runUpdates] updateProgress result:", result);
 
-        // 2. Update streaks in Supabase
+        // 2. Update streaks
         await supabase.rpc("update_streaks_after_session", {
-          p_user_id: currentCard.user_id,
+          p_user_id: resolvedUserId,
           p_deck_results: [
             {
-              deck_id: deck.id,
+              deck_id: deckSnapshot.id,
               cards_reviewed: cardsReviewed,
               cards_learned: cardsLearned,
             },
@@ -208,6 +288,7 @@ export default function useStudySession({ deck, navMode }) {
           p_user_timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         });
 
+        // 3. Update time studied
         const studiedSeconds = Math.max(
           1,
           Math.round((Date.now() - sessionStartedAtRef.current) / 1000),
@@ -216,7 +297,7 @@ export default function useStudySession({ deck, navMode }) {
         const { data: dailyStats } = await supabase
           .from("daily_user_stats")
           .select("time_studied_seconds")
-          .eq("user_id", currentCard.user_id)
+          .eq("user_id", resolvedUserId)
           .eq("date", today)
           .maybeSingle();
 
@@ -226,66 +307,44 @@ export default function useStudySession({ deck, navMode }) {
             time_studied_seconds:
               (dailyStats?.time_studied_seconds || 0) + studiedSeconds,
           })
-          .eq("user_id", currentCard.user_id)
+          .eq("user_id", resolvedUserId)
           .eq("date", today);
 
-        // 3. Refresh cards, deck counts, streaks, and activity in parallel for faster UI updates
-        const [fetchResult] = await Promise.all([
+        // 4. Refresh cards (correct sessionMode), deck counts, streaks, activity
+        // Reset fetchedKey so the next session start re-fetches fresh cards
+        fetchedKeyRef.current = null;
+
+        await Promise.all([
           dispatch(
             fetchCards({
-              deck_id: deck.id,
-              user_id: currentCard.user_id,
-              study_mode: deck.study_mode,
+              deck_id: deckSnapshot.id,
+              user_id: resolvedUserId,
+              study_mode: deckSnapshot.study_mode,
+              sessionMode: sessionModeSnapshot,
+              page: 0,
+              pageSize: batchSizeSnapshot,
             }),
           ).unwrap(),
-          dispatch(fetchDeckCounts({ user_id: currentCard.user_id })).unwrap(),
-          dispatch(
-            fetchDailyStreakStats({ user_id: currentCard.user_id }),
-          ).unwrap(),
-          dispatch(fetchDailyActivity({ user_id: currentCard.user_id })),
+          dispatch(fetchDeckCounts({ user_id: resolvedUserId })).unwrap(),
+          dispatch(fetchDailyStreakStats({ user_id: resolvedUserId })).unwrap(),
+          dispatch(fetchDailyActivity({ user_id: resolvedUserId })),
         ]);
 
-        console.log(
-          "[runUpdates] fetchCards result - first 3 cards:",
-          fetchResult.slice(0, 3),
-        );
-        console.log(
-          "[runUpdates] studied card after fetch:",
-          fetchResult.find((c) => c.card_id === sessionUpdates[0]?.card_id),
-        );
-        console.log("[runUpdates] fetchCards count:", fetchResult.length);
-        console.log(
-          "[runUpdates] new cards after fetch:",
-          fetchResult
-            .filter((c) => c.status === "new")
-            .map((c) => ({ id: c.card_id, front: c.front, status: c.status })),
-        );
-        console.log(
-          "[runUpdates] studied card in result:",
-          fetchResult.find((c) => c.card_id === sessionUpdates[0]?.card_id)
-            ?.status ?? "NOT IN RESULT",
-        );
+        batchPageRef.current = 1;
+        isFetchingMoreRef.current = false;
 
-        // 4. Log activity locally
+        // 5. Log activity
         dispatch(logStudySession({ cardsReviewed, cardsLearned }));
 
-        // 5. Clear session updates
+        // 6. Clear session updates
         setSessionUpdates([]);
       } catch (err) {
-        console.error("Failed batch update:", err);
+        console.error("[runUpdates] Failed batch update:", err);
       }
     };
 
     runUpdates();
-  }, [
-    sessionFinished,
-    sessionUpdates,
-    deck,
-    currentCard,
-    dispatch,
-    isReviewMode,
-    sessionSummary,
-  ]);
+  }, [sessionFinished]); // intentionally minimal — snapshots handle the values
 
   // ----------------------
   // Return
