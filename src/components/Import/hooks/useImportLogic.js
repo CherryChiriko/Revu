@@ -19,7 +19,7 @@ export const useImportLogic = () => {
   const existingStudyType = targetDeck?.study_mode === "C" ? 2 : 1;
 
   const [currentStep, setCurrentStep] = useState(0);
-  const [selectedStudyType, setselectedStudyType] = useState(1);
+  const [selectedStudyType, setSelectedStudyType] = useState(1);
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploadError, setUploadError] = useState(null);
   const [fileContent, setFileContent] = useState([]);
@@ -465,7 +465,7 @@ export const useImportLogic = () => {
     currentStep,
     setCurrentStep,
     selectedStudyType,
-    setselectedStudyType,
+    setSelectedStudyType,
     selectedFile,
     fileContent,
     uploadError,

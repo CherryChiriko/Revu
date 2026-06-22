@@ -94,7 +94,7 @@ const Step4 = ({ activeTheme, logic, onNext, onBack }) => {
 
   // ── New deck mode: original deck settings form ────────────────────────────
   const getLanguageOptions = () => {
-    switch (logic.setselectedStudyType) {
+    switch (logic.selectedStudyType) {
       case 1:
         return [...logic.existingLanguages, "Add new language..."];
       case 2:
@@ -157,7 +157,7 @@ const Step4 = ({ activeTheme, logic, onNext, onBack }) => {
                 className={`block ${activeTheme.text.primary} text-sm font-medium`}
               >
                 Language{" "}
-                {logic.setselectedStudyType === 2 && (
+                {logic.selectedStudyType === 2 && (
                   <span className="text-red-500">*</span>
                 )}
               </label>
@@ -251,6 +251,32 @@ const Step4 = ({ activeTheme, logic, onNext, onBack }) => {
                   tags: e.target.value,
                 })
               }
+              /* Automatically cleans up whitespace and removes duplicates on blur */
+              onBlur={(e) => {
+                const rawValue = e.target.value;
+                if (!rawValue.trim()) return;
+
+                // Split by commas, trim spaces, drop empty values, filter unique case-insensitively
+                const tagArray = rawValue
+                  .split(",")
+                  .map((t) => t.trim())
+                  .filter(Boolean);
+                const uniqueTags = [];
+                const seen = new Set();
+
+                tagArray.forEach((tag) => {
+                  const lower = tag.toLowerCase();
+                  if (!seen.has(lower)) {
+                    seen.add(lower);
+                    uniqueTags.push(tag); // Keeps original casing of the first match
+                  }
+                });
+
+                logic.setDeckSettings({
+                  ...logic.deckSettings,
+                  tags: uniqueTags.join(", "),
+                });
+              }}
               placeholder="Enter tags separated by comma"
               className={`block w-full ${activeTheme.background.canvas} ${activeTheme.text.secondary} rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 ${activeTheme.ring.input}`}
             />
@@ -259,7 +285,9 @@ const Step4 = ({ activeTheme, logic, onNext, onBack }) => {
           <div
             className={`rounded-lg p-4 border ${activeTheme.border.card} ${activeTheme.background.canvas}`}
           >
-            <h4 className={`font-semibold mb-2 ${activeTheme.text.primary}`}>
+            <h4
+              className={`font-semibold mb-2 ${activeTheme.text.primary} mb-3`}
+            >
               Import Summary
             </h4>
             <div className={`text-sm ${activeTheme.text.secondary} space-y-1`}>

@@ -149,7 +149,7 @@ const Step1 = ({ activeTheme, logic, onNext }) => {
             <button
               key={type.id}
               type="button"
-              onClick={() => logic.selectedStudyType(type.id)}
+              onClick={() => logic.setSelectedStudyType(type.id)}
               className={`text-left flex justify-start flex-col rounded-xl border p-4 transition-all duration-200
               ${
                 isSelected
