@@ -10,7 +10,7 @@ export const useImportLogic = () => {
   const dispatch = useDispatch();
   const allDecks = useSelector(selectDecks);
 
-  const [importMode, setImportMode] = useState(null);
+  const [importMode, setImportMode] = useState("new");
   const [targetDeckId, setTargetDeckId] = useState("");
 
   const targetDeck =

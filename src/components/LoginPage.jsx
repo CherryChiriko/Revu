@@ -74,7 +74,7 @@ const LoginPage = ({ activeTheme }) => {
               </label>
               <input
                 type="text"
-                className="w-full border rounded px-3 py-2"
+                className={`w-full border rounded px-3 py-2 ${activeTheme.background.canvas} ${activeTheme.text.primary}`}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Enter your username"
@@ -93,7 +93,7 @@ const LoginPage = ({ activeTheme }) => {
               </label>
               <input
                 type="email"
-                className="w-full border rounded px-3 py-2"
+                className={`w-full border rounded px-3 py-2 ${activeTheme.background.canvas} ${activeTheme.text.primary}`}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
@@ -112,7 +112,7 @@ const LoginPage = ({ activeTheme }) => {
               </label>
               <input
                 type="password"
-                className="w-full border rounded px-3 py-2"
+                className={`w-full border rounded px-3 py-2 ${activeTheme.background.canvas} ${activeTheme.text.primary}`}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"

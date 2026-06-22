@@ -3,15 +3,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSquarePlus,
   faLayerGroup,
-  faChevronRight,
+  faArrowRight,
 } from "@fortawesome/free-solid-svg-icons";
 
 const Step0 = ({ activeTheme, logic, onSelectNew, onSelectExisting }) => {
-  const selectCls = `w-full rounded-xl py-2.5 px-3.5 text-sm border outline-none
-    focus:ring-2 appearance-none transition-all
-    ${activeTheme.background.canvas} ${activeTheme.text.primary}
-    ${activeTheme.border.card} focus:ring-violet-300`;
-
   const MODES = [
     {
       id: "new",
@@ -24,9 +19,13 @@ const Step0 = ({ activeTheme, logic, onSelectNew, onSelectExisting }) => {
       icon: faLayerGroup,
       title: "Add to existing deck",
       description:
-        "Append new cards from your file to a deck you already have. Existing cards are never modified.",
+        "The cards you import will be added to an existing deck without modifying what you already have.",
     },
   ];
+
+  const isNextDisabled =
+    !logic.importMode ||
+    (logic.importMode === "existing" && !logic.targetDeckId);
 
   return (
     <>
@@ -35,7 +34,7 @@ const Step0 = ({ activeTheme, logic, onSelectNew, onSelectExisting }) => {
           className={`text-2xl font-bold flex items-center gap-2 ${activeTheme.text.primary}`}
         >
           <FontAwesomeIcon icon={faLayerGroup} className="w-5 h-5" />
-          How would you like to import?
+          Import mode
         </h2>
         <p className={`${activeTheme.text.secondary} text-sm mt-2`}>
           Choose whether to create a new deck or add cards to an existing one.
@@ -50,16 +49,20 @@ const Step0 = ({ activeTheme, logic, onSelectNew, onSelectExisting }) => {
               key={mode.id}
               type="button"
               onClick={() => logic.setImportMode(mode.id)}
-              className={`text-left flex flex-col gap-3 rounded-xl border p-5 transition-all duration-200
+              className={`text-left flex flex-col gap-3 rounded-xl border p-5 transition-all duration-200 outline-none
                 ${
                   isSelected
-                    ? `border-violet-400 ring-2 ring-violet-300/40 ${activeTheme.background.canvas}`
-                    : `${activeTheme.border.card} ${activeTheme.background.canvas} hover:border-violet-300`
+                    ? `${activeTheme.border.primary} ring-2 ring-offset-2 ${activeTheme.ring}`
+                    : activeTheme.border.muted
                 }`}
             >
               <div
-                className={`w-10 h-10 rounded-xl flex items-center justify-center
-                ${isSelected ? "bg-violet-500/20 text-violet-400" : `${activeTheme.background.secondary} ${activeTheme.text.muted}`}`}
+                className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors
+                ${
+                  isSelected
+                    ? `${activeTheme.background.accent1} ${activeTheme.text.activeButton}`
+                    : `${activeTheme.background.light} ${activeTheme.text.muted}`
+                }`}
               >
                 <FontAwesomeIcon icon={mode.icon} className="w-4 h-4" />
               </div>
@@ -81,7 +84,7 @@ const Step0 = ({ activeTheme, logic, onSelectNew, onSelectExisting }) => {
           <label
             className={`block text-sm font-semibold ${activeTheme.text.primary}`}
           >
-            Target deck <span className="text-red-500">*</span>
+            Target deck <span className={activeTheme.text.danger}>*</span>
           </label>
           <div className="relative">
             <FontAwesomeIcon
@@ -91,7 +94,10 @@ const Step0 = ({ activeTheme, logic, onSelectNew, onSelectExisting }) => {
             <select
               value={logic.targetDeckId}
               onChange={(e) => logic.setTargetDeckId(e.target.value)}
-              className={`${selectCls} pl-8`}
+              className={`w-full rounded-xl py-2.5 px-3.5 pl-8 text-sm border outline-none
+    focus:ring-2 appearance-none transition-all
+    ${activeTheme.background.canvas} ${activeTheme.text.primary}
+    ${activeTheme.border.secondary} ${activeTheme.ring}`}
             >
               <option value="" disabled>
                 Choose a deck…
@@ -124,16 +130,11 @@ const Step0 = ({ activeTheme, logic, onSelectNew, onSelectExisting }) => {
             else if (logic.importMode === "existing" && logic.targetDeckId)
               onSelectExisting();
           }}
-          disabled={
-            !logic.importMode ||
-            (logic.importMode === "existing" && !logic.targetDeckId)
-          }
-          className={`px-5 py-2 rounded-lg font-semibold flex items-center gap-2
-            disabled:opacity-40 disabled:cursor-not-allowed
-            bg-gradient-to-r ${activeTheme.gradients.from} ${activeTheme.gradients.to} text-white`}
+          disabled={isNextDisabled}
+          className={`px-4 py-2 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed`}
         >
-          Next
-          <FontAwesomeIcon icon={faChevronRight} className="text-xs" />
+          Next: Upload File
+          <FontAwesomeIcon icon={faArrowRight} className="ml-2" />
         </button>
       </div>
     </>

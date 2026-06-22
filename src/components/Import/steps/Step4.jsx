@@ -94,7 +94,7 @@ const Step4 = ({ activeTheme, logic, onNext, onBack }) => {
 
   // ── New deck mode: original deck settings form ────────────────────────────
   const getLanguageOptions = () => {
-    switch (logic.selectedType) {
+    switch (logic.setselectedStudyType) {
       case 1:
         return [...logic.existingLanguages, "Add new language..."];
       case 2:
@@ -157,7 +157,7 @@ const Step4 = ({ activeTheme, logic, onNext, onBack }) => {
                 className={`block ${activeTheme.text.primary} text-sm font-medium`}
               >
                 Language{" "}
-                {logic.selectedType === 2 && (
+                {logic.setselectedStudyType === 2 && (
                   <span className="text-red-500">*</span>
                 )}
               </label>

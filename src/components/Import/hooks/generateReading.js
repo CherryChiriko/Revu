@@ -65,11 +65,11 @@ export const generateReading = (
 
       // Pleco Chinese Tone Colors
       const colors = {
+        0: "gray",
         1: "red",
         2: "green",
         3: "blue",
         4: "purple",
-        5: "gray",
       };
 
       result.strokeColors = result.tones.map((t) => colors[t]);

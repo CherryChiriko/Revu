@@ -144,12 +144,12 @@ const Step1 = ({ activeTheme, logic, onNext }) => {
       {/* Flashcard Type Selection */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {CARD_TYPES.map((type) => {
-          const isSelected = logic.selectedType === type.id;
+          const isSelected = logic.selectedStudyType === type.id;
           return (
             <button
               key={type.id}
               type="button"
-              onClick={() => logic.setSelectedType(type.id)}
+              onClick={() => logic.selectedStudyType(type.id)}
               className={`text-left flex justify-start flex-col rounded-xl border p-4 transition-all duration-200
               ${
                 isSelected
@@ -201,7 +201,7 @@ const Step1 = ({ activeTheme, logic, onNext }) => {
       <div className="flex justify-end mt-8">
         <button
           onClick={onNext}
-          disabled={!logic.selectedType}
+          disabled={!logic.selectedStudyType}
           className={`px-4 py-2 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed`}
         >
           Next: Upload File

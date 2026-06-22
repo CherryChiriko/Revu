@@ -12,7 +12,7 @@ import {
 
 const Step2 = ({ activeTheme, logic, onNext, onBack }) => {
   const Format = () => {
-    switch (logic.selectedType) {
+    switch (logic.setselectedStudyType) {
       case 1:
         return (
           <div className={`text-sm ${activeTheme.text.muted}`}>
