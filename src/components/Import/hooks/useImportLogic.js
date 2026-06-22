@@ -35,13 +35,13 @@ export const useImportLogic = () => {
   const [importResultDeckId, setImportResultDeckId] = useState(null);
   const [createdDeckId, setCreatedDeckId] = useState(null);
   const hasTriggeredRef = useRef(false);
-
+  console.log("[useImportLogic] render, currentStep:", currentStep);
   useEffect(() => {
     if (currentStep !== 5) {
       hasTriggeredRef.current = false;
       return;
     }
-
+    console.log("[useImportLogic] inside useEffect, currentStep:", currentStep);
     // Already started
     if (hasTriggeredRef.current || isProcessing) return;
 

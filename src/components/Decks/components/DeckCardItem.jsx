@@ -18,6 +18,8 @@ function DeckCardItem({ deck, activeTheme, variant, toast, highlightedId }) {
     (String(deck.id) === String(highlightedId) ||
       String(deck.deck_id) === String(highlightedId));
 
+  const glowColor = activeTheme.gradients?.colors?.[4] || "#6366f1";
+
   const base = `rounded-xl border shadow-md transition-all duration-300 p-6 shadow-xl 
     cursor-pointer ${activeTheme.border.card}
     ${activeTheme.background.secondary} ${activeTheme.text.primary}
@@ -25,7 +27,7 @@ function DeckCardItem({ deck, activeTheme, variant, toast, highlightedId }) {
     ${
       /* Pure Tailwind Highlight State: Green ring, glow shadow, scaling up, and a subtle entry pulse */
       isHighlighted
-        ? "ring-4 ring-green-500/80 shadow-[0_0_30px_rgba(34,197,94,0.5)] scale-[1.03] -translate-y-1 animate-pulse"
+        ? `ring-4 ${activeTheme.ring?.focus || "ring-indigo-500"} shadow-[0_0_35px_${glowColor}80] scale-[1.03] -translate-y-1 animate-pulse`
         : "hover:shadow-2xl hover:-translate-y-1 transform"
     }`;
 

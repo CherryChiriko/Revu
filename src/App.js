@@ -226,6 +226,28 @@ function App() {
       );
     }
 
+    const isImportPath = location.pathname.startsWith("/decks/import");
+    if (isImportPath && session) {
+      return (
+        <>
+          <DecksLoader session={session} authLoading={authLoading} />
+          <StatsLoader session={session} authLoading={authLoading} />
+          <div
+            style={{
+              backgroundColor: activeTheme.background.app,
+              color: activeTheme.text.primary,
+              minHeight: "100vh",
+            }}
+          >
+            <Navbar />
+            <main>
+              <ScrollToTop />
+              <AppRoutes {...routeProps} />
+            </main>
+          </div>
+        </>
+      );
+    }
     return (
       <>
         <DecksLoader session={session} authLoading={authLoading} />
