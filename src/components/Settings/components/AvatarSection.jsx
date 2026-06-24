@@ -242,7 +242,7 @@ export function AvatarSection({ profile, settings, activeTheme, dispatch }) {
           {activeUrl ? (
             <img
               src={activeUrl}
-              alt="avatar"
+              alt="icon"
               className="w-full h-full object-cover"
             />
           ) : activeIsEmoji ? (

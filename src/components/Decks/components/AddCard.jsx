@@ -7,7 +7,7 @@ import {
   faExclamationCircle,
   faLayerGroup,
 } from "@fortawesome/free-solid-svg-icons";
-import { useQuickCreateLogic } from "./hooks/useQuickCreateLogic";
+import { useQuickCreateLogic } from "../hooks/useAddCard";
 
 /** Thin accent stripe that mirrors the Dashboard/Settings header treatment */
 const AccentStripe = ({ activeTheme }) => (

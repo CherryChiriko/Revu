@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { supabase } from "../../../utils/supabaseClient";
 import { selectDecks } from "../../../slices/deckSlice";
 import { fetchDecks } from "../../../slices/deckSlice";
-import { generateReading } from "./generateReading";
+import { generateReading } from "../../Import/hooks/generateReading";
 
 const INITIAL_FIELDS = { front: "", back: "", reading: "", audioUrl: "" };
 

@@ -25,21 +25,6 @@ const ImportView = () => {
   const navigate = useNavigate();
   const logic = useImportLogic();
 
-  // React.useEffect(() => {
-  //   if (logic.isProcessing || logic.uploadError) return;
-  //   if (!logic.importResultDeckId) return;
-
-  //   navigate("/decks", {
-  //     replace: true,
-  //     state: { highlightedDeckId: logic.importResultDeckId },
-  //   });
-  // }, [
-  //   logic.isProcessing,
-  //   logic.uploadError,
-  //   logic.importResultDeckId,
-  //   navigate,
-  // ]);
-
   const progressSteps =
     logic.importMode === "existing" ? EXISTING_STEPS : NEW_STEPS;
 

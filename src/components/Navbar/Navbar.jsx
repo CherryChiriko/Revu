@@ -120,7 +120,7 @@ const Navbar = () => {
             {avatarUrl ? (
               <img
                 src={avatarUrl}
-                alt={`${username} avatar`}
+                alt="icon"
                 className="w-full h-full object-cover"
               />
             ) : (
