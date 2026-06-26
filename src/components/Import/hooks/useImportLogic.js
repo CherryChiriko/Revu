@@ -1,10 +1,11 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { supabase } from "../../../utils/supabaseClient";
-import { generateReading } from "./generateReading";
+import { generateReading } from "../hooks/generateReading";
 import Papa from "papaparse";
 import * as XLSX from "xlsx";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchDecks, selectDecks } from "../../../slices/deckSlice";
+import { hasCJKCharacter } from "../../../utils/cjkValidation";
 
 export const useImportLogic = () => {
   const dispatch = useDispatch();
@@ -35,14 +36,18 @@ export const useImportLogic = () => {
   const [importResultDeckId, setImportResultDeckId] = useState(null);
   const [createdDeckId, setCreatedDeckId] = useState(null);
   const hasTriggeredRef = useRef(false);
+
+  // ── CJK warning for import mode ───────────────────────────────────────────
+  const [cjkWarning, setCjkWarning] = useState(null); // string | null
+
   console.log("[useImportLogic] render, currentStep:", currentStep);
+
   useEffect(() => {
     if (currentStep !== 5) {
       hasTriggeredRef.current = false;
       return;
     }
     console.log("[useImportLogic] inside useEffect, currentStep:", currentStep);
-    // Already started
     if (hasTriggeredRef.current || isProcessing) return;
 
     hasTriggeredRef.current = true;
@@ -302,6 +307,12 @@ export const useImportLogic = () => {
     return selectedStudyType === 2 ? "C" : "A";
   };
 
+  const isChineseMode = () => {
+    const type =
+      importMode === "existing" ? existingStudyType : selectedStudyType;
+    return type === 2;
+  };
+
   const prepareCardsForInsert = (row) => {
     const type =
       importMode === "existing" ? existingStudyType : selectedStudyType;
@@ -336,9 +347,27 @@ export const useImportLogic = () => {
   const allCards = useMemo(() => {
     if (!mappedColumns.front || !mappedColumns.back || fileContent.length === 0)
       return [];
-    return fileContent
+
+    const prepared = fileContent
       .map((row) => prepareCardsForInsert(row))
       .filter((c) => c.front?.trim() && c.back?.trim());
+
+    // For Chinese mode, validate that the mapped character column contains CJK
+    if (isChineseMode() && mappedColumns.front) {
+      const valid = prepared.filter((c) => hasCJKCharacter(c.front));
+      const skipped = prepared.length - valid.length;
+      if (skipped > 0) {
+        setCjkWarning(
+          `${skipped} ${skipped === 1 ? "row was" : "rows were"} skipped — no valid CJK character found in the Character column.`,
+        );
+      } else {
+        setCjkWarning(null);
+      }
+      return valid;
+    }
+
+    setCjkWarning(null);
+    return prepared;
   }, [fileContent, mappedColumns, selectedStudyType, importMode, targetDeckId]);
 
   const uploadCards = async (deckId, targetTable) => {
@@ -527,6 +556,7 @@ export const useImportLogic = () => {
     isProcessing,
     processingProgress,
     allCards,
+    cjkWarning,
     createDeck,
     createdDeckId,
     importResultDeckId,

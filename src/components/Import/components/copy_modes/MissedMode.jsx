@@ -1,6 +1,4 @@
-import React from "react";
-
-export function MissedLimitSlider({ logic, activeTheme }) {
+export function MissedMode({ logic, activeTheme }) {
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-center justify-between">

@@ -68,7 +68,7 @@ export function StepCopy1({ logic, activeTheme }) {
                   key={type.id}
                   type="button"
                   onClick={() => logic.selectCloneType(type.id)}
-                  className={`w-full text-left flex items-start gap-3 px-4 py-3 rounded-xl border transition-all outline-none
+                  className={`w-full text-left flex items-start gap-3 px-4 py-2 rounded-xl border transition-all outline-none
                     ${
                       isActive
                         ? `ring-2 ${activeTheme.ring.focus} ${activeTheme.border.secondary} ${activeTheme.background.canvas}`
@@ -76,7 +76,7 @@ export function StepCopy1({ logic, activeTheme }) {
                     }`}
                 >
                   <div
-                    className={`mt-0.5 w-7 h-7 rounded-lg flex items-center justify-center shrink-0
+                    className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0
                     ${isActive ? `${activeTheme.background.accent3} ${activeTheme.text.activeButton}` : `${activeTheme.background.secondary} ${activeTheme.text.muted}`}`}
                   >
                     <FontAwesomeIcon
@@ -84,20 +84,22 @@ export function StepCopy1({ logic, activeTheme }) {
                       className="text-xs"
                     />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p
+                  <div className="flex min-w-0 flex-col">
+                    <span
                       className={`text-sm font-semibold ${activeTheme.text.primary}`}
                     >
                       {type.label}
-                    </p>
-                    <p className={`text-xs mt-0.5 ${activeTheme.text.muted}`}>
+                    </span>
+                    <span
+                      className={`mt-0.5 text-xs ${activeTheme.text.muted}`}
+                    >
                       {type.description}
-                    </p>
+                    </span>
                   </div>
                   {isActive && (
                     <FontAwesomeIcon
                       icon={faCheckCircle}
-                      className={`mt-0.5 shrink-0 ${activeTheme.text.accent1}`}
+                      className={`shrink-0 ${activeTheme.text.accent1}`}
                     />
                   )}
                 </button>
