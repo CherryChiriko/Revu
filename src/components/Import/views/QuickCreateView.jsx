@@ -8,16 +8,12 @@ import { CopyDeck } from "../components/CopyDeck";
 export default function QuickCreateView({ activeTheme, mode, onClose }) {
   const navigate = useNavigate();
 
-  const handleClose = () => {
-    onClose();
-  };
+  if (mode !== "new" && mode !== "clone") return null;
 
   const handleDeckCreated = (deckId) => {
-    handleClose();
+    onClose();
     navigate(`/decks/${deckId}`);
   };
-
-  if (mode !== "new" && mode !== "clone") return null;
 
   return (
     <div
@@ -27,13 +23,13 @@ export default function QuickCreateView({ activeTheme, mode, onClose }) {
           ? "rgba(0, 0, 0, 0.5)"
           : "rgba(15, 23, 42, 0.3)",
       }}
-      onClick={(e) => e.target === e.currentTarget && handleClose()}
+      onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div
         className={`w-full max-w-md rounded-2xl shadow-xl overflow-hidden border
         ${activeTheme.background.secondary} ${activeTheme.border.secondary}`}
       >
-        {/* Header */}
+        {/* Unified Header */}
         <div
           className={`flex items-start justify-between px-6 pt-6 pb-2 border-b ${activeTheme.border.muted}`}
         >
@@ -41,20 +37,20 @@ export default function QuickCreateView({ activeTheme, mode, onClose }) {
             <h2
               className={`text-lg font-bold tracking-tight leading-tight ${activeTheme.text.primary}`}
             >
-              {mode === "new" ? "New Deck" : "Create From Deck"}
+              {mode === "new" ? "New Deck" : "Create from deck"}
             </h2>
             <p
               className={`text-xs mt-1 leading-snug font-medium ${activeTheme.text.muted}`}
             >
               {mode === "new"
                 ? "Create an empty deck and add cards later."
-                : "Create a new deck from a copy of an existing one."}
+                : "Select a deck and configure your copy options."}
             </p>
           </div>
 
           <button
             type="button"
-            onClick={handleClose}
+            onClick={onClose}
             className={`p-1.5 -mr-1.5 -mt-1 rounded-lg transition-colors outline-none focus:ring-2 ${activeTheme.link.hoverBg} ${activeTheme.ring.focus} ${activeTheme.text.secondary}`}
             aria-label="close"
           >
@@ -62,17 +58,12 @@ export default function QuickCreateView({ activeTheme, mode, onClose }) {
           </button>
         </div>
 
-        {/* Body */}
+        {/* Form Body Context Window */}
         <div className="px-6 pb-6 pt-4">
           {mode === "new" ? (
             <NewDeck activeTheme={activeTheme} onCreated={handleDeckCreated} />
           ) : (
-            <CopyDeck
-              activeTheme={activeTheme}
-              isOpen={true}
-              onClose={handleClose}
-              onCreated={handleDeckCreated}
-            />
+            <CopyDeck activeTheme={activeTheme} onCreated={handleDeckCreated} />
           )}
         </div>
       </div>

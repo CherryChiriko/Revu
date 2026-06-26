@@ -4,6 +4,7 @@ import { supabase } from "../../../utils/supabaseClient";
 import { selectDecks } from "../../../slices/deckSlice";
 import { fetchDecks } from "../../../slices/deckSlice";
 import { generateReading } from "../../Import/hooks/generateReading";
+import { TABLES, PROGRESS } from "../../../utils/constants";
 
 const INITIAL_FIELDS = { front: "", back: "", reading: "", audioUrl: "" };
 
@@ -53,9 +54,8 @@ export const useQuickCreateLogic = (onClose) => {
       } = await supabase.auth.getUser();
       if (userError || !user) throw new Error("Not authenticated.");
 
-      const targetTable = studyMode === "C" ? "cards_c" : "cards_a";
-      const progressTable =
-        studyMode === "C" ? "card_c_progress" : "card_a_progress";
+      const targetTable = TABLES[studyMode];
+      const progressTable = PROGRESS[studyMode];
 
       // Build card payload
       let cardPayload = {

@@ -21,7 +21,7 @@ import {
 } from "../../../slices/deckSlice";
 import CardDetail from "../components/CardDetail";
 import { DeckMenu } from "../components/DeckMenu"; // Ensure path matches your setup
-import { CHUNK_SIZE } from "../../../utils/constants";
+import { CHUNK_SIZE, PROGRESS } from "../../../utils/constants";
 
 const STATUS_FILTERS = ["new", "waiting", "due", "mastered", "suspended"];
 
@@ -171,7 +171,7 @@ export default function DeckDetails({ activeTheme }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const deckName = useSelector(selectDeckNameById(deckId));
+  // const deckName = useSelector(selectDeckNameById(deckId));
   const deck = useSelector((s) =>
     selectDecks(s).find((d) => d.deck_id === deckId || d.id === deckId),
   );
@@ -196,7 +196,7 @@ export default function DeckDetails({ activeTheme }) {
   const studyMode = deck?.study_mode || "A";
   const totalCardCount = Number(deck?.cards_count || 0);
   const totalPages = Math.max(0, Math.ceil(totalCardCount / CHUNK_SIZE));
-  const progressTable = `card_${studyMode.toLowerCase()}_progress`;
+  const progressTable = PROGRESS[studyMode];
 
   // ── Sync internal edit state when deck info loads/updates
   useEffect(() => {

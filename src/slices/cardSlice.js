@@ -2,17 +2,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { supabase } from "../utils/supabaseClient";
 import { getCardStatus } from "../utils/cardUtils";
-import { CHUNK_SIZE } from "../utils/constants";
-
-const TABLES = {
-  A: "cards_a",
-  C: "cards_c",
-};
-
-const PROGRESS = {
-  A: "card_a_progress",
-  C: "card_c_progress",
-};
+import { CHUNK_SIZE, PROGRESS, TABLES } from "../utils/constants";
 
 async function loadCardsForDeck({
   deck_id,

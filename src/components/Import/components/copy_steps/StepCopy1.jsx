@@ -5,16 +5,22 @@ import {
   faCheckCircle,
   faChevronDown,
 } from "@fortawesome/free-solid-svg-icons";
-import { selectCls } from "./SharedStyles";
+import { selectCls } from "../SharedStyles";
+import { TYPE_ICONS } from "../../../../utils/constants";
 
-export function StepDeck({ logic, activeTheme, TYPE_ICONS }) {
+const STUDY_MODES = {
+  A: "Standard",
+  C: "Character",
+};
+
+export function StepCopy1({ logic, activeTheme }) {
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-1">
         <p
           className={`text-xs font-semibold uppercase tracking-wider ${activeTheme.text.muted}`}
         >
-          Source deck
+          Original deck
         </p>
         <div className="relative w-full">
           <FontAwesomeIcon
@@ -34,7 +40,8 @@ export function StepDeck({ logic, activeTheme, TYPE_ICONS }) {
             </option>
             {logic.decks.map((d) => (
               <option key={d.deck_id} value={d.deck_id}>
-                {d.name} · {d.language} · Mode {d.study_mode}
+                {d.name} · {d.language} ·{" "}
+                {STUDY_MODES[d.study_mode.toUpperCase()]}
               </option>
             ))}
           </select>
@@ -49,9 +56,9 @@ export function StepDeck({ logic, activeTheme, TYPE_ICONS }) {
       {logic.selectedDeckId && (
         <div className="flex flex-col gap-1">
           <p
-            className={`text-xs font-semibold uppercase tracking-wider ${activeTheme.text.muted}`}
+            className={`text-xs font-semibold uppercase tracking-wider ${activeTheme.text.muted} mt-2`}
           >
-            Clone type
+            Copy type
           </p>
           <div className="space-y-2">
             {logic.availableTypes.map((type) => {
