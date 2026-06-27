@@ -17,7 +17,6 @@ export default function useDeckLogic(id, cards_count, { toast, activeTheme }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // ── Delete modal state ─────────────────────────────────────────────────────
   const [pendingDeleteDeck, setPendingDeleteDeck] = useState(null);
 
   const counts = useSelector(
@@ -48,26 +47,19 @@ export default function useDeckLogic(id, cards_count, { toast, activeTheme }) {
         if (!deckData || !deckData.study_mode) {
           throw new Error("Deck data is missing or invalid");
         }
-
         const table = "cards_" + deckData.study_mode.toLowerCase();
-
         const { error: cardsError } = await supabase
           .from(table)
           .delete()
           .eq("deck_id", id);
-
         if (cardsError) throw cardsError;
-
         const { error: decksError } = await supabase
           .from("decks")
           .delete()
           .eq("id", id);
-
         if (decksError) throw decksError;
-
         setPendingDeleteDeck(null);
         await dispatch(fetchDecks());
-
         toast?.current?.show({
           severity: "success",
           summary: "Deck deleted",
@@ -95,6 +87,12 @@ export default function useDeckLogic(id, cards_count, { toast, activeTheme }) {
 
       if (type === "learn" || type === "review") {
         navigate(`/study?mode=${type}`);
+        return;
+      }
+
+      if (type === "edit") {
+        // Navigate to detail page and signal it to open the editor
+        navigate(`/decks/${id}`, { state: { openEdit: true } });
         return;
       }
 

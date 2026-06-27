@@ -226,8 +226,9 @@ export default function DeckListView() {
           <div className="flex justify-center items-center mt-4 space-x-2">
             <button
               onClick={() => setPage(currentPage - 1)}
+              className={`inline-flex items-center gap-2 text-sm font-semibold px-3 py-1.5 rounded-xl border transition-colors ${activeTheme.border.secondary} ${activeTheme.text.secondary} hover:${activeTheme.background.canvas}`}
+              aria-label="Prev page"
               disabled={currentPage <= 1}
-              className={`${activeTheme.button.secondary} ${activeTheme.text.secondary} px-4 py-1 rounded-lg`}
             >
               Previous
             </button>
@@ -237,7 +238,8 @@ export default function DeckListView() {
             <button
               onClick={() => setPage(currentPage + 1)}
               disabled={currentPage >= totalPages}
-              className={`${activeTheme.button.secondary} ${activeTheme.text.secondary} px-4 py-1 rounded-lg`}
+              className={`inline-flex items-center gap-2 text-sm font-semibold px-3 py-1.5 rounded-xl border transition-colors ${activeTheme.border.secondary} ${activeTheme.text.secondary} hover:${activeTheme.background.canvas}`}
+              aria-label="Next page"
             >
               Next
             </button>

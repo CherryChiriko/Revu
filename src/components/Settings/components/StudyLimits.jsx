@@ -66,7 +66,6 @@ export function StudyLimitsSection({
         onChange={(v) => set("learnLimit", v)}
         activeTheme={activeTheme}
       />
-      <div className={`border-t ${activeTheme.border.card}`} />
       <p className={`${activeTheme.text.muted} text-xs mt-3`}>
         Complete at least this many reviews <em>or</em> new cards in a session
         to count it toward your daily streak.
