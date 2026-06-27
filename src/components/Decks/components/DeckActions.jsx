@@ -8,7 +8,8 @@ export function DeckActions({
   handleAction,
   activeTheme,
   due = 0,
-  large = false, // compact = false, full = true
+  newCount = 0,
+  large = false,
 }) {
   if (isMastered) {
     return (
@@ -21,37 +22,37 @@ export function DeckActions({
     );
   }
 
-  const sizeClasses = large
-    ? "flex-1 py-2 rounded-lg font-semibold flex items-center justify-center"
-    : "w-24 h-6 rounded-full flex items-center justify-center";
+  const largeClasses =
+    "flex-1 py-2 rounded-lg font-semibold flex items-center justify-center";
+
+  // Compact: pill badge with icon + count
+  const compactClasses =
+    "h-7 px-2.5 rounded-full flex items-center gap-1.5 text-xs font-semibold";
 
   return (
-    <div className={large ? "mt-3 flex space-x-3" : "flex space-x-3"}>
+    <div className={large ? "mt-3 flex space-x-3" : "flex space-x-2"}>
       {showLearn && (
         <button
           onClick={(e) => handleAction(e, "learn")}
-          className={`${activeTheme.button.primary} ${activeTheme.text.activeButton} ${sizeClasses}`}
+          className={`${activeTheme.button.primary} ${activeTheme.text.activeButton} ${large ? largeClasses : compactClasses}`}
         >
-          {large && <FontAwesomeIcon icon={faGraduationCap} className="mr-2" />}
-          {!large && (
-            <FontAwesomeIcon icon={faGraduationCap} className="h-3 w-3" />
-          )}
-          {large && "Learn"}
+          <FontAwesomeIcon
+            icon={faGraduationCap}
+            className={large ? "mr-2" : "w-3 h-3"}
+          />
+          Learn
         </button>
       )}
-
       {showReview && (
         <button
           onClick={(e) => handleAction(e, "review")}
-          className={`${activeTheme.button.accent} ${activeTheme.text.activeButton} ${sizeClasses}`}
+          className={`${activeTheme.button.accent} ${activeTheme.text.activeButton} ${large ? largeClasses : compactClasses}`}
         >
-          {large && (
-            <>
-              <FontAwesomeIcon icon={faRedo} className="mr-2" />
-              Review ({due})
-            </>
-          )}
-          {!large && <FontAwesomeIcon icon={faRedo} className="h-3 w-3" />}
+          <FontAwesomeIcon
+            icon={faRedo}
+            className={large ? "mr-2" : "w-3 h-3"}
+          />
+          {`Review (${due})`}
         </button>
       )}
     </div>

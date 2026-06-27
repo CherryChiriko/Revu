@@ -67,23 +67,10 @@ export function StudyLimitsSection({
         activeTheme={activeTheme}
       />
       <div className={`border-t ${activeTheme.border.card}`} />
-      <div>
-        <LabelledSlider
-          icon={faFire}
-          label="Daily streak goal"
-          value={settings.streakGoal}
-          min={5}
-          max={100}
-          step={5}
-          format={(v) => `${v} cards`}
-          onChange={(v) => set("streakGoal", v)}
-          activeTheme={activeTheme}
-        />
-        <p className={`${activeTheme.text.muted} text-xs mt-3`}>
-          Complete at least this many reviews <em>or</em> new cards in a session
-          to count it toward your daily streak.
-        </p>
-      </div>
+      <p className={`${activeTheme.text.muted} text-xs mt-3`}>
+        Complete at least this many reviews <em>or</em> new cards in a session
+        to count it toward your daily streak.
+      </p>
     </SettingCard>
   );
 }

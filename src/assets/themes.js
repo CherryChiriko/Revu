@@ -60,14 +60,7 @@ const themes = [
     gradients: {
       from: "from-indigo-500",
       to: "to-purple-500",
-      colors: [
-        "#111827",
-        "#0a2554",
-        "#0c2f83",
-        "#2e33b1",
-        "#5d2edb",
-        "#9400ff",
-      ],
+      colors: ["#111827", "#072c73", "#3d33bf", "#9400ff"],
     },
   },
   {
@@ -135,22 +128,7 @@ const themes = [
       from: "from-indigo-400",
       to: "to-purple-400",
 
-      // colors: [
-      //   "#FFDBFD",
-      //   "#efbff9",
-      //   "#daa4f8",
-      //   "#be8df9",
-      //   "#9878fc",
-      //   "#8084FF",
-      // ],
-      colors: [
-        "#D2A7FB",
-        "#c6a2fa",
-        "#ba9df9",
-        "#ac98f8",
-        "#9e94f7",
-        "#8E90F5",
-      ],
+      colors: ["#D2A7FB", "#be9ff9", "#a797f7", "#8E90F5"],
     },
   },
 ];

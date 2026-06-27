@@ -1,15 +1,14 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFire, faStar } from "@fortawesome/free-solid-svg-icons";
+import { faFire, faStar, faSnowflake } from "@fortawesome/free-solid-svg-icons";
 
-export function DeckBadges({
-  isMastered,
-  streak,
-  isStreakActive,
-  activeTheme,
-}) {
-  const activeColor = "text-amber-500 bg-amber-500/10"; // active streak color
-  const inactiveColor = "text-gray-400 bg-gray-400/10"; // inactive streak color
-  const frozenColor = "text-sky-300 bg-sky-300/10"; // frozen streak color
+export function DeckBadges({ isMastered, streak, streakState, activeTheme }) {
+  const colorMap = {
+    active: "text-amber-500 bg-amber-500/10",
+    inactive: "text-gray-400 bg-gray-400/10",
+    frozen: "text-sky-400 bg-sky-400/10",
+  };
+  const badgeColor = colorMap[streakState] || colorMap.inactive;
+  console.log(streakState, colorMap[streakState]);
 
   return (
     <>
@@ -23,11 +22,12 @@ export function DeckBadges({
 
       {!isMastered && streak > 0 && (
         <div
-          className={`flex items-center gap-1 ${
-            isStreakActive ? activeColor : inactiveColor
-          } text-xs font-semibold px-2 py-1 rounded-full`}
+          className={`flex items-center gap-1 ${badgeColor} text-xs font-semibold px-2 py-1 rounded-full`}
         >
-          <FontAwesomeIcon icon={faFire} /> {streak}
+          <FontAwesomeIcon
+            icon={streakState === "frozen" ? faSnowflake : faFire}
+          />{" "}
+          {streak}
         </div>
       )}
     </>

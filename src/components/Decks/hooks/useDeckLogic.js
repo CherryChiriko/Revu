@@ -25,10 +25,11 @@ export default function useDeckLogic(id, cards_count, { toast, activeTheme }) {
   );
 
   const streakData = useSelector(selectDeckStreakById(id));
-  const { streak, maxStreak, isStreakActive } = streakData || {
+  const { streak, maxStreak, isStreakActive, streakState } = streakData || {
     streak: 0,
     maxStreak: 0,
     isStreakActive: false,
+    streakState: "inactive",
   };
 
   const showLearn = counts.new > 0;
@@ -117,6 +118,7 @@ export default function useDeckLogic(id, cards_count, { toast, activeTheme }) {
       streak,
       maxStreak,
       isStreakActive,
+      streakState,
       pendingDeleteDeck,
       onConfirmDelete: () => deleteDeck(pendingDeleteDeck),
       onCancelDelete: () => setPendingDeleteDeck(null),
@@ -132,6 +134,7 @@ export default function useDeckLogic(id, cards_count, { toast, activeTheme }) {
       streak,
       maxStreak,
       isStreakActive,
+      streakState,
       pendingDeleteDeck,
       deleteDeck,
     ],

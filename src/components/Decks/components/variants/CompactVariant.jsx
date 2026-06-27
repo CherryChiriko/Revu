@@ -7,6 +7,7 @@ export default function CompactVariant({ deck, activeTheme, logic }) {
   const {
     handleAction,
     streak,
+    streakState,
     isMastered,
     isStreakActive,
     counts,
@@ -19,7 +20,6 @@ export default function CompactVariant({ deck, activeTheme, logic }) {
     <div className="relative">
       {/* Top Row: Name on the left, Badges & Menu on the right */}
       <div className="flex flex-row justify-between items-center mb-2 gap-4">
-        {/* Left Side: Name container. min-w-0 is CRITICAL for truncation inside flex */}
         <div className="min-w-0 flex-grow">
           <span
             className={`text-sm font-bold block truncate ${activeTheme.text.primary}`}
@@ -28,11 +28,10 @@ export default function CompactVariant({ deck, activeTheme, logic }) {
             {deck.name}
           </span>
         </div>
-
-        {/* Right Side: Badges and Menu grouped together */}
         <div className="flex items-center gap-2 flex-shrink-0">
           <DeckBadges
             streak={streak}
+            streakState={streakState}
             activeTheme={activeTheme}
             isMastered={isMastered}
             isStreakActive={isStreakActive}
@@ -59,6 +58,8 @@ export default function CompactVariant({ deck, activeTheme, logic }) {
           showReview={showReview}
           handleAction={handleAction}
           large={false}
+          newCount={counts.new}
+          due={counts.due}
         />
       </div>
     </div>
