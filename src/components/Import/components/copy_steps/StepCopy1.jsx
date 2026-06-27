@@ -1,10 +1,6 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faLayerGroup,
-  faCheckCircle,
-  faChevronDown,
-} from "@fortawesome/free-solid-svg-icons";
+import { faLayerGroup, faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import { selectCls } from "../SharedStyles";
 import { TYPE_ICONS } from "../../../../utils/constants";
 
@@ -62,22 +58,17 @@ export function StepCopy1({ logic, activeTheme }) {
           </p>
           <div className="space-y-2">
             {logic.availableTypes.map((type) => {
-              const isActive = logic.cloneTypeId === type.id;
               return (
                 <button
                   key={type.id}
                   type="button"
                   onClick={() => logic.selectCloneType(type.id)}
                   className={`w-full text-left flex items-start gap-3 px-4 py-2 rounded-xl border transition-all outline-none
-                    ${
-                      isActive
-                        ? `ring-2 ${activeTheme.ring.focus} ${activeTheme.border.secondary} ${activeTheme.background.canvas}`
-                        : `${activeTheme.border.secondary} ${activeTheme.background.canvas} ${activeTheme.link.hoverBg}`
-                    }`}
+                    ${`${activeTheme.border.secondary} ${activeTheme.background.canvas} ${activeTheme.link.hoverBg}`}`}
                 >
                   <div
                     className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0
-                    ${isActive ? `${activeTheme.background.accent3} ${activeTheme.text.activeButton}` : `${activeTheme.background.secondary} ${activeTheme.text.muted}`}`}
+                    ${`${activeTheme.background.secondary} ${activeTheme.text.muted}`}`}
                   >
                     <FontAwesomeIcon
                       icon={TYPE_ICONS[type.id]}
@@ -96,12 +87,6 @@ export function StepCopy1({ logic, activeTheme }) {
                       {type.description}
                     </span>
                   </div>
-                  {isActive && (
-                    <FontAwesomeIcon
-                      icon={faCheckCircle}
-                      className={`shrink-0 ${activeTheme.text.accent1}`}
-                    />
-                  )}
                 </button>
               );
             })}

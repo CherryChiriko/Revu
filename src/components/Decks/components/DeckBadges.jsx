@@ -9,7 +9,7 @@ export function DeckBadges({
 }) {
   const activeColor = "text-amber-500 bg-amber-500/10"; // active streak color
   const inactiveColor = "text-gray-400 bg-gray-400/10"; // inactive streak color
-  const frozenColor = "text-gray-300 bg-gray-300/10"; // frozen streak color
+  const frozenColor = "text-sky-300 bg-sky-300/10"; // frozen streak color
 
   return (
     <>

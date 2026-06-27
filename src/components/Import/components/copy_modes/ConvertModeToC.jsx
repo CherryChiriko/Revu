@@ -9,25 +9,29 @@ import { faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
  */
 export function ConvertModeToC({ activeTheme }) {
   return (
-    <div
-      className={`flex items-start gap-2.5 text-xs px-3 py-2.5 rounded-xl border ${activeTheme.border.secondary} ${activeTheme.background.canvas}`}
-    >
+    <div className={`flex items-start gap-2.5 text-xs px-3 py-2.5`}>
       <FontAwesomeIcon
         icon={faTriangleExclamation}
         className={`mt-0.5 shrink-0 ${activeTheme.text.muted}`}
       />
-      <p className={`${activeTheme.text.muted} text-pretty`}>
-        The{" "}
-        <span className={`font-semibold ${activeTheme.text.primary}`}>
-          front
-        </span>{" "}
-        of each card will become the Chinese character and the{" "}
-        <span className={`font-semibold ${activeTheme.text.primary}`}>
-          back
-        </span>{" "}
-        will become the meaning. Pinyin will be generated automatically. Cards
-        whose front doesn't contain a valid CJK character will be skipped.
-      </p>
+      <div className={`${activeTheme.text.muted} text-pretty flex flex-col`}>
+        <p>
+          The{" "}
+          <span className={`font-semibold ${activeTheme.text.primary}`}>
+            front
+          </span>{" "}
+          of each card will become the Chinese character and the{" "}
+          <span className={`font-semibold ${activeTheme.text.primary}`}>
+            back
+          </span>{" "}
+          will become the meaning.
+        </p>
+        <span>Pinyin will be generated automatically.</span>
+        <span>
+          Cards whose front doesn't contain a valid CJK character will be
+          skipped.
+        </span>
+      </div>
     </div>
   );
 }

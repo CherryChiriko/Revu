@@ -1,26 +1,30 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faChevronRight,
   faChevronDown,
+  faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
 import { C_FIELDS } from "../../hooks/useQuickCreate";
 import { selectCls } from "../SharedStyles";
 
 export function ConvertMode({ logic, activeTheme }) {
+  // Check if they are currently violating the unique constraint to show a helpful validation hint
+  const hasConflict = logic.frontField === logic.backField;
+
   return (
     <div className="flex flex-col gap-1 w-full">
       <p
         className={`text-xs font-semibold uppercase tracking-wider ${activeTheme.text.muted}`}
       >
-        Field mapping
+        Assign fields
       </p>
-      <p className={`text-xs ${activeTheme.text.muted} mb-1`}>
-        Choose which Chinese fields become the front and back of the new
-        standard cards.
-      </p>
+      <span className={`text-xs ${activeTheme.text.muted} mb-2`}>
+        Choose what should be the front and back of the new cards.
+      </span>
+
       <div className="grid grid-cols-2 gap-3">
-        <div className="flex flex-col gap-1">
+        {/* Front Field Select */}
+        <div className="flex flex-col">
           <p
             className={`text-[10px] font-bold uppercase tracking-wider ${activeTheme.text.muted}`}
           >
@@ -30,9 +34,10 @@ export function ConvertMode({ logic, activeTheme }) {
             <select
               value={logic.frontField}
               onChange={(e) => logic.setFrontField(e.target.value)}
-              className={selectCls(activeTheme)}
+              className={`${selectCls(activeTheme)} ${hasConflict ? `${activeTheme.ring.error}` : ""}`}
             >
-              {C_FIELDS.filter((f) => f.value !== logic.backField).map((f) => (
+              {/* REMOVED FILTER: All options are always visible */}
+              {C_FIELDS.map((f) => (
                 <option key={f.value} value={f.value}>
                   {f.label}
                 </option>
@@ -45,7 +50,9 @@ export function ConvertMode({ logic, activeTheme }) {
             </div>
           </div>
         </div>
-        <div className="flex flex-col gap-1">
+
+        {/* Back Field Select */}
+        <div className="flex flex-col">
           <p
             className={`text-[10px] font-bold uppercase tracking-wider ${activeTheme.text.muted}`}
           >
@@ -55,9 +62,10 @@ export function ConvertMode({ logic, activeTheme }) {
             <select
               value={logic.backField}
               onChange={(e) => logic.setBackField(e.target.value)}
-              className={selectCls(activeTheme)}
+              className={`${selectCls(activeTheme)} ${hasConflict ? `${activeTheme.ring.error}` : ""}`}
             >
-              {C_FIELDS.filter((f) => f.value !== logic.frontField).map((f) => (
+              {/* REMOVED FILTER: All options are always visible */}
+              {C_FIELDS.map((f) => (
                 <option key={f.value} value={f.value}>
                   {f.label}
                 </option>
@@ -72,15 +80,18 @@ export function ConvertMode({ logic, activeTheme }) {
         </div>
       </div>
 
-      <div
-        className={`mt-2 flex items-center gap-2 text-xs ${activeTheme.text.muted} px-3 py-2 rounded-lg ${activeTheme.background.canvas} border ${activeTheme.border.secondary}`}
-      >
-        <span className={`font-semibold ${activeTheme.text.primary}`}>
-          {C_FIELDS.find((f) => f.value === logic.frontField)?.label}
-        </span>
-        <FontAwesomeIcon icon={faChevronRight} className="text-[9px]" />
-        <span>{C_FIELDS.find((f) => f.value === logic.backField)?.label}</span>
-      </div>
+      {/* Optional: Add a subtle text danger so the user knows why the submit button went dead */}
+      {hasConflict && (
+        <div className={`${activeTheme.text.danger} flex flex-row gap-2 mt-2`}>
+          <FontAwesomeIcon
+            icon={faTriangleExclamation}
+            className="mt-0.5 shrink-0"
+          />
+          <span className="text-[11px]  mt-1 font-medium">
+            "Front" and "Back" fields must be different.
+          </span>
+        </div>
+      )}
     </div>
   );
 }

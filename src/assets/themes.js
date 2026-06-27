@@ -24,6 +24,7 @@ const themes = [
       muted: "text-gray-500",
       activeButton: "text-white",
       danger: "text-red-300",
+      warning: "text-amber-500",
       accent1: "text-sky-500",
       accent2: "text-purple-500",
       accent3: "text-indigo-500",
@@ -95,6 +96,7 @@ const themes = [
       muted: "text-gray-500",
       activeButton: "text-white",
       danger: "text-red-600",
+      warning: "text-amber-500",
       accent1: "text-sky-500",
       accent2: "text-purple-500",
       accent3: "text-purple-500",
@@ -109,6 +111,7 @@ const themes = [
     // New: Focus ring
     ring: {
       focus: "ring-indigo-600", // Focus ring color
+      error: "ring-red-500",
     },
 
     // Components (Buttons, Borders, Gradients)

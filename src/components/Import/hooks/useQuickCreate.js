@@ -14,7 +14,6 @@ export const ACTION_TYPES = [
     label: "Copy deck",
     description: "Make an exact copy of this deck.",
     compatibleModes: ["A", "C"],
-    // outputMode matches the source deck's mode — resolved at submit time
     outputMode: null,
   },
   {
@@ -36,20 +35,10 @@ export const ACTION_TYPES = [
     label: "Convert card type",
     description: "Switch between standard and character cards.",
     compatibleModes: ["A", "C"],
-    outputMode: null, // opposite of source — resolved at submit time
+    outputMode: null,
   },
-
-  // missed — deferred
-  // {
-  //   id: "missed",
-  //   label: "Difficult cards",
-  //   description: "A remedial deck built from your hardest cards.",
-  //   compatibleModes: ["A", "C"],
-  //   outputMode: "A",
-  // },
 ];
 
-// C→A field options
 export const C_FIELDS = [
   { value: "front", label: "Character" },
   { value: "back", label: "Meaning" },
@@ -62,16 +51,13 @@ export function useQuickCreate(onClose) {
   const dispatch = useDispatch();
   const decks = useSelector(selectDecks);
 
-  // Step 1 — source deck + clone type
   const [selectedDeckId, setSelectedDeckId] = useState("");
   const [cloneTypeId, setCloneTypeId] = useState(null);
 
-  // Step 2 — options per type
   const [newDeckName, setNewDeckName] = useState("");
-  const [frontField, setFrontField] = useState("front"); // C→A mapping
-  const [backField, setBackField] = useState("back"); // C→A mapping
+  const [frontField, setFrontField] = useState("front");
+  const [backField, setBackField] = useState("back");
 
-  // Submission state
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
@@ -82,16 +68,15 @@ export function useQuickCreate(onClose) {
   const selectedDeck = decks.find(
     (d) => String(d.deck_id) === String(selectedDeckId),
   );
-  const studyMode = selectedDeck?.study_mode ?? null; // "A" or "C"
+  const studyMode = selectedDeck?.study_mode ?? null;
 
-  // swap is only available for mode A; hide it for C
   const availableTypes = ACTION_TYPES.filter(
     (t) => !studyMode || t.compatibleModes.includes(studyMode),
-  ).filter((t) => !(t.id === "swap" && studyMode === "C"));
+  );
 
+  const clearError = () => setError(null);
   const cloneType = ACTION_TYPES.find((t) => t.id === cloneTypeId);
 
-  // Resolve the output mode for types whose outputMode is dynamic
   const resolvedOutputMode = (() => {
     if (!cloneType || !studyMode) return null;
     if (cloneType.outputMode) return cloneType.outputMode;
@@ -105,8 +90,9 @@ export function useQuickCreate(onClose) {
     cloneTypeId &&
     newDeckName.trim() !== "" &&
     (cloneTypeId !== "convert" ||
-      studyMode !== "C" || // A→C needs no extra field check
+      studyMode !== "C" ||
       (frontField && backField && frontField !== backField));
+  console.log("is valid? ", isValid);
 
   // ── Reset ─────────────────────────────────────────────────────────────────
 
@@ -126,10 +112,14 @@ export function useQuickCreate(onClose) {
     onClose();
   };
 
-  // ── Auto-suggest deck name when type is chosen ────────────────────────────
-
   const selectCloneType = (id) => {
     setCloneTypeId(id);
+    setError(null); // <-- Clear previous submission errors
+    setSkippedCount(0); // <-- Reset skip counts
+    // Reset convert fields to default values to instantly remove the duplicate warning
+    setFrontField("front");
+    setBackField("back");
+
     if (!selectedDeck) return;
     const base = selectedDeck.name;
     const suggestions = {
@@ -140,8 +130,6 @@ export function useQuickCreate(onClose) {
     };
     setNewDeckName(suggestions[id] ?? base);
   };
-
-  // ── Fetch ALL source cards (no pagination — clone needs everything) ────────
 
   const fetchAllSourceCards = async (deckId, mode) => {
     const table = TABLES[mode];
@@ -156,11 +144,6 @@ export function useQuickCreate(onClose) {
 
   // ── Build insert payload per clone type ───────────────────────────────────
 
-  /**
-   * Returns { cards, skipped }
-   * cards  — array ready for Supabase insert (without deck_id)
-   * skipped — count of rows dropped (CJK validation failures)
-   */
   const buildInsertPayload = (sourceCards, type, sourceMode) => {
     switch (type) {
       // ── simple: exact copy, same mode ─────────────────────────────────────
@@ -170,10 +153,11 @@ export function useQuickCreate(onClose) {
             cards: sourceCards.map((c) => ({
               front: c.front ?? "",
               back: c.back ?? "",
-              reading: c.reading ?? null,
+              // FIX: Checked snake_case property keys from Supabase structure
+              reading: c.reading ?? "",
               tones: c.tones ?? null,
-              strokeColors: c.strokeColors ?? null,
-              audioUrl: c.audioUrl ?? null,
+              strokeColors: c.stroke_colors ?? c.strokeColors ?? null,
+              audioUrl: c.audio_url ?? c.audioUrl ?? null,
               created_at: new Date(),
             })),
             skipped: 0,
@@ -183,7 +167,7 @@ export function useQuickCreate(onClose) {
           cards: sourceCards.map((c) => ({
             front: c.front ?? "",
             back: c.back ?? "",
-            audioUrl: c.audioUrl ?? null,
+            audioUrl: c.audio_url ?? c.audioUrl ?? null,
             created_at: new Date(),
           })),
           skipped: 0,
@@ -196,7 +180,7 @@ export function useQuickCreate(onClose) {
           cards: sourceCards.map((c) => ({
             front: c.back ?? "",
             back: c.front ?? "",
-            audioUrl: c.audioUrl ?? null,
+            audioUrl: c.audio_url ?? c.audioUrl ?? null,
             created_at: new Date(),
           })),
           skipped: 0,
@@ -209,13 +193,13 @@ export function useQuickCreate(onClose) {
             ...sourceCards.map((c) => ({
               front: c.front ?? "",
               back: c.back ?? "",
-              audioUrl: c.audioUrl ?? null,
+              audioUrl: c.audio_url ?? c.audioUrl ?? null,
               created_at: new Date(),
             })),
             ...sourceCards.map((c) => ({
               front: c.back ?? "",
               back: c.front ?? "",
-              audioUrl: c.audioUrl ?? null,
+              audioUrl: c.audio_url ?? c.audioUrl ?? null,
               created_at: new Date(),
             })),
           ],
@@ -224,40 +208,45 @@ export function useQuickCreate(onClose) {
 
       // ── convert ───────────────────────────────────────────────────────────
       case "convert": {
-        // C → A: user picks which C fields map to front/back
+        // C → A: No CJK validation required here
         if (sourceMode === "C") {
+          console.log("this is the first card ", sourceCards[0]);
           const mapped = sourceCards
             .map((c) => ({
-              front: c[frontField] ?? "",
-              back: c[backField] ?? "",
-              audioUrl: c.audioUrl ?? null,
+              front: String(c[frontField] ?? "").trim(),
+              back: String(c[backField] ?? "").trim(),
+              audioUrl: c.audio_url ?? c.audioUrl ?? null,
               created_at: new Date(),
             }))
-            .filter((c) => c.front.trim() !== "");
+            .filter((c) => c.front !== "");
           return { cards: mapped, skipped: 0 };
         }
 
-        // A → C: front must be a valid CJK character; generate pinyin
+        // A → C: ONLY validate CJK here (moving from standard A to character C)
         const valid = [];
         let skipped = 0;
         for (const c of sourceCards) {
           const character = (c.front ?? "").trim();
+
+          // Only validate characters if we are building a dynamic Character deck
           if (!hasCJKCharacter(character)) {
             skipped++;
             continue;
           }
+
           const { reading, strokeColors, tones } = generateReading(
             character,
             "Chinese",
             null,
           );
+
           valid.push({
             front: character,
             back: c.back ?? "",
-            reading: reading ?? null,
+            reading: reading ?? "",
             strokeColors: strokeColors ?? null,
             tones: tones ?? null,
-            audioUrl: c.audioUrl ?? null,
+            audioUrl: c.audio_url ?? c.audioUrl ?? null,
             created_at: new Date(),
           });
         }
@@ -284,11 +273,9 @@ export function useQuickCreate(onClose) {
       } = await supabase.auth.getUser();
       if (userErr || !user) throw new Error("Not authenticated.");
 
-      // 1. Fetch source cards
       const sourceCards = await fetchAllSourceCards(selectedDeckId, studyMode);
       if (!sourceCards.length) throw new Error("No cards found in this deck.");
 
-      // 2. Build insert payload
       const { cards: cardPayload, skipped } = buildInsertPayload(
         sourceCards,
         cloneTypeId,
@@ -300,11 +287,9 @@ export function useQuickCreate(onClose) {
       if (!cardPayload.length)
         throw new Error("No valid cards to clone with the selected options.");
 
-      // 3. Determine target table
       const targetTable = TABLES[resolvedOutputMode];
       const progressTable = PROGRESS[resolvedOutputMode];
 
-      // 4. Create the new deck
       const { data: newDeck, error: deckErr } = await supabase
         .from("decks")
         .insert([
@@ -331,7 +316,6 @@ export function useQuickCreate(onClose) {
 
       if (deckErr) throw deckErr;
 
-      // 5. Assign deck_id and insert cards in chunks
       const withDeckId = cardPayload.map((c) => ({
         ...c,
         deck_id: newDeck.id,
@@ -348,7 +332,6 @@ export function useQuickCreate(onClose) {
         insertedCards = [...insertedCards, ...data];
       }
 
-      // 6. Insert progress rows
       const progressRows = insertedCards.map((c) => ({
         user_id: user.id,
         card_id: c.id,
@@ -380,7 +363,6 @@ export function useQuickCreate(onClose) {
   };
 
   return {
-    // Data
     decks,
     selectedDeckId,
     setSelectedDeckId,
@@ -391,14 +373,12 @@ export function useQuickCreate(onClose) {
     cloneTypeId,
     cloneType,
     selectCloneType,
-    // Options
     newDeckName,
     setNewDeckName,
     frontField,
     setFrontField,
     backField,
     setBackField,
-    // Submission
     isValid,
     isSubmitting,
     error,
@@ -407,5 +387,6 @@ export function useQuickCreate(onClose) {
     submit,
     reset,
     handleClose,
+    clearError,
   };
 }

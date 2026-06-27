@@ -1,6 +1,4 @@
 import React from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { useQuickCreate } from "../hooks/useQuickCreate";
 import { SuccessView } from "./copy_steps/SuccessView";
 import { StepCopy1 } from "./copy_steps/StepCopy1";
@@ -11,7 +9,6 @@ export function CopyDeck({ activeTheme, onCreated }) {
   const logic = useQuickCreate(onCreated);
 
   const step = !logic.cloneTypeId ? 1 : 2;
-  const isNextDisabled = !logic.cloneTypeId;
   const isSubmitDisabled = !logic.isValid || logic.isSubmitting;
 
   if (logic.success) {
@@ -23,24 +20,16 @@ export function CopyDeck({ activeTheme, onCreated }) {
       {step === 1 ? (
         <>
           <StepCopy1 logic={logic} activeTheme={activeTheme} />
-          <div className="flex justify-end pt-2">
-            <button
-              disabled={isNextDisabled}
-              onClick={() => {}} /* State naturally changes inside step handlers */
-              className={`px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-1.5 ${activeTheme.text.activeButton} transition-all
-                ${isNextDisabled ? activeTheme.button.disabled : `bg-gradient-to-r ${activeTheme.gradients.from} ${activeTheme.gradients.to} hover:brightness-110`}`}
-            >
-              Next
-              <FontAwesomeIcon icon={faChevronRight} className="text-xs" />
-            </button>
-          </div>
         </>
       ) : (
         <>
           <StepCopy2 logic={logic} activeTheme={activeTheme} />
           <div className="flex justify-between pt-2">
             <button
-              onClick={() => logic.selectCloneType(null)}
+              onClick={() => {
+                logic.clearError(); // Wipes out Supabase/Network error states
+                logic.selectCloneType(null); // Safely sets type to null and strips field conflicts
+              }}
               className={`px-4 py-2 rounded-xl text-sm font-semibold border transition-colors ${activeTheme.border.card} ${activeTheme.text.secondary} ${activeTheme.link.hoverBg}`}
             >
               Back
