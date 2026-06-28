@@ -1,46 +1,34 @@
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { supabase } from "../../../utils/supabaseClient";
-import { selectDecks } from "../../../slices/deckSlice";
-import { fetchDecks } from "../../../slices/deckSlice";
-import { generateReading } from "../../Import/hooks/generateReading";
 import { TABLES, PROGRESS } from "../../../utils/constants";
+import { generateReading } from "../../Import/hooks/generateReading";
+import { appendCard } from "../../../slices/cardSlice";
 
 const INITIAL_FIELDS = { front: "", back: "", reading: "", audioUrl: "" };
 
-export const useQuickCreateLogic = (onClose) => {
+export const useAddCard = ({
+  deckId,
+  studyMode,
+  totalCardCount,
+  onSuccess,
+  onClose, // <─── 1. Pass onClose into your hook options hook parameter object
+}) => {
   const dispatch = useDispatch();
-  const decks = useSelector(selectDecks);
-
-  const [selectedDeckId, setSelectedDeckId] = useState("");
   const [fields, setFields] = useState(INITIAL_FIELDS);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(false);
-
-  const selectedDeck = decks.find(
-    (d) => String(d.deck_id) === String(selectedDeckId),
-  );
-
-  const studyMode = selectedDeck?.study_mode ?? null; // "A" | "C"
 
   const setField = (key, value) =>
     setFields((prev) => ({ ...prev, [key]: value }));
 
   const reset = () => {
-    setSelectedDeckId("");
     setFields(INITIAL_FIELDS);
     setError(null);
-    setSuccess(false);
-  };
-
-  const handleClose = () => {
-    reset();
-    onClose();
   };
 
   const isValid =
-    selectedDeckId && fields.front.trim() !== "" && fields.back.trim() !== "";
+    deckId && fields.front.trim() !== "" && fields.back.trim() !== "";
 
   const submit = async () => {
     if (!isValid || isSubmitting) return;
@@ -57,13 +45,12 @@ export const useQuickCreateLogic = (onClose) => {
       const targetTable = TABLES[studyMode];
       const progressTable = PROGRESS[studyMode];
 
-      // Build card payload
       let cardPayload = {
-        deck_id: selectedDeckId,
+        deck_id: deckId,
         front: fields.front.trim(),
         back: fields.back.trim(),
         audioUrl: fields.audioUrl.trim() || null,
-        created_at: new Date(),
+        created_at: new Date().toISOString(),
       };
 
       if (studyMode === "C") {
@@ -84,51 +71,53 @@ export const useQuickCreateLogic = (onClose) => {
       const { data: inserted, error: insertError } = await supabase
         .from(targetTable)
         .insert([cardPayload])
-        .select("id")
+        .select("*")
         .single();
 
       if (insertError) throw insertError;
 
       // Insert progress row
+      const defaultProgress = {
+        user_id: user.id,
+        card_id: inserted.id,
+        deck_id: deckId,
+        status: "new",
+        ease_factor: 2.5,
+        review_interval: 0,
+        repetitions: 0,
+        suspended: false,
+        due_date: null,
+        last_studied: null,
+      };
+
       const { error: progressError } = await supabase
         .from(progressTable)
-        .insert([
-          {
-            user_id: user.id,
-            card_id: inserted.id,
-            deck_id: selectedDeckId,
-            status: "new",
-            ease_factor: 2.5,
-            review_interval: 0,
-            repetitions: 0,
-            suspended: false,
-            due_date: null,
-            last_studied: null,
-          },
-        ]);
+        .insert([defaultProgress]);
 
       if (progressError) throw progressError;
 
-      // Bump deck counts (new_count, cards_count, active_cards_count)
-      // const { error: deckUpdateError } = await supabase.rpc(
-      //   "increment_deck_new_card",
-      //   { p_deck_id: selectedDeckId },
-      // );
+      // ─── 2. FORMAT COMPATIBILITY FIX ───
+      // Ensure the structural layout matches exactly what mappedCards emits
+      const UIReadyCard = {
+        ...inserted,
+        ...defaultProgress,
+        id: inserted.id, // Ensure component unique keys match
+        card_id: inserted.id, // Match structural references
+        status: "new", // Ensure card displays instantly under UI filters
+      };
 
-      // Fallback to manual update if RPC doesn't exist yet
-      // if (deckUpdateError) {
-      //   await supabase
-      //     .from("decks")
-      //     .update({
-      //       new_count: (selectedDeck.new ?? 0) + 1,
-      //       cards_count: (selectedDeck.cards_count ?? 0) + 1,
-      //       active_cards_count: (selectedDeck.active_cards_count ?? 0) + 1,
-      //     })
-      //     .eq("id", selectedDeckId);
-      // }
+      dispatch(appendCard(UIReadyCard));
 
-      await dispatch(fetchDecks()).unwrap();
-      setSuccess(true);
+      if (onSuccess) {
+        await onSuccess();
+      }
+
+      reset();
+
+      // ─── 3. AUTO CLOSE MODAL ───
+      if (onClose) {
+        onClose();
+      }
     } catch (err) {
       console.error("Quick create failed:", err);
       setError(err.message || "Something went wrong.");
@@ -137,20 +126,5 @@ export const useQuickCreateLogic = (onClose) => {
     }
   };
 
-  return {
-    decks,
-    selectedDeckId,
-    setSelectedDeckId,
-    selectedDeck,
-    studyMode,
-    fields,
-    setField,
-    isValid,
-    isSubmitting,
-    error,
-    success,
-    submit,
-    reset,
-    handleClose,
-  };
+  return { fields, setField, isValid, isSubmitting, error, submit, reset };
 };

@@ -255,6 +255,9 @@ const cardSlice = createSlice({
       state.status = "idle";
       state.error = null;
     },
+    appendCard(state, action) {
+      state.cards.push(action.payload);
+    },
     updateCardProgress(state, action) {
       const { cardId, updates } = action.payload;
       if (cardId !== -1) {
@@ -291,7 +294,7 @@ const cardSlice = createSlice({
   },
 });
 
-export const { clearCards, updateCardProgress } = cardSlice.actions;
+export const { clearCards, appendCard, updateCardProgress } = cardSlice.actions;
 
 export const selectCards = (state) => state.cards.cards;
 export const selectCardsStatus = (state) => state.cards.status;

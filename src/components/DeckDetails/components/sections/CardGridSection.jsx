@@ -1,8 +1,9 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
-import { EmptyTile } from "../CardTile"; // Standard path to your skeleton loaders
-import { STATUS_TILE } from "../SharedStyles";
+import { EmptyTile } from "../tiles/EmptyTile";
+import { CardTile } from "../tiles/CardTile";
+import { AddCardTile } from "../tiles/AddCardTile";
 
 export default function CardGridSection({
   cards,
@@ -12,61 +13,56 @@ export default function CardGridSection({
   totalCount,
   onLoadMore,
   onCardClick,
+  onAddCard,
   activeTheme,
 }) {
-  if (totalCount === 0) {
+  // Empty deck: show only the add tile with a hint
+  if (totalCount === 0 && !isLoading) {
     return (
-      <p className={`text-sm ${activeTheme.text.muted} py-12 text-center`}>
-        No cards in this deck yet.
-      </p>
+      <div className="space-y-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+          <AddCardTile onClick={onAddCard} activeTheme={activeTheme} />
+        </div>
+        <p className={`text-xs ${activeTheme.text.muted} text-center`}>
+          No cards yet — add your first one above.
+        </p>
+      </div>
     );
   }
 
   return (
     <div className="space-y-4">
       {isLoading && cards.length === 0 ? (
+        // Initial load: show skeletons (add tile not shown during first load)
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
           {Array.from({ length: 10 }).map((_, i) => (
             <EmptyTile key={i} activeTheme={activeTheme} />
           ))}
         </div>
-      ) : cards.length === 0 ? (
-        <p className={`text-sm ${activeTheme.text.muted} py-12 text-center`}>
-          No matching cards found or loaded yet.
-        </p>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-          {cards.map((card) => {
-            const status = card.suspended ? "suspended" : card.status;
-            const tile = STATUS_TILE[status] ?? STATUS_TILE.new;
-            return (
-              <button
-                key={card.card_id}
-                onClick={() => onCardClick(card)}
-                className={`group flex flex-col justify-between gap-2 min-h-[72px] rounded-xl border px-3 py-2.5 text-left text-xs font-medium transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 ${activeTheme.ring.focus} focus:ring-offset-1 ${activeTheme.background.secondary} ${activeTheme.border.secondary}`}
-              >
-                <span
-                  className={`line-clamp-3 text-xs leading-snug ${activeTheme.text.primary}`}
-                >
-                  {card.front}
-                </span>
-                <span
-                  className={`text-xs leading-snug ${activeTheme.text.secondary} line-clamp-1 opacity-60`}
-                >
-                  {card.back}
-                </span>
-                <span className="flex items-center gap-1">
-                  <span className={`size-1.5 rounded-full ${tile.dot}`} />
-                  <span
-                    className={`text-[9px] font-bold uppercase ${tile.text}`}
-                  >
-                    {tile.label}
-                  </span>
-                </span>
-              </button>
-            );
-          })}
+          {/* Add tile always first */}
+          <AddCardTile onClick={onAddCard} activeTheme={activeTheme} />
 
+          {cards.length === 0 ? (
+            // Filter active but no matches
+            <p
+              className={`col-span-full text-sm ${activeTheme.text.muted} py-8 text-center`}
+            >
+              No matching cards found or loaded yet.
+            </p>
+          ) : (
+            cards.map((card) => (
+              <CardTile
+                key={card.card_id}
+                card={card}
+                onClick={onCardClick}
+                activeTheme={activeTheme}
+              />
+            ))
+          )}
+
+          {/* Trailing skeletons while loading more pages */}
           {isLoading &&
             Array.from({ length: 5 }).map((_, i) => (
               <EmptyTile key={`skel-${i}`} activeTheme={activeTheme} />
@@ -74,7 +70,6 @@ export default function CardGridSection({
         </div>
       )}
 
-      {/* Pagination Actions Button Footer */}
       {hasMore && !isLoading && (
         <div className="flex flex-col items-center gap-1 pt-2">
           <p className={`text-xs tabular-nums ${activeTheme.text.muted}`}>
