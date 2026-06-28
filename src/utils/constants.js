@@ -25,3 +25,8 @@ export const PROGRESS = {
   A: "card_a_progress",
   C: "card_c_progress",
 };
+
+export const STUDY_MODES = {
+  A: "Standard",
+  C: "Character",
+};

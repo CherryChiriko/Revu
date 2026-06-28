@@ -5,7 +5,7 @@ import {
   faChevronDown,
 } from "@fortawesome/free-solid-svg-icons";
 import { useCreateNew } from "../hooks/useCreateNew";
-import { inputCls, selectCls } from "./SharedStyles";
+import { inputCls, selectCls } from "../../General/ui/FormStyles";
 
 const STUDY_MODES = [
   { value: "A", label: "Standard", description: "Front / Back flashcards" },

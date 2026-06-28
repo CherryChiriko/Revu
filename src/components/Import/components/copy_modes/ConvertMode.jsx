@@ -5,7 +5,7 @@ import {
   faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
 import { C_FIELDS } from "../../hooks/useQuickCreate";
-import { selectCls } from "../SharedStyles";
+import { selectCls } from "../../../General/ui/FormStyles";
 
 export function ConvertMode({ logic, activeTheme }) {
   // Check if they are currently violating the unique constraint to show a helpful validation hint

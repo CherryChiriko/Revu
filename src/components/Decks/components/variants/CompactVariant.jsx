@@ -1,7 +1,7 @@
 import { ProgressBar } from "../ProgressBar";
 import { DeckActions } from "../DeckActions";
 import { DeckBadges } from "../DeckBadges";
-import { DeckMenu } from "../DeckMenu";
+import { DeckMenu } from "../../../DeckMenu/components/DeckMenu";
 
 export default function CompactVariant({ deck, activeTheme, logic }) {
   const {

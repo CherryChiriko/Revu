@@ -15,7 +15,7 @@ import {
 import Header from "../../General/ui/Header";
 import { Toast } from "primereact/toast";
 
-import QuickCreateMenu from "./QuickCreateMenu";
+import QuickCreateMenu from "../../DeckMenu/views/QuickCreateMenu";
 import QuickCreateView from "../../Import/views/QuickCreateView";
 
 export default function DeckListView() {

@@ -4,7 +4,7 @@ import {
   faExclamationCircle,
   faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
-import { inputCls } from "../SharedStyles";
+import { inputCls } from "../../../General/ui/FormStyles";
 import { ConvertMode } from "../copy_modes/ConvertMode";
 import { ConvertModeToC } from "../copy_modes/ConvertModeToC";
 import { TYPE_ICONS } from "../../../../utils/constants";

@@ -5,7 +5,7 @@ import {
   faChevronDown,
 } from "@fortawesome/free-solid-svg-icons";
 import { C_FIELDS } from "../../hooks/useQuickCreate";
-import { selectCls } from "../SharedStyles";
+import { selectCls } from "../../../General/ui/FormStyles";
 
 export function FieldMapping({ logic, activeTheme }) {
   return (

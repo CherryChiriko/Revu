@@ -2,7 +2,7 @@ import React from "react";
 import useDeckLogic from "../hooks/useDeckLogic";
 import FullVariant from "./variants/FullVariant";
 import CompactVariant from "./variants/CompactVariant";
-import DeckDelete from "./DeckDelete";
+import DeckDelete from "../../DeckMenu/components/DeckDelete";
 
 function DeckCardItem({ deck, activeTheme, variant, toast, highlightedId }) {
   const logic = useDeckLogic(deck.id, deck.cards_count || 0, {
