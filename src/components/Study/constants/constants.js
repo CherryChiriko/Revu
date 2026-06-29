@@ -1,6 +1,3 @@
-export const LEARN_LIMIT = 1;
-export const REVIEW_LIMIT = 2;
-
 export const PHASES = {
   A: [
     { displayState: "animation", allowRating: false },

@@ -5,7 +5,7 @@ import { PROGRESS } from "../../../utils/constants";
 import DeckHeaderSection from "../components/sections/DeckHeaderSection";
 import DeckStatsSection from "../components/sections/DeckStatsSection";
 import CardGridSection from "../components/sections/CardGridSection";
-import CardDetail from "../../Decks/components/CardDetail";
+import CardDetails from "../../CardDetails/views/CardDetails";
 import { AddCardMenu } from "../components/AddCardMenu";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
@@ -70,7 +70,7 @@ export default function DeckDetails({ activeTheme }) {
 
       {/* Card detail drawer */}
       {selectedCard && (
-        <CardDetail
+        <CardDetails
           card={selectedCard}
           deckId={deckId}
           userId={state.userId}

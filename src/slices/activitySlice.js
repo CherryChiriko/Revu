@@ -3,15 +3,10 @@ import {
   createSelector,
   createAsyncThunk,
 } from "@reduxjs/toolkit";
-import {
-  REVIEW_LIMIT,
-  LEARN_LIMIT,
-} from "../components/Study/constants/constants";
 import { supabase } from "../utils/supabaseClient";
 
-/* -------------------------------------------
-   Helper Functions
--------------------------------------------- */
+export const selectSettingsState = (state) => state.settings;
+
 /* -------------------------------------------
    Helper Functions
 -------------------------------------------- */
@@ -223,15 +218,17 @@ export const selectTotalActivity = createSelector(
 
 // Heatmap data (original implementation)
 export const selectHeatmapData = createSelector(
-  [selectActivityDays],
-  (days) => {
+  [selectActivityDays, selectSettingsState],
+  (days, settings) => {
+    // Graceful fallback defaults if settings are still hydrating
+    const reviewLimit = settings?.reviewLimit || 20;
+    const learnLimit = settings?.learnLimit || 5;
+
     return Object.values(days)
       .map((d) => {
         const objective = Math.round(
-          Math.max(
-            d.cardsReviewed / REVIEW_LIMIT,
-            d.cardsLearned / LEARN_LIMIT,
-          ) * 100,
+          Math.max(d.cardsReviewed / reviewLimit, d.cardsLearned / learnLimit) *
+            100,
         );
         const percent = Math.min(100, objective);
         return {

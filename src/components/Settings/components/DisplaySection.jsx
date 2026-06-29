@@ -2,13 +2,13 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { SettingCard, SegmentButton } from "../SettingsTemplates";
 import { updateSettings } from "../../../slices/settingsSlice";
+import { updateLocalProfile } from "../../../slices/userSlice";
 import { supabase } from "../../../utils/supabaseClient";
 import { useSettingSave } from "../hooks/useSettingsSave";
 import {
   faCalendarDays,
   faLayerGroup,
   faRotate,
-  faChartSimple,
 } from "@fortawesome/free-solid-svg-icons";
 
 export function DisplaySection({ profile, settings, activeTheme, dispatch }) {
@@ -28,6 +28,13 @@ export function DisplaySection({ profile, settings, activeTheme, dispatch }) {
         dateFormat: settings.dateFormat,
         defaultDeckView: settings.defaultDeckView,
         heatmapMetric: settings.heatmapMetric,
+      }),
+    );
+    dispatch(
+      updateLocalProfile({
+        date_format: settings.dateFormat,
+        default_deck_view: settings.defaultDeckView,
+        heatmap_metric: settings.heatmapMetric,
       }),
     );
   });

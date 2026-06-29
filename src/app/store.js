@@ -6,7 +6,10 @@ import streakReducer, { clearStreak } from "../slices/streakSlice";
 import userReducer from "../slices/userSlice";
 import progressReducer from "../slices/progressSlice";
 import activityReducer, { resetActivity } from "../slices/activitySlice";
-import settingsReducer from "../slices/settingsSlice";
+import settingsReducer, {
+  getPersistableSettings,
+  SETTINGS_STORAGE_KEY,
+} from "../slices/settingsSlice";
 import { getTodayISO } from "../utils/dateHelper";
 
 const checkMidnightReset = () => {
@@ -49,4 +52,25 @@ export const store = configureStore({
     activity: activityReducer,
     settings: settingsReducer,
   },
+});
+
+let previousPersistedSettings = JSON.stringify(
+  getPersistableSettings(store.getState().settings),
+);
+
+store.subscribe(() => {
+  try {
+    if (typeof localStorage === "undefined") return;
+
+    const nextPersistedSettings = JSON.stringify(
+      getPersistableSettings(store.getState().settings),
+    );
+
+    if (nextPersistedSettings !== previousPersistedSettings) {
+      localStorage.setItem(SETTINGS_STORAGE_KEY, nextPersistedSettings);
+      previousPersistedSettings = nextPersistedSettings;
+    }
+  } catch (error) {
+    console.error("Failed to persist settings", error);
+  }
 });

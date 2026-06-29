@@ -1,9 +1,7 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
 import { supabase } from "../../../utils/supabaseClient";
 import { TABLES, PROGRESS } from "../../../utils/constants";
 import { generateReading } from "../../Import/hooks/generateReading";
-import { appendCard } from "../../../slices/cardSlice";
 
 const INITIAL_FIELDS = { front: "", back: "", reading: "", audioUrl: "" };
 
@@ -12,9 +10,8 @@ export const useAddCard = ({
   studyMode,
   totalCardCount,
   onSuccess,
-  onClose, // <─── 1. Pass onClose into your hook options hook parameter object
+  onClose,
 }) => {
-  const dispatch = useDispatch();
   const [fields, setFields] = useState(INITIAL_FIELDS);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -67,7 +64,7 @@ export const useAddCard = ({
         };
       }
 
-      // Insert card
+      // 1. Insert core card contents
       const { data: inserted, error: insertError } = await supabase
         .from(targetTable)
         .insert([cardPayload])
@@ -76,45 +73,34 @@ export const useAddCard = ({
 
       if (insertError) throw insertError;
 
-      // Insert progress row
-      const defaultProgress = {
-        user_id: user.id,
-        card_id: inserted.id,
-        deck_id: deckId,
-        status: "new",
-        ease_factor: 2.5,
-        review_interval: 0,
-        repetitions: 0,
-        suspended: false,
-        due_date: null,
-        last_studied: null,
-      };
-
+      // 2. Insert progress row
       const { error: progressError } = await supabase
         .from(progressTable)
-        .insert([defaultProgress]);
+        .insert([
+          {
+            user_id: user.id,
+            card_id: inserted.id,
+            deck_id: deckId,
+            status: "new",
+            ease_factor: 2.5,
+            review_interval: 0,
+            repetitions: 0,
+            suspended: false,
+            due_date: null,
+            last_studied: null,
+          },
+        ]);
 
       if (progressError) throw progressError;
 
-      // ─── 2. FORMAT COMPATIBILITY FIX ───
-      // Ensure the structural layout matches exactly what mappedCards emits
-      const UIReadyCard = {
-        ...inserted,
-        ...defaultProgress,
-        id: inserted.id, // Ensure component unique keys match
-        card_id: inserted.id, // Match structural references
-        status: "new", // Ensure card displays instantly under UI filters
-      };
-
-      dispatch(appendCard(UIReadyCard));
-
+      // ─── 3. EXECUTE PARENT REFETCH LOGIC FIRST ───
       if (onSuccess) {
         await onSuccess();
       }
 
       reset();
 
-      // ─── 3. AUTO CLOSE MODAL ───
+      // ─── 4. CLOSE MODAL AFTER SUCCESSFUL REFETCH ───
       if (onClose) {
         onClose();
       }
