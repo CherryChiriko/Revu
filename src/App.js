@@ -87,16 +87,6 @@ const AppRoutes = ({
           />
         }
       />
-      <Route
-        path="account"
-        element={
-          <SettingsAccountPage
-            profile={profile}
-            activeTheme={activeTheme}
-            dispatch={dispatch}
-          />
-        }
-      />
     </Route>
     <Route
       path="/reset-password"

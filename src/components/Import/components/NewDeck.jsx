@@ -6,180 +6,112 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useCreateNew } from "../hooks/useCreateNew";
 import { inputCls, selectCls } from "../../General/ui/FormStyles";
+import { FormField } from "../../General/ui/FormField";
 
 const STUDY_MODES = [
-  { value: "A", label: "Standard", description: "Front / Back flashcards" },
-  {
-    value: "C",
-    label: "Character",
-    description: "Characters, pinyin, strokes",
-  },
+  { value: "A", label: "Standard" },
+  { value: "C", label: "Character" },
 ];
 
 export function NewDeck({ activeTheme, onCreated }) {
-  // Consume our isolated logic hook
-  const {
-    name,
-    setName,
-    language,
-    setLanguage,
-    studyMode,
-    setStudyMode,
-    description,
-    setDescription,
-    tags,
-    setTags,
-    isSaving,
-    error,
-    isValid,
-    handleCreate,
-  } = useCreateNew(onCreated);
-
-  const isButtonDisabled = !isValid || isSaving;
+  const state = useCreateNew(onCreated);
+  const baseInputCls = inputCls(activeTheme);
+  const isButtonDisabled = !state.isValid || state.isSaving;
 
   return (
     <div className="space-y-4">
       {/* Name */}
-      <div className="flex flex-col gap-1">
-        <p
-          className={`text-xs font-semibold uppercase tracking-wider ${activeTheme.text.muted}`}
-        >
-          Deck name <span className={activeTheme.text.danger}>*</span>
-        </p>
+      <FormField label="Deck name" required activeTheme={activeTheme}>
         <input
           type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={state.name}
+          onChange={(e) => state.setName(e.target.value)}
           placeholder="Enter deck name"
-          className={inputCls(activeTheme)}
+          className={baseInputCls}
           autoFocus
         />
-      </div>
+      </FormField>
 
-      {/* Language + Study mode side by side */}
+      {/* Language + Card Type Side-by-Side Flex Grid */}
       <div className="flex gap-3 w-full">
-        <div className="flex flex-col gap-1 flex-1">
-          <p
-            className={`text-xs font-semibold uppercase tracking-wider ${activeTheme.text.muted}`}
-          >
-            Language <span className={activeTheme.text.danger}>*</span>
-          </p>
-          <input
-            type="text"
-            value={language}
-            onChange={(e) => setLanguage(e.target.value)}
-            placeholder="Enter target language"
-            className={inputCls(activeTheme)}
-          />
+        <div className="flex-1">
+          <FormField label="Language" required activeTheme={activeTheme}>
+            <input
+              type="text"
+              value={state.language}
+              onChange={(e) => state.setLanguage(e.target.value)}
+              placeholder="Enter target language"
+              className={baseInputCls}
+            />
+          </FormField>
         </div>
-        <div className="flex flex-col gap-1 flex-1">
-          <p
-            className={`text-xs font-semibold uppercase tracking-wider ${activeTheme.text.muted}`}
-          >
-            Card type
-          </p>
-          <div className="relative w-full">
-            <select
-              value={studyMode}
-              onChange={(e) => setStudyMode(e.target.value)}
-              className={selectCls(activeTheme)}
-            >
-              {STUDY_MODES.map((m) => (
-                <option key={m.value} value={m.value}>
-                  {m.label}
-                </option>
-              ))}
-            </select>
-            <div
-              className={`absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none ${activeTheme.text.muted}`}
-            >
-              <FontAwesomeIcon icon={faChevronDown} className="w-3 h-3" />
+
+        <div className="flex-1">
+          <FormField label="Card type" activeTheme={activeTheme}>
+            <div className="relative w-full">
+              <select
+                value={state.studyMode}
+                onChange={(e) => state.setStudyMode(e.target.value)}
+                className={selectCls(activeTheme)}
+              >
+                {STUDY_MODES.map((m) => (
+                  <option key={m.value} value={m.value}>
+                    {m.label}
+                  </option>
+                ))}
+              </select>
+              <div
+                className={`absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none ${activeTheme.text.muted}`}
+              >
+                <FontAwesomeIcon icon={faChevronDown} className="w-3 h-3" />
+              </div>
             </div>
-          </div>
+          </FormField>
         </div>
       </div>
 
       {/* Description */}
-      <div className="flex flex-col gap-2">
-        <p
-          className={`text-xs font-semibold uppercase tracking-wider ${activeTheme.text.muted}`}
-        >
-          Description
-        </p>
+      <FormField label="Description" activeTheme={activeTheme}>
         <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          value={state.description}
+          onChange={(e) => state.setDescription(e.target.value)}
           placeholder="Optional description…"
           rows={2}
-          className={`${inputCls(activeTheme)} resize-none`}
+          className={`${baseInputCls} resize-none`}
         />
-      </div>
+      </FormField>
 
       {/* Tags */}
-      <div className="flex flex-col gap-1">
-        <p
-          className={`text-xs font-semibold uppercase tracking-wider ${activeTheme.text.muted}`}
-        >
-          Tags
-        </p>
+      <FormField label="Tags" activeTheme={activeTheme}>
         <input
           type="text"
-          value={tags}
-          onChange={(e) => setTags(e.target.value)}
-          onBlur={(e) => {
-            const rawValue = e.target.value;
-            if (!rawValue.trim()) return;
-
-            const tagArray = rawValue
-              .split(",")
-              .map((t) => t.trim())
-              .filter(Boolean);
-
-            const uniqueTags = [];
-            const seen = new Set();
-
-            tagArray.forEach((tag) => {
-              const lower = tag.toLowerCase();
-              if (!seen.has(lower)) {
-                seen.add(lower);
-                uniqueTags.push(tag);
-              }
-            });
-
-            setTags(uniqueTags.join(", "));
-          }}
+          value={state.tags}
+          onChange={(e) => state.setTags(e.target.value)}
           placeholder="tag1, tag2, tag3"
-          className={inputCls(activeTheme)}
+          className={baseInputCls}
         />
-      </div>
+      </FormField>
 
-      {error && (
+      {state.error && (
         <div
           className={`flex items-center gap-1 text-xs ${activeTheme.text.danger}`}
         >
           <FontAwesomeIcon icon={faExclamationCircle} />
-          {error}
+          {state.error}
         </div>
       )}
 
       <button
-        onClick={handleCreate}
+        onClick={state.handleCreate}
         disabled={isButtonDisabled}
-        className={`w-full mt-5 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all
+        className={`w-full mt-2 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all
           ${
             isButtonDisabled
               ? activeTheme.button.disabled
               : `bg-gradient-to-r ${activeTheme.gradients.from} ${activeTheme.gradients.to} ${activeTheme.text.activeButton} opacity-100 hover:brightness-110`
           }`}
       >
-        {isSaving ? (
-          <>
-            <span className="animate-spin inline-block w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full" />
-            Creating…
-          </>
-        ) : (
-          <>Create deck</>
-        )}
+        {state.isSaving ? "Creating…" : "Create deck"}
       </button>
     </div>
   );

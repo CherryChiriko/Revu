@@ -1,33 +1,60 @@
+import React, { useState } from "react";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
 import { SettingCard } from "../SettingsTemplates";
+import AccountEditView from "../views/AccountEditView"; // Path to your new modal component
 
-export function AccountSection({ profile, activeTheme }) {
+export function AccountSection({ profile, activeTheme, dispatch }) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
-    <SettingCard icon={faUser} title="Account" activeTheme={activeTheme}>
-      <div className="space-y-4">
-        <div>
-          <p className="text-xs uppercase tracking-wider text-slate-400">
-            Username
-          </p>
-          <p className="font-semibold text-sm">
-            {profile?.username ?? "Not set"}
-          </p>
+    <>
+      <SettingCard icon={faUser} title="Account" activeTheme={activeTheme}>
+        <div className="space-y-4 text-left">
+          {/* Username Snapshot Display */}
+          <div>
+            <p
+              className={`text-[10px] font-black uppercase tracking-widest ${activeTheme.text.muted ?? "text-slate-400"}`}
+            >
+              Username
+            </p>
+            <p className={`font-semibold text-sm ${activeTheme.text.primary}`}>
+              {profile?.username ?? "Not set"}
+            </p>
+          </div>
+
+          {/* Email Snapshot Display */}
+          <div>
+            <p
+              className={`text-[10px] font-black uppercase tracking-widest ${activeTheme.text.muted ?? "text-slate-400"}`}
+            >
+              Email
+            </p>
+            <p className={`font-semibold text-sm ${activeTheme.text.primary}`}>
+              {profile?.email ?? "Not set"}
+            </p>
+          </div>
         </div>
-        <div>
-          <p className="text-xs uppercase tracking-wider text-slate-400">
-            Email
-          </p>
-          <p className="font-semibold text-sm">{profile?.email ?? "Not set"}</p>
+
+        {/* Action Button Segment Layer formatted exactly like the SettingCard footer wrapper */}
+        <div className="pt-2">
+          <button
+            type="button"
+            onClick={() => setIsModalOpen(true)}
+            className={`w-full py-2 rounded-lg font-semibold text-sm transition-colors active:scale-[0.99] ${activeTheme.button.accent2}`}
+          >
+            Manage account
+          </button>
         </div>
-        <Link
-          to="account"
-          style={{ textDecoration: "none" }}
-          className={`inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold ${activeTheme.button.accent2}`}
-        >
-          Manage account
-        </Link>
-      </div>
-    </SettingCard>
+      </SettingCard>
+
+      {/* Account Edit Modal Window Layer */}
+      <AccountEditView
+        profile={profile}
+        activeTheme={activeTheme}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        dispatch={dispatch}
+      />
+    </>
   );
 }

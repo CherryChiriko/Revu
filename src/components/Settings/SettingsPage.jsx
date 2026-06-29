@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
-import { AccountEdit } from "./components/AccountEdit";
 import { AvatarSection } from "./components/AvatarSection";
 import { StudyLimitsSection } from "./components/StudyLimits";
 import { ThemeSection } from "./components/ThemeSection";
@@ -89,12 +88,6 @@ export function SettingsAccountPage({ profile, activeTheme, dispatch }) {
           <FontAwesomeIcon icon={faArrowLeft} className="text-xs px-2" /> Back
         </button>
       </div>
-
-      <AccountEdit
-        profile={profile}
-        activeTheme={activeTheme}
-        dispatch={dispatch}
-      />
     </div>
   );
 }

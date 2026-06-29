@@ -1,4 +1,5 @@
 import React from "react";
+import { FormField } from "../../General/ui/FormField";
 
 export function CardEdit({
   editFront,
@@ -13,12 +14,7 @@ export function CardEdit({
 }) {
   return (
     <div className="space-y-5">
-      <div className="space-y-1.5">
-        <label
-          className={`text-[10px] font-black uppercase tracking-widest ${activeTheme.text.accent3}`}
-        >
-          Front
-        </label>
+      <FormField label="Front" activeTheme={activeTheme}>
         <input
           type="text"
           value={editFront}
@@ -27,14 +23,9 @@ export function CardEdit({
           className={inputCls}
           autoFocus
         />
-      </div>
+      </FormField>
 
-      <div className="space-y-1.5">
-        <label
-          className={`text-[10px] font-black uppercase tracking-widest ${activeTheme.text.accent3}`}
-        >
-          Back / Meaning
-        </label>
+      <FormField label="Back / Meaning" activeTheme={activeTheme}>
         <textarea
           value={editBack}
           onChange={(e) => setEditBack(e.target.value)}
@@ -42,15 +33,14 @@ export function CardEdit({
           rows={3}
           className={`${inputCls} resize-none`}
         />
-      </div>
+      </FormField>
 
       {isC && (
-        <div className="space-y-1.5">
-          <label
-            className={`text-[10px] font-black uppercase tracking-widest ${activeTheme.text.accent3}`}
-          >
-            Reading (Pinyin)
-          </label>
+        <FormField
+          label="Reading (Pinyin)"
+          hint="Changing the character will regenerate tones and stroke colours automatically."
+          activeTheme={activeTheme}
+        >
           <input
             type="text"
             value={editReading}
@@ -58,11 +48,7 @@ export function CardEdit({
             placeholder="e.g. nǐ hǎo  (auto-generated if blank)"
             className={inputCls}
           />
-          <p className={`text-[10px] ${activeTheme.text.muted}`}>
-            Changing the character will regenerate tones and stroke colours
-            automatically.
-          </p>
-        </div>
+        </FormField>
       )}
     </div>
   );
