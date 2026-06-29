@@ -6,23 +6,38 @@ import {
   faRepeat,
 } from "@fortawesome/free-solid-svg-icons";
 
-const MetaRow = ({ icon, label, value, activeTheme }) => (
-  <div className="flex items-center justify-between gap-4">
-    <span
-      className={`flex items-center gap-2 text-xs ${activeTheme.text.muted}`}
-    >
-      <FontAwesomeIcon icon={icon} className="w-3 h-3" />
-      {label}
-    </span>
-    <span
-      className={`text-xs font-semibold ${activeTheme.text.secondary} text-right`}
-    >
-      {value}
-    </span>
-  </div>
-);
+import { STATUS_TILE } from "../../DeckDetails/components/SharedStyles";
+
+const getCardStrengthLabel = (easeFactor, status) => {
+  if (status === "new") return "New card";
+  const ef = Number(easeFactor);
+
+  if (ef < 1.7) return "Challenging";
+  if (ef < 2.2) return "Getting There";
+  if (ef <= 2.6) return "Good";
+  return "Mastered 🎉";
+};
+
+const MetaRow = ({ icon, label, value, activeTheme }) => {
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <span
+        className={`flex items-center gap-2 text-xs ${activeTheme.text.muted}`}
+      >
+        <FontAwesomeIcon icon={icon} className="w-3 h-3" />
+        {label}
+      </span>
+      <span
+        className={`text-xs font-semibold ${activeTheme.text.secondary} text-right`}
+      >
+        {value}
+      </span>
+    </div>
+  );
+};
 
 export function CardInfo({ card, isC, activeTheme }) {
+  const tile = STATUS_TILE[card.status] ?? STATUS_TILE.new;
   return (
     <>
       <section className="space-y-1.5">
@@ -77,40 +92,41 @@ export function CardInfo({ card, isC, activeTheme }) {
 
       <section className="space-y-3">
         <label
-          className={`text-[10px] font-black uppercase tracking-widest ${activeTheme.text.accent3}`}
+          className={`text-[10px] font-black uppercase tracking-widest ${activeTheme.text.secondary}`}
         >
           Card info
         </label>
+        <div>
+          <span className="flex items-center gap-1">
+            <span className={`size-1.5 rounded-full ${tile.dot}`} />
+            <span className={`text-xs font-bold uppercase ${tile.text}`}>
+              {tile.label}
+            </span>
+          </span>
+        </div>
+
         <div className="space-y-2.5">
-          {card.due_date && (
-            <MetaRow
-              icon={faCalendarDays}
-              label="Due"
-              value={new Date(card.due_date).toLocaleDateString()}
-              activeTheme={activeTheme}
-            />
-          )}
           {card.ease_factor != null && (
             <MetaRow
               icon={faGaugeHigh}
-              label="Ease factor"
-              value={Number(card.ease_factor).toFixed(2)}
+              label="Recall score"
+              value={getCardStrengthLabel(card.ease_factor, card.status)}
               activeTheme={activeTheme}
             />
           )}
           {card.repetitions != null && (
             <MetaRow
               icon={faRepeat}
-              label="Repetitions"
+              label="Times studied"
               value={card.repetitions}
               activeTheme={activeTheme}
             />
           )}
-          {card.review_interval != null && (
+          {card.due_date && (
             <MetaRow
               icon={faCalendarDays}
-              label="Interval"
-              value={`${card.review_interval} day${card.review_interval !== 1 ? "s" : ""}`}
+              label="Due date for review"
+              value={new Date(card.due_date).toLocaleDateString()}
               activeTheme={activeTheme}
             />
           )}
