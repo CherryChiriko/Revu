@@ -1,19 +1,22 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import Header from "../../General/ui/Header";
 import CardRenderer from "../../Study/components/Card/CardRenderer";
 import SessionComplete from "../components/Modals/SessionComplete";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { Bar } from "../../General/ui/Bar";
+import { selectSettings } from "../../../slices/settingsSlice";
 
 const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
   const navigate = useNavigate();
 
-  React.useEffect(() => {
-    console.log("[SessionMode] MOUNTED");
-    return () => console.log("[SessionMode] UNMOUNTED");
-  }, []);
+  const settings = useSelector(selectSettings);
+  const autoFlipEnabled = settings.autoflipModeA ?? false;
+  // autoflipSpeed is stored in seconds; FlipCard expects milliseconds
+  const autoFlipDelay = (settings.autoflipSpeed ?? 3) * 1000;
+  const strokeAnimationSpeed = settings.characterAnimationSpeed ?? 1;
 
   const {
     currentCard,
@@ -30,7 +33,6 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
     exitSession,
   } = session;
 
-  // SessionMode.jsx
   const [previousCardId, setPreviousCardId] = React.useState(currentCard?.id);
   const [isTransitioning, setIsTransitioning] = React.useState(false);
   const [sessionResetCount, setSessionResetCount] = React.useState(0);
@@ -38,23 +40,19 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
 
   React.useEffect(() => {
     if (!isTransitioning) return;
-
     if (transitionTimeoutRef.current) {
       window.clearTimeout(transitionTimeoutRef.current);
       transitionTimeoutRef.current = null;
     }
-
     if (currentCard?.id && currentCard?.id !== previousCardId) {
       setIsTransitioning(false);
       setPreviousCardId(currentCard.id);
       return;
     }
-
     transitionTimeoutRef.current = window.setTimeout(() => {
       setIsTransitioning(false);
       transitionTimeoutRef.current = null;
     }, 1000);
-
     return () => {
       if (transitionTimeoutRef.current) {
         window.clearTimeout(transitionTimeoutRef.current);
@@ -92,7 +90,7 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
         className={`min-h-screen ${activeTheme.background.app} ${activeTheme.text.primary} w-full`}
       >
         <div className="max-w-screen-xl mx-auto px-4 md:px-8 py-8">
-          <Header title={`${activeDeck.name}`} />
+          <Header title={activeDeck.name} />
           <div className="h-96 flex items-center justify-center">
             <p className="text-xl animate-pulse">Loading next card…</p>
           </div>
@@ -123,18 +121,12 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
     );
   }
 
-  console.log("[SessionMode render]", {
-    currentCard: currentCard?.id,
-    phase: currentPhase?.displayState,
-    sessionFinished,
-  });
-
   return (
     <div
       className={`min-h-screen ${activeTheme.background.app} ${activeTheme.text.primary} w-full`}
     >
       <div className="max-w-screen-xl mx-auto px-4 md:px-8 py-8">
-        <Header title={`${activeDeck.name}`} />
+        <Header title={activeDeck.name} />
 
         <header className="flex justify-between items-center mb-10">
           <button
@@ -166,6 +158,9 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
             onReveal={onReveal}
             onRate={handleRate}
             onPassComplete={handlePassComplete}
+            autoFlipEnabled={autoFlipEnabled}
+            autoFlipDelay={autoFlipDelay}
+            strokeAnimationSpeed={strokeAnimationSpeed}
           />
         </div>
       </div>

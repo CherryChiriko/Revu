@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import RatingButtons from "../Controls/RatingButtons";
 import RevealButton from "../Controls/RevealButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -6,26 +6,11 @@ import { faFastForward } from "@fortawesome/free-solid-svg-icons";
 
 const CardStyles = () => (
   <style>{`
-    .perspective {
-      perspective: 1000px;
-    }
-    .preserve-3d {
-      transform-style: preserve-3d;
-    }
-    .backface-hidden {
-      backface-visibility: hidden;
-    }
-    .rotate-y-180 {
-      transform: rotateY(180deg);
-    }
-    .rotate-y-0 {
-      transform: rotateY(0deg);
-    }
-    .slide-out-right {
-      transform: translateX(120%) rotateZ(10deg);
-      opacity: 0;
-      transition: transform 0.5s ease, opacity 0.5s ease;
-    }
+    .perspective { perspective: 1000px; }
+    .preserve-3d { transform-style: preserve-3d; }
+    .backface-hidden { backface-visibility: hidden; }
+    .rotate-y-180 { transform: rotateY(180deg); }
+    .rotate-y-0 { transform: rotateY(0deg); }
   `}</style>
 );
 
@@ -38,42 +23,50 @@ const FlipCard = ({
   onPassComplete,
   autoFlipEnabled = false,
   autoFlipDelay = 3000,
-  autoAdvanceDelay = 3000,
 }) => {
   const [showAnswer, setShowAnswer] = useState(false);
+  const timerRef = useRef(null);
 
-  // Auto-flip front in animation mode
+  const clearTimer = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  };
+
+  // Reset flip state whenever the card changes
+  useEffect(() => {
+    clearTimer();
+    setShowAnswer(false);
+  }, [card?.id]);
+
+  // Autoflip: animation mode only, front → back after delay
   useEffect(() => {
     if (!autoFlipEnabled) return;
-    let frontTimer;
-    if (displayState === "animation" && !showAnswer) {
-      frontTimer = setTimeout(() => setShowAnswer(true), autoFlipDelay);
-    }
-    return () => clearTimeout(frontTimer);
-  }, [displayState, showAnswer, autoFlipDelay, autoFlipEnabled]);
+    if (displayState !== "animation") return;
+    if (showAnswer) return; // already flipped
 
-  // Auto-advance after back
-  useEffect(() => {
-    if (!autoFlipEnabled) return;
-    let backTimer;
-    if ((displayState === "animation" || !allowRating) && showAnswer) {
-      backTimer = setTimeout(() => handleNext(), autoAdvanceDelay);
-    }
-    return () => clearTimeout(backTimer);
-  }, [
-    displayState,
-    showAnswer,
-    allowRating,
-    onPassComplete,
-    autoAdvanceDelay,
-    autoFlipEnabled,
-  ]);
+    clearTimer();
+    timerRef.current = setTimeout(() => {
+      setShowAnswer(true);
+    }, autoFlipDelay);
 
-  const handleReveal = () => setShowAnswer(true);
+    return clearTimer;
+  }, [autoFlipEnabled, displayState, showAnswer, autoFlipDelay, card?.id]);
+
+  // Cleanup on unmount
+  useEffect(() => clearTimer, []);
+
+  const handleReveal = () => {
+    clearTimer();
+    setShowAnswer(true);
+  };
+
   const handleNext = () => {
     setShowAnswer(false);
     onPassComplete?.();
   };
+
   const handleRate = (rating) => {
     setShowAnswer(false);
     onRate?.(rating);
@@ -98,8 +91,9 @@ const FlipCard = ({
               {card?.front}
             </span>
 
+            {/* Animation mode: show "Show" button; autoflip will also trigger if enabled */}
             {!showAnswer && displayState === "animation" && (
-              <div className="absolute bottom-8 w-full flex justify-center space-x-4 px-8">
+              <div className="absolute bottom-8 w-full flex justify-center px-8">
                 <button
                   onClick={handleReveal}
                   className={`px-6 py-3 rounded-full font-semibold ${activeTheme.button.primary} ${activeTheme.text.primary} transition-all duration-300 shadow-lg hover:shadow-xl`}
@@ -108,8 +102,10 @@ const FlipCard = ({
                 </button>
               </div>
             )}
+
+            {/* Quiz mode: reveal button */}
             {!showAnswer && displayState === "quiz" && (
-              <div className="absolute bottom-8 w-full flex justify-center space-x-4 px-8">
+              <div className="absolute bottom-8 w-full flex justify-center px-8">
                 <RevealButton
                   onReveal={handleReveal}
                   activeTheme={activeTheme}
@@ -131,6 +127,8 @@ const FlipCard = ({
                 </p>
               </div>
             )}
+
+            {/* User controls the back — no auto-advance */}
             {showAnswer && allowRating && <RatingButtons onRate={handleRate} />}
             {showAnswer && !allowRating && (
               <button

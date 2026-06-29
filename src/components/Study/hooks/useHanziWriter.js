@@ -1,8 +1,7 @@
 import { useEffect, useRef } from "react";
 
-const WRITER_CONFIG = {
+const BASE_WRITER_CONFIG = {
   padding: 5,
-  strokeAnimationSpeed: 2,
   delayBetweenStrokes: 100,
   drawingColor: "rgba(0,0,0,0)",
   highlightWrongColor: "#ff4d4d",
@@ -15,6 +14,7 @@ export function useHanziWriter({
   activeTheme,
   strokeColor,
   revealed,
+  strokeAnimationSpeed = 1,
   width,
   height,
 }) {
@@ -26,56 +26,58 @@ export function useHanziWriter({
   const writerRef = useRef(null);
   const generationRef = useRef(0);
 
-  // Create writer only when character changes
+  // ── Create writer when character or visual config changes ─────────────────
+  // strokeAnimationSpeed is a create-time config in HanziWriter — the writer
+  // must be recreated when it changes.
   useEffect(() => {
     if (!character || !window.HanziWriter || !containerRef.current) return;
+
     containerRef.current.innerHTML = "";
+
     const writer = window.HanziWriter.create(containerRef.current, character, {
-      ...WRITER_CONFIG,
+      ...BASE_WRITER_CONFIG,
+      strokeAnimationSpeed,
       strokeColor,
       outlineColor,
       highlightColor: strokeColor,
       width,
       height,
     });
+
     writerRef.current = writer;
+
     return () => {
       writerRef.current = null;
       if (containerRef.current) {
         containerRef.current.innerHTML = "";
       }
     };
-  }, [character, strokeColor, outlineColor, width, height]);
+  }, [
+    character,
+    strokeColor,
+    outlineColor,
+    strokeAnimationSpeed,
+    width,
+    height,
+  ]);
 
-  // Control display state
+  // ── Control display state ─────────────────────────────────────────────────
   useEffect(() => {
     const writer = writerRef.current;
     if (!writer) return;
 
-    // Increment FIRST, then capture — this generation is now "current"
     generationRef.current += 1;
     const generation = generationRef.current;
 
-    // If a manual reveal was triggered, show the character immediately
-    // and skip other state handling. This guarantees Continue->reveal
-    // works in both outline and quiz phases.
+    // Manual reveal overrides everything — show character immediately
     if (revealed) {
       writer.cancelQuiz();
       writer.showOutline();
       writer.showCharacter();
-      console.log("[useHanziWriter effect] forced reveal");
       return;
     }
 
-    // Ensure that quiz mode is handled next
     const resolvedState = displayState === "quiz" ? "quiz" : displayState;
-
-    console.log("[useHanziWriter effect]", {
-      displayState,
-      revealed,
-      resolvedState,
-      generation,
-    });
 
     switch (resolvedState) {
       case "animation":
@@ -88,10 +90,8 @@ export function useHanziWriter({
         writer.cancelQuiz();
         writer.hideCharacter();
         writer.showOutline();
-        // Start a quiz, but force the background outline to stay visible!
         writer.quiz({
           onComplete: () => {
-            console.log("[Outline Trace] Tracing complete!");
             onQuizComplete?.();
           },
         });
@@ -104,18 +104,7 @@ export function useHanziWriter({
         writer.quiz({
           showOutline: false,
           onComplete: (summary) => {
-            if (generationRef.current !== generation) {
-              console.log("[quiz onComplete] stale, ignoring", {
-                generation,
-                current: generationRef.current,
-              });
-              return;
-            }
-            console.log("[quiz onComplete] firing", {
-              character,
-              displayState,
-              summary,
-            });
+            if (generationRef.current !== generation) return;
             onQuizComplete?.(summary?.totalMistakes ?? 0);
           },
         });

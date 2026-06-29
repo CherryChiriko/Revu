@@ -1,10 +1,9 @@
+import React from "react";
 import CharacterCard from "./CharacterCard";
 import FlipCard from "./FlipCard";
 import NotFound404 from "../../../404";
 
-/* Maps mistake count to an SRS rating  */
 const getRatingFromMistakes = (mistakes) => {
-  // console.log("mistakes", mistakes);
   if (mistakes === 2) return "hard";
   if (mistakes === 1) return "good";
   if (mistakes === 0) return "easy";
@@ -20,6 +19,11 @@ const CardRenderer = ({
   onReveal,
   onRate,
   onPassComplete,
+  // Mode A autoflip settings
+  autoFlipEnabled = false,
+  autoFlipDelay = 3000,
+  // Mode C animation speed
+  strokeAnimationSpeed = 1,
 }) => {
   switch (study_mode) {
     case "A":
@@ -31,6 +35,8 @@ const CardRenderer = ({
           onRate={onRate}
           allowRating={allowRating}
           onPassComplete={onPassComplete}
+          autoFlipEnabled={autoFlipEnabled}
+          autoFlipDelay={autoFlipDelay}
         />
       );
     case "C":
@@ -44,6 +50,7 @@ const CardRenderer = ({
           allowRating={allowRating}
           getRatingFromMistakes={getRatingFromMistakes}
           onPassComplete={onPassComplete}
+          strokeAnimationSpeed={strokeAnimationSpeed}
         />
       );
     default:

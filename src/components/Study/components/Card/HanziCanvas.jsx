@@ -8,12 +8,8 @@ const HanziCanvas = ({
   activeTheme,
   strokeColor,
   revealed,
+  strokeAnimationSpeed = 1,
 }) => {
-  React.useEffect(() => {
-    console.log("[HanziCanvas] MOUNTED", character);
-    return () => console.log("[HanziCanvas] UNMOUNTED", character);
-  }, []);
-
   const { containerRef } = useHanziWriter({
     character,
     displayState,
@@ -21,6 +17,7 @@ const HanziCanvas = ({
     activeTheme,
     strokeColor,
     revealed,
+    strokeAnimationSpeed,
     width: 250,
     height: 250,
   });
@@ -28,23 +25,12 @@ const HanziCanvas = ({
   const bgColor = activeTheme?.background?.canvas ?? "bg-white";
   const borderColor = activeTheme?.border?.card ?? "border-gray-200";
 
-  console.log(
-    "[HanziCanvas] Rendered with character:",
-    character,
-    "displayState:",
-    displayState,
-  );
-
   return (
     <div className="flex flex-col items-center justify-center h-full w-full">
       <div
         ref={containerRef}
-        className={`${bgColor} border-4 ${borderColor} rounded-xl shadow-lg transition-all duration-300`}
-        style={{
-          width: "250px",
-          height: "250px",
-          position: "relative", // ensures SVG sits inside
-        }}
+        className={`${bgColor} border-4 ${borderColor} rounded-xl shadow-md transition-all duration-300`}
+        style={{ width: "250px", height: "250px", position: "relative" }}
         role="region"
         aria-label="Character writing canvas"
       />

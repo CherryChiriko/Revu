@@ -24,14 +24,12 @@ export function StudyLimitsSection({
       p_user_id: profile.id,
       p_review_limit: settings.reviewLimit,
       p_learn_limit: settings.learnLimit,
-      p_streak_goal: settings.streakGoal,
     });
     if (error) throw error;
     dispatch(
       updateLocalProfile({
         review_limit: settings.reviewLimit,
         learn_limit: settings.learnLimit,
-        streak_goal: settings.streakGoal,
       }),
     );
   });
@@ -66,9 +64,9 @@ export function StudyLimitsSection({
         onChange={(v) => set("learnLimit", v)}
         activeTheme={activeTheme}
       />
-      <p className={`${activeTheme.text.muted} text-xs mt-3`}>
-        Complete at least this many reviews <em>or</em> new cards in a session
-        to count it toward your daily streak.
+      <p className={`${activeTheme.text.muted} text-xs mt-1`}>
+        Complete at least your review <em>or</em> learning session to keep your
+        daily streak going.
       </p>
     </SettingCard>
   );
