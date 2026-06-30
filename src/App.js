@@ -10,7 +10,6 @@ import {
 import { selectSettings } from "./slices/settingsSlice";
 import {
   clearDecks,
-  selectActiveDeck,
   selectDeckStatus,
   selectDeckError,
 } from "./slices/deckSlice";
@@ -30,10 +29,7 @@ import DeckListView from "./components/Decks/views/DeckListView";
 import DeckDetails from "./components/DeckDetails/views/DeckDetails";
 import ImportView from "./components/Import/views/ImportView";
 import StudySession from "./components/Study/views/StudySession";
-import {
-  SettingsPage,
-  SettingsAccountPage,
-} from "./components/Settings/SettingsPage";
+import { SettingsPage } from "./components/Settings/SettingsPage";
 import SettingsView from "./components/Settings/views/SettingsView";
 import ActivityPage from "./components/Activity/ActivityPage";
 import LoginPage from "./components/LoginPage";

@@ -2,6 +2,20 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "../utils/supabaseClient";
 import { useDispatch } from "react-redux";
 import { resetAllUserState } from "../app/store";
+import { SETTINGS_STORAGE_KEY } from "../slices/settingsSlice";
+
+/**
+ * Clears all user-specific localStorage entries before Redux reset.
+ * Must run BEFORE resetAllUserState so that loadPersistedSettings()
+ * inside settingsSlice doesn't re-hydrate stale values on the next login.
+ */
+function clearUserLocalStorage() {
+  try {
+    localStorage.removeItem(SETTINGS_STORAGE_KEY);
+  } catch (e) {
+    console.error("[clearUserLocalStorage] failed:", e);
+  }
+}
 
 export default function useAuth() {
   const dispatch = useDispatch();
@@ -12,7 +26,6 @@ export default function useAuth() {
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
 
-  // Keep track of the current user to prevent redundant state wipes on token refresh
   const currentUserIdRef = useRef(null);
 
   useEffect(() => {
@@ -29,9 +42,7 @@ export default function useAuth() {
         }
       } catch (err) {
         console.error("Failed to get session:", err);
-        if (mounted) {
-          setLoading(false);
-        }
+        if (mounted) setLoading(false);
       }
     };
 
@@ -45,28 +56,20 @@ export default function useAuth() {
       const nextSession = data?.session ?? null;
       const nextUserId = nextSession?.user?.id || null;
 
-      console.log("[useAuth] onAuthStateChange", {
-        event,
-        userId: nextUserId,
-        sessionExists: !!nextSession,
-      });
-
-      // 💥 THE FIX: Only reset the Redux store if the authentication state actually transitioned to a completely different user identity.
       if (event === "SIGNED_OUT") {
-        console.log("[useAuth] User signed out. Clearing store.");
+        // Clear localStorage FIRST so resetAllUserState picks up clean defaults
+        clearUserLocalStorage();
         dispatch(resetAllUserState());
         currentUserIdRef.current = null;
       } else if (event === "SIGNED_IN") {
         if (nextUserId && nextUserId !== currentUserIdRef.current) {
-          console.log(
-            "[useAuth] Genuine new login detected. Resetting store for new user context.",
-          );
+          // Different user — clear previous user's cached settings before reset
+          clearUserLocalStorage();
           dispatch(resetAllUserState());
           currentUserIdRef.current = nextUserId;
         }
       }
 
-      // Update local state safely
       setSession(nextSession);
 
       if (event === "SIGNED_IN" && !nextSession) {
@@ -85,29 +88,22 @@ export default function useAuth() {
     };
   }, [dispatch]);
 
-  // SIGNUP
   const signup = useCallback(async (username, email, password) => {
     setAuthLoading(true);
     setError(null);
     setSuccessMessage(null);
-
     try {
-      if (!username || !email || !password) {
+      if (!username || !email || !password)
         throw new Error("All fields are required");
-      }
-      if (password.length < 6) {
+      if (password.length < 6)
         throw new Error("Password must be at least 6 characters");
-      }
 
       const { data: existingUser } = await supabase
         .from("profiles")
         .select("id")
         .eq("username", username)
         .single();
-
-      if (existingUser) {
-        throw new Error("Username already exists");
-      }
+      if (existingUser) throw new Error("Username already exists");
 
       const { data: authData, error: signUpError } = await supabase.auth.signUp(
         {
@@ -116,7 +112,6 @@ export default function useAuth() {
           options: { data: { username } },
         },
       );
-
       if (signUpError) throw signUpError;
       if (!authData.user) throw new Error("Failed to create user");
 
@@ -129,17 +124,12 @@ export default function useAuth() {
           global_max_streak: 0,
         },
       ]);
-
       if (profileError) throw profileError;
 
       setSuccessMessage("Account created successfully! Logging you in...");
 
       const { data: loginData, error: loginError } =
-        await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
+        await supabase.auth.signInWithPassword({ email, password });
       if (loginError) throw loginError;
       if (!loginData.session) throw new Error("Login failed after signup");
 
@@ -152,37 +142,30 @@ export default function useAuth() {
     }
   }, []);
 
-  // LOGIN
   const login = useCallback(async (username, password) => {
     setAuthLoading(true);
     setError(null);
     setSuccessMessage(null);
-
     try {
-      if (!username || !password) {
+      if (!username || !password)
         throw new Error("Username and password are required");
-      }
 
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("email")
         .eq("username", username)
         .single();
-
-      if (profileError || !profile) {
+      if (profileError || !profile)
         throw new Error("Invalid username or password");
-      }
 
       const { data: authData, error: signInError } =
         await supabase.auth.signInWithPassword({
           email: profile.email,
           password,
         });
-
       if (signInError) throw signInError;
-      if (!authData.session) {
+      if (!authData.session)
         throw new Error("Login failed. Please check your credentials.");
-      }
 
       setSuccessMessage("Login successful!");
       return true;
@@ -194,26 +177,19 @@ export default function useAuth() {
     }
   }, []);
 
-  // RESET PASSWORD
   const resetPassword = useCallback(async (email) => {
     setAuthLoading(true);
     setError(null);
     setSuccessMessage(null);
-
     try {
-      if (!email) {
-        throw new Error("Email is required");
-      }
-
+      if (!email) throw new Error("Email is required");
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(
         email,
         {
           redirectTo: `${window.location.origin}/reset-password`,
         },
       );
-
       if (resetError) throw resetError;
-
       setSuccessMessage("Password reset email sent. Check your inbox.");
       return true;
     } catch (err) {
@@ -224,33 +200,28 @@ export default function useAuth() {
     }
   }, []);
 
-  // LOGOUT
   const logout = useCallback(async () => {
     setSession(null);
     currentUserIdRef.current = null;
     setLoading(false);
     setAuthLoading(false);
     await supabase.auth.signOut();
+    // onAuthStateChange SIGNED_OUT handler clears localStorage + Redux
   }, []);
 
-  // DELETE ACCOUNT
   const deleteAccount = useCallback(async () => {
     setAuthLoading(true);
     setError(null);
-
     try {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) {
-        throw new Error("No user logged in");
-      }
+      if (!user) throw new Error("No user logged in");
 
       const { error: profileDeleteError } = await supabase
         .from("profiles")
         .delete()
         .eq("id", user.id);
-
       if (profileDeleteError) throw profileDeleteError;
 
       await supabase.auth.signOut();
