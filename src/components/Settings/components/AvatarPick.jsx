@@ -1,7 +1,12 @@
 import React, { useRef, useState, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUpload, faXmark, faCheck } from "@fortawesome/free-solid-svg-icons";
+import {
+  faUpload,
+  faXmark,
+  faCheck,
+  faTrash,
+} from "@fortawesome/free-solid-svg-icons";
 import { supabase } from "../../../utils/supabaseClient";
 import { updateSettings } from "../../../slices/settingsSlice";
 import { updateLocalProfile } from "../../../slices/userSlice";
@@ -175,6 +180,21 @@ export function AvatarPick({
     [history, apply],
   );
 
+  // ── Remove currently active uploaded photo ───────────────────────────────
+
+  const removeActivePhoto = useCallback(async () => {
+    if (!activeUrl) return;
+    const entry = history.find((h) => h.url === activeUrl);
+    if (entry) {
+      await supabase.storage.from("avatars").remove([entry.path]);
+    }
+    const nextHistory = history.filter((h) => h.url !== activeUrl);
+    // Fall back to next history photo, or revert to initial
+    const nextUrl = nextHistory[0]?.url ?? null;
+    const nextIcon = nextUrl ? activeIcon : initial;
+    apply({ url: nextUrl, history: nextHistory, icon: nextIcon });
+  }, [activeUrl, history, activeIcon, initial, apply]);
+
   // ── Preset avatar (transparent PNG — color shows through) ─────────────────
 
   const selectPreset = useCallback(
@@ -226,26 +246,38 @@ export function AvatarPick({
         <div
           className={`flex items-center justify-center py-4 rounded-xl ${activeTheme.background.canvas}`}
         >
-          <div
-            className="size-20 rounded-2xl overflow-hidden flex items-center justify-center text-3xl font-black text-white shadow-lg transition-all duration-200"
-            style={{
-              backgroundColor: isPhotoMode ? "transparent" : activeColor,
-            }}
-          >
-            {isPhotoMode ? (
-              <img
-                src={activeUrl}
-                alt="avatar"
-                className="w-full h-full object-cover"
-              />
-            ) : isPresetMode ? (
-              <img
-                src={activeIcon}
-                alt="avatar"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              activeIcon || initial
+          <div className="relative">
+            <div
+              className="size-20 rounded-2xl overflow-hidden flex items-center justify-center text-3xl font-black text-white shadow-lg transition-all duration-200"
+              style={{
+                backgroundColor: isPhotoMode ? "transparent" : activeColor,
+              }}
+            >
+              {isPhotoMode ? (
+                <img
+                  src={activeUrl}
+                  alt="avatar"
+                  className="w-full h-full object-cover"
+                />
+              ) : isPresetMode ? (
+                <img
+                  src={activeIcon}
+                  alt="avatar"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                activeIcon || initial
+              )}
+            </div>
+            {/* Trash button — only shown when a photo is active */}
+            {isPhotoMode && (
+              <button
+                onClick={removeActivePhoto}
+                aria-label="Remove photo"
+                className="absolute -top-1.5 -right-1.5 size-6 rounded-full flex items-center justify-center bg-red-500 text-white shadow-md hover:bg-red-600 transition-colors"
+              >
+                <FontAwesomeIcon icon={faTrash} className="text-[9px]" />
+              </button>
             )}
           </div>
         </div>
@@ -348,7 +380,7 @@ export function AvatarPick({
           {history.length > 0 && (
             <div className="grid grid-cols-6 gap-2 mt-3">
               {history.map((entry) => (
-                <div key={entry.path} className="relative group">
+                <div key={entry.path} className="relative">
                   <button
                     onClick={() => selectHistoryEntry(entry)}
                     className="relative w-full aspect-square rounded-xl overflow-hidden focus:outline-none"
@@ -366,7 +398,7 @@ export function AvatarPick({
                   <button
                     onClick={() => removeHistoryEntry(entry)}
                     aria-label="Remove"
-                    className="absolute -top-1 -right-1 size-4 rounded-full flex items-center justify-center text-[9px] opacity-0 group-hover:opacity-100 transition-opacity bg-red-500 text-white"
+                    className="absolute -top-1 -right-1 size-4 rounded-full flex items-center justify-center text-[9px] bg-red-500 text-white shadow-sm hover:bg-red-600 transition-colors"
                   >
                     <FontAwesomeIcon icon={faXmark} />
                   </button>

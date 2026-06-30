@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SettingCard — wraps a settings section.
+// SettingCard
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function SettingCard({
@@ -13,16 +13,19 @@ export function SettingCard({
   activeTheme,
   onSave,
   saveState,
+  saveLabel, // optional: overrides the idle button label (default "Save")
 }) {
   const hasSave = Boolean(onSave);
 
   const btnText =
     {
-      idle: "Save",
+      idle: saveLabel ?? "Save",
       saving: "Saving…",
       saved: "Saved",
       error: "Try again",
-    }[saveState] ?? "Save";
+    }[saveState] ??
+    saveLabel ??
+    "Save";
 
   return (
     <section
@@ -38,12 +41,12 @@ export function SettingCard({
         <h2 className="text-lg font-bold">{title}</h2>
       </div>
 
-      {/* Body — grows to fill available space */}
+      {/* Body */}
       <div className="flex-1 px-5 pb-4 space-y-6">{children}</div>
 
-      {/* Save button — only rendered when onSave is provided */}
+      {/* Save / action button — only rendered when onSave is provided */}
       {hasSave && (
-        <div className={`px-5 py-5`}>
+        <div className="px-5 py-5">
           <button
             type="button"
             onClick={onSave}
@@ -166,6 +169,7 @@ export function FieldRow({
     saved: "Saved",
     error: "Try again",
   }[status];
+
   return (
     <div className={`rounded-xl p-4 ${activeTheme.background.canvas}`}>
       <label
@@ -196,7 +200,7 @@ export function FieldRow({
           {btnText}
         </button>
       </div>
-      {error && <p className="text-red-400   text-xs mt-1.5">{error}</p>}
+      {error && <p className="text-red-400    text-xs mt-1.5">{error}</p>}
       {success && <p className="text-emerald-400 text-xs mt-1.5">{success}</p>}
     </div>
   );

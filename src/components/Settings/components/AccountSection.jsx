@@ -8,7 +8,14 @@ export function AccountSection({ profile, activeTheme, dispatch }) {
 
   return (
     <>
-      <SettingCard icon={faUser} title="Account" activeTheme={activeTheme}>
+      <SettingCard
+        icon={faUser}
+        title="Account"
+        activeTheme={activeTheme}
+        onSave={() => setIsModalOpen(true)}
+        saveState="idle"
+        saveLabel="Manage account"
+      >
         <div className="space-y-4 text-left">
           {/* Username Snapshot Display */}
           <div>
@@ -36,7 +43,7 @@ export function AccountSection({ profile, activeTheme, dispatch }) {
         </div>
 
         {/* Action Button Segment Layer formatted exactly like the SettingCard footer wrapper */}
-        <div className="pt-2">
+        {/* <div className="pt-2">
           <button
             type="button"
             onClick={() => setIsModalOpen(true)}
@@ -44,7 +51,7 @@ export function AccountSection({ profile, activeTheme, dispatch }) {
           >
             Manage account
           </button>
-        </div>
+        </div> */}
       </SettingCard>
 
       {/* Account Edit Modal Window Layer */}
