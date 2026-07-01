@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBan,
@@ -13,9 +13,18 @@ import { CardEdit } from "../components/CardEdit";
 import { CardInfo } from "../components/CardInfo";
 import { ModalTemplate } from "../../General/ui/ModalTemplate";
 import { inputCls } from "../../General/ui/FormStyles";
+import ConfirmationDialog from "../../General/ui/ConfirmationDialog";
 
 export default function CardDetails(props) {
-  const { card, studyMode, activeTheme, onClose, userId } = props;
+  const { studyMode, activeTheme, onClose, userId } = props;
+
+  // Track the card state locally inside the modal so modifications reflect instantly
+  const [currentCard, setCurrentCard] = useState(props.card);
+
+  // Keep local state in sync if the parent passes down a new card prop
+  useEffect(() => {
+    setCurrentCard(props.card);
+  }, [props.card]);
 
   const {
     isEditing,
@@ -35,7 +44,18 @@ export default function CardDetails(props) {
     toggleSuspension,
     handleDeleteCard,
     handleResetProgress,
-  } = useCardDetails(props);
+  } = useCardDetails({
+    ...props,
+    card: currentCard,
+    onUpdate: (updatedCard) => {
+      // Instantly update local state representation
+      setCurrentCard(updatedCard);
+
+      // Bubble changes back up to the parent pagination structures safely
+      if (props.handleCardUpdate) props.handleCardUpdate(updatedCard);
+      if (props.onUpdate) props.onUpdate(updatedCard);
+    },
+  });
 
   const [confirmTarget, setConfirmTarget] = useState(null);
   const isC = studyMode === "C";
@@ -64,7 +84,7 @@ export default function CardDetails(props) {
           />
         ) : (
           <>
-            <CardInfo card={card} isC={isC} activeTheme={activeTheme} />
+            <CardInfo card={currentCard} isC={isC} activeTheme={activeTheme} />
 
             {/* ── Edit + Suspend row ── */}
             <div className="flex gap-2">
@@ -84,18 +104,18 @@ export default function CardDetails(props) {
                 onClick={toggleSuspension}
                 disabled={isToggling || !userId}
                 className={`flex-1 py-2.5 px-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-colors disabled:opacity-50 ${
-                  card.suspended
+                  currentCard.suspended
                     ? "bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25"
                     : "bg-amber-500/15 text-amber-400 hover:bg-amber-500/25"
                 }`}
               >
                 <FontAwesomeIcon
-                  icon={card.suspended ? faCircleCheck : faBan}
+                  icon={currentCard.suspended ? faCircleCheck : faBan}
                   className="text-xs"
                 />
                 {isToggling
                   ? "Updating…"
-                  : card.suspended
+                  : currentCard.suspended
                     ? "Reactivate"
                     : "Suspend"}
               </button>
@@ -157,48 +177,28 @@ export default function CardDetails(props) {
 
         {/* ── Confirmation overlay ── */}
         {confirmTarget && (
-          <div className="absolute inset-0 z-50 rounded-xl bg-black/70 backdrop-blur-[1px] flex items-center justify-center p-4">
-            <div
-              className={`w-full rounded-2xl border p-5 shadow-2xl ${activeTheme.background.secondary} ${activeTheme.border.card}`}
-            >
-              <h3 className={`text-sm font-bold ${activeTheme.text.primary}`}>
-                {confirmTarget === "delete"
-                  ? "Delete Card Permanently?"
-                  : "Reset Spaced Repetition?"}
-              </h3>
-              <p
-                className={`text-xs mt-1.5 leading-relaxed ${activeTheme.text.muted}`}
-              >
-                {confirmTarget === "delete"
-                  ? "This completely removes the card and its historical memory weight scores from this deck. This action cannot be reversed."
-                  : "This will wipe out current scheduler patterns, intervals, and history, reverting the card back into a fresh 'New' deck status state."}
-              </p>
-              <div className="mt-4 flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setConfirmTarget(null)}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg border ${activeTheme.border.secondary} ${activeTheme.text.secondary} hover:${activeTheme.background.canvas}`}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (confirmTarget === "delete") handleDeleteCard?.();
-                    else handleResetProgress?.();
-                    setConfirmTarget(null);
-                  }}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg text-white ${
-                    confirmTarget === "delete"
-                      ? (activeTheme.button.danger ?? "bg-red-600")
-                      : "bg-amber-600"
-                  }`}
-                >
-                  Confirm
-                </button>
-              </div>
-            </div>
-          </div>
+          <ConfirmationDialog
+            activeTheme={activeTheme}
+            variant={confirmTarget === "delete" ? "danger" : "warning"}
+            title={
+              confirmTarget === "delete"
+                ? "Delete Card Permanently?"
+                : "Reset Spaced Repetition?"
+            }
+            description={
+              confirmTarget === "delete"
+                ? "This will permanently delete the card along with its study progress."
+                : "This will wipe out your current progress, resetting the card to its 'new' status."
+            }
+            confirmText="Confirm"
+            cancelText="Cancel"
+            onCancel={() => setConfirmTarget(null)}
+            onConfirm={() => {
+              if (confirmTarget === "delete") handleDeleteCard?.();
+              else handleResetProgress?.();
+              setConfirmTarget(null);
+            }}
+          />
         )}
       </div>
     </ModalTemplate>

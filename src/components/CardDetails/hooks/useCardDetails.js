@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { supabase } from "../../../utils/supabaseClient";
 import { generateReading } from "../../Import/hooks/generateReading";
+import { hasCJKCharacter } from "../../../utils/cjkValidation";
 
 export const useCardDetails = ({
   card,
@@ -38,16 +39,24 @@ export const useCardDetails = ({
     setSaveError(null);
   };
 
-  const getPageKey = () => {
-    const pageKey = Object.keys(cardsByPage).find((pi) =>
-      cardsByPage[pi]?.some((c) => c.card_id === card.card_id),
+  const getPageKey = (id) => {
+    if (!cardsByPage) return null; // Prevent the "undefined to object" error
+
+    return Object.keys(cardsByPage).find((key) =>
+      cardsByPage[key]?.some((c) => c.id === id),
     );
-    return pageKey !== undefined ? Number(pageKey) : 0;
   };
 
   const handleSave = async () => {
     const front = editFront.trim();
     const back = editBack.trim();
+
+    // Add validation check for Chinese Mode during save
+    if (isC && !hasCJKCharacter(front)) {
+      setSaveError("Invalid character.");
+      return;
+    }
+
     if (!front || !back) {
       setSaveError("Front and back cannot be empty.");
       return;
@@ -76,14 +85,17 @@ export const useCardDetails = ({
         }
       }
 
-      const { error: dbError } = await supabase
+      // Add .select().single() to get the updated row back from Supabase
+      const { data: updatedData, error: dbError } = await supabase
         .from(cardTable)
         .update(payload)
-        .eq("id", card.card_id);
+        .eq("id", card.card_id)
+        .select("*")
+        .single();
 
       if (dbError) throw dbError;
 
-      await onUpdate(getPageKey());
+      await onUpdate({ ...card, ...updatedData });
       setIsEditing(false);
     } catch (err) {
       console.error(err);
@@ -99,24 +111,26 @@ export const useCardDetails = ({
     setToggleError(null);
 
     try {
-      const { error: dbError } = await supabase.from(progressTable).upsert(
-        {
-          user_id: userId,
-          deck_id: deckId,
-          card_id: card.card_id,
-          ease_factor: card.ease_factor ?? 2.5,
-          review_interval: card.review_interval ?? 0,
-          repetitions: card.repetitions ?? 0,
-          due_date: card.due_date ?? null,
-          last_studied: card.last_studied ?? null,
-          status: isSusp ? "waiting" : card.status,
-          suspended: !isSusp,
-        },
-        { onConflict: "user_id,card_id" },
-      );
+      const progressPayload = {
+        user_id: userId,
+        deck_id: deckId,
+        card_id: card.card_id,
+        ease_factor: card.ease_factor ?? 2.5,
+        review_interval: card.review_interval ?? 0,
+        repetitions: card.repetitions ?? 0,
+        due_date: card.due_date ?? null,
+        last_studied: card.last_studied ?? null,
+        status: isSusp ? "waiting" : card.status,
+        suspended: !isSusp,
+      };
+
+      const { error: dbError } = await supabase
+        .from(progressTable)
+        .upsert(progressPayload, { onConflict: "user_id,card_id" });
 
       if (dbError) throw dbError;
-      await onUpdate(getPageKey());
+
+      await onUpdate({ ...card, ...progressPayload });
     } catch (err) {
       console.error(err);
       setToggleError("Could not save — please try again.");

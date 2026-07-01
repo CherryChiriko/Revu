@@ -96,18 +96,37 @@ export function useDeckDetails(deckId) {
   }, [cardsByPage]);
 
   const handleCardUpdate = useCallback(
-    (newCard) => {
-      // 1. Inject the new card instantly into the very front of Page 0
+    (updatedCard) => {
+      if (!updatedCard) return;
+
       setCardsByPage((prev) => {
-        const pageZero = prev[0] ?? [];
-        return {
-          ...prev,
-          0: [newCard, ...pageZero],
-        };
+        const pageEntries = Object.entries(prev);
+        // Fallback match check covering both root ids and relational mapping keys
+        const pageToUpdate = pageEntries.find(([_, cards]) =>
+          cards.some(
+            (c) => c.id === updatedCard.id || c.card_id === updatedCard.card_id,
+          ),
+        );
+
+        if (pageToUpdate) {
+          const [pageKey, cards] = pageToUpdate;
+          return {
+            ...prev,
+            [pageKey]: cards.map((c) =>
+              c.id === updatedCard.id || c.card_id === updatedCard.card_id
+                ? updatedCard
+                : c,
+            ),
+          };
+        } else {
+          const pageZero = prev[0] ?? [];
+          return {
+            ...prev,
+            0: [updatedCard, ...pageZero],
+          };
+        }
       });
 
-      // 2. Refresh the overall deck meta counts in Redux so that totalCardCount
-      // increments and reflects across your entire application layout seamlessly.
       if (deckId) {
         dispatch(fetchDeckCounts());
       }

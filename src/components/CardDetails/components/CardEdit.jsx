@@ -1,5 +1,7 @@
 import React from "react";
 import { FormField } from "../../General/ui/FormField";
+// 1. Make sure to import your regex helper here as well!
+import { hasCJKCharacter } from "../../../utils/cjkValidation";
 
 export function CardEdit({
   editFront,
@@ -13,6 +15,7 @@ export function CardEdit({
   inputCls,
 }) {
   const baseInputCls = inputCls(activeTheme);
+
   return (
     <div className="space-y-5">
       <FormField label="Front" activeTheme={activeTheme}>
@@ -24,6 +27,13 @@ export function CardEdit({
           className={`${baseInputCls} resize-none`}
           autoFocus
         />
+
+        {/* 2. Adjusted variables to match CardEdit's local props */}
+        {isC && editFront.trim() !== "" && !hasCJKCharacter(editFront) && (
+          <p className={`text-xs ${activeTheme.text.danger} mt-1`}>
+            Front must contain at least one Chinese character.
+          </p>
+        )}
       </FormField>
 
       <FormField label="Back / Meaning" activeTheme={activeTheme}>

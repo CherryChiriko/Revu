@@ -6,6 +6,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useAddCard } from "../hooks/useAddCard";
 import { inputCls } from "../../General/ui/FormStyles";
+import { hasCJKCharacter } from "../../../utils/cjkValidation";
 
 export function AddCardMenu({
   isOpen,
@@ -103,6 +104,13 @@ export function AddCardMenu({
               placeholder={isC ? "e.g. 你好" : "Word or phrase"}
               className={inputCls(activeTheme)}
             />
+            {isC &&
+              fields.front.trim() !== "" &&
+              !hasCJKCharacter(fields.front) && (
+                <p className={`text-xs ${activeTheme.text.danger} mt-1`}>
+                  This field must contain at least one Chinese character.
+                </p>
+              )}
           </div>
 
           {/* Meaning input */}
