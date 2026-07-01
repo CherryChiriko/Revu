@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { STATUS_COLOR } from "../../Study/constants/constants";
+import { STATUS_COLOR } from "../../../utils/constants";
 
 export const ProgressBar = ({
   counts = {},

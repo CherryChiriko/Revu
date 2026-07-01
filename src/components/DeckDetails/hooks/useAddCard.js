@@ -70,32 +70,36 @@ export const useAddCard = ({
         .insert([cardPayload])
         .select("*")
         .single();
-
       if (insertError) throw insertError;
 
       // 2. Insert progress row
+      const progressPayload = {
+        user_id: user.id,
+        card_id: inserted.id,
+        deck_id: deckId,
+        status: "new",
+        ease_factor: 2.5,
+        review_interval: 0,
+        repetitions: 0,
+        suspended: false,
+        due_date: null,
+        last_studied: null,
+      };
+
       const { error: progressError } = await supabase
         .from(progressTable)
-        .insert([
-          {
-            user_id: user.id,
-            card_id: inserted.id,
-            deck_id: deckId,
-            status: "new",
-            ease_factor: 2.5,
-            review_interval: 0,
-            repetitions: 0,
-            suspended: false,
-            due_date: null,
-            last_studied: null,
-          },
-        ]);
+        .insert([progressPayload]);
 
       if (progressError) throw progressError;
 
-      // ─── 3. EXECUTE PARENT REFETCH LOGIC FIRST ───
+      // ─── 3. EXECUTE PARENT UPDATE INSTANTLY WITH COMPILED SCHEMA ───
       if (onSuccess) {
-        await onSuccess();
+        // We synthesize the full card structure so useDeckDetails filters it correctly
+        const fullOptimisticCard = {
+          ...inserted,
+          ...progressPayload, // Appends status: "new" and suspended: false
+        };
+        await onSuccess(fullOptimisticCard);
       }
 
       reset();

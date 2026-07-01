@@ -12,6 +12,7 @@ export function CardEdit({
   activeTheme,
   inputCls,
 }) {
+  const baseInputCls = inputCls(activeTheme);
   return (
     <div className="space-y-5">
       <FormField label="Front" activeTheme={activeTheme}>
@@ -20,7 +21,7 @@ export function CardEdit({
           value={editFront}
           onChange={(e) => setEditFront(e.target.value)}
           placeholder={isC ? "Chinese character(s)" : "Word or phrase"}
-          className={inputCls}
+          className={`${baseInputCls} resize-none`}
           autoFocus
         />
       </FormField>
@@ -31,7 +32,7 @@ export function CardEdit({
           onChange={(e) => setEditBack(e.target.value)}
           placeholder="Meaning or translation"
           rows={3}
-          className={`${inputCls} resize-none`}
+          className={`${baseInputCls} resize-none`}
         />
       </FormField>
 
@@ -46,7 +47,7 @@ export function CardEdit({
             value={editReading}
             onChange={(e) => setEditReading(e.target.value)}
             placeholder="e.g. nǐ hǎo  (auto-generated if blank)"
-            className={inputCls}
+            className={`${baseInputCls} resize-none`}
           />
         </FormField>
       )}

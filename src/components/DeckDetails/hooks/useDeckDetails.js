@@ -96,13 +96,23 @@ export function useDeckDetails(deckId) {
   }, [cardsByPage]);
 
   const handleCardUpdate = useCallback(
-    async (pageToRefresh) => {
-      await Promise.all([
-        dispatch(fetchDeckCounts({ user_id: userId })),
-        fetchPage(pageToRefresh),
-      ]);
+    (newCard) => {
+      // 1. Inject the new card instantly into the very front of Page 0
+      setCardsByPage((prev) => {
+        const pageZero = prev[0] ?? [];
+        return {
+          ...prev,
+          0: [newCard, ...pageZero],
+        };
+      });
+
+      // 2. Refresh the overall deck meta counts in Redux so that totalCardCount
+      // increments and reflects across your entire application layout seamlessly.
+      if (deckId) {
+        dispatch(fetchDeckCounts());
+      }
     },
-    [dispatch, userId, fetchPage],
+    [deckId, dispatch],
   );
 
   return {

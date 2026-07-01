@@ -21,7 +21,7 @@ import {
 import { computeSM2 } from "../../../utils/srs";
 import { supabase } from "../../../utils/supabaseClient";
 import { getTodayISO } from "../../../utils/dateHelper";
-import { PHASES } from "../constants/constants";
+import { PHASES } from "../../../utils/constants";
 import { createSelector } from "@reduxjs/toolkit";
 
 // ----------------------

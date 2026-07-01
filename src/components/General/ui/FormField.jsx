@@ -12,7 +12,7 @@ export function FormField({
     <div className="flex flex-col gap-1.5 text-left">
       {label && (
         <p
-          className={`text-[10px] font-black uppercase tracking-widest ${activeTheme.text.accent3 ?? activeTheme.text.muted}`}
+          className={`text-[10px] font-black uppercase tracking-widest ${activeTheme.text.muted}`}
         >
           {label}{" "}
           {required && <span className={activeTheme.text.danger}>*</span>}

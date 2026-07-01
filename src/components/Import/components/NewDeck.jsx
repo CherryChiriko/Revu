@@ -104,7 +104,7 @@ export function NewDeck({ activeTheme, onCreated }) {
       <button
         onClick={state.handleCreate}
         disabled={isButtonDisabled}
-        className={`w-full mt-2 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all
+        className={`w-full mt-5 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all
           ${
             isButtonDisabled
               ? activeTheme.button.disabled

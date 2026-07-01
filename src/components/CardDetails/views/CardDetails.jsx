@@ -11,7 +11,7 @@ import {
 import { useCardDetails } from "../hooks/useCardDetails";
 import { CardEdit } from "../components/CardEdit";
 import { CardInfo } from "../components/CardInfo";
-import { ModalTemplate } from "../../General/ui/ModalTemplate"; // Reusing your new template!
+import { ModalTemplate } from "../../General/ui/ModalTemplate";
 import { inputCls } from "../../General/ui/FormStyles";
 
 export default function CardDetails(props) {
@@ -37,20 +37,19 @@ export default function CardDetails(props) {
     handleResetProgress,
   } = useCardDetails(props);
 
-  const [confirmTarget, setConfirmTarget] = useState(null); // 'delete' | 'reset' | null
+  const [confirmTarget, setConfirmTarget] = useState(null);
   const isC = studyMode === "C";
 
   return (
     <ModalTemplate
-      isOpen={true} // Controlled by parent mounting state
-      onClose={isEditing ? undefined : onClose} // Prevent accidental overlay close during edits
+      isOpen={true}
+      onClose={isEditing ? cancelEditing : onClose}
       title="Card Details"
       subtitle=""
       activeTheme={activeTheme}
       maxWidth="max-w-md"
     >
       <div className="relative space-y-6">
-        {/* Dynamic Display Switchboard */}
         {isEditing ? (
           <CardEdit
             editFront={editFront}
@@ -67,58 +66,42 @@ export default function CardDetails(props) {
           <>
             <CardInfo card={card} isC={isC} activeTheme={activeTheme} />
 
-            <div className="flex justify-center gap-3">
-              {/* Toggle Edit Control Layer */}
-              <div
-                className={`flex justify-end -mt-2 text-xs ${activeTheme.text.secondary}`}
+            {/* ── Edit + Suspend row ── */}
+            <div className="flex gap-2">
+              {/* Edit — ghost/outline, low visual weight */}
+              <button
+                type="button"
+                onClick={startEditing}
+                className={`flex-1 py-2.5 px-3 rounded-xl border text-sm font-semibold flex items-center justify-center gap-2 transition-colors ${activeTheme.border.secondary} ${activeTheme.text.secondary} hover:${activeTheme.background.canvas}`}
               >
-                {!isEditing ? (
-                  <button
-                    type="button"
-                    onClick={startEditing}
-                    className={`py-2 px-3 rounded-xl border font-bold flex items-center justify-center gap-1.5 hover:${activeTheme.background.canvas}`}
-                  >
-                    <FontAwesomeIcon
-                      icon={faPencil}
-                      className={`${activeTheme.text.activeButton}`}
-                    />
-                    Edit Card
-                  </button>
-                ) : (
-                  //   <button
-                  //     type="button"
-                  //     onClick={startEditing}
-                  //     className={`px-3 py-1.5 text-xs font-bold rounded-xl border flex items-center gap-1.5 transition-colors
-                  // ${activeTheme.border.secondary} ${activeTheme.text.secondary} hover:${activeTheme.background.canvas}`}
-                  //   >
-                  <button
-                    type="button"
-                    onClick={cancelEditing}
-                    className={`px-3 py-1.5 text-xs font-bold rounded-xl border transition-colors
-                ${activeTheme.border.secondary} ${activeTheme.text.muted} `}
-                  >
-                    Cancel
-                  </button>
-                )}
-              </div>
+                <FontAwesomeIcon icon={faPencil} className="text-xs" />
+                Edit
+              </button>
+
+              {/* Suspend — amber warning; Reactivate — green positive */}
               <button
                 type="button"
                 onClick={toggleSuspension}
                 disabled={isToggling || !userId}
-                className={`w-full py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all ${card.suspended ? `${activeTheme.button.primary} ${activeTheme.text.activeButton}` : `border ${activeTheme.border.danger} ${activeTheme.text.danger} hover:${activeTheme.background.danger}`}`}
+                className={`flex-1 py-2.5 px-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-colors disabled:opacity-50 ${
+                  card.suspended
+                    ? "bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25"
+                    : "bg-amber-500/15 text-amber-400 hover:bg-amber-500/25"
+                }`}
               >
                 <FontAwesomeIcon
                   icon={card.suspended ? faCircleCheck : faBan}
+                  className="text-xs"
                 />
                 {isToggling
-                  ? "Updating Status…"
+                  ? "Updating…"
                   : card.suspended
-                    ? "Reactivate Card"
-                    : "Suspend Card"}
+                    ? "Reactivate"
+                    : "Suspend"}
               </button>
             </div>
 
-            {/* Destructive Option Partition */}
+            {/* ── Danger Zone ── */}
             <div className="pt-4 border-t">
               <p
                 className={`text-xs uppercase text-pretty ${activeTheme.text.danger}`}
@@ -131,18 +114,18 @@ export default function CardDetails(props) {
                 <button
                   type="button"
                   onClick={() => setConfirmTarget("reset")}
-                  className={`py-2 px-3 rounded-xl ${activeTheme.button.danger} font-bold flex items-center justify-center gap-1.5 `}
+                  className={`py-2 px-3 rounded-xl ${activeTheme.button.danger} font-bold flex items-center justify-center gap-1.5`}
                 >
                   <FontAwesomeIcon
                     icon={faArrowRotateLeft}
-                    className={`${activeTheme.text.activeButton}`}
+                    className={activeTheme.text.activeButton}
                   />
                   Reset Progress
                 </button>
                 <button
                   type="button"
                   onClick={() => setConfirmTarget("delete")}
-                  className={`py-2 px-3 rounded-xl ${activeTheme.button.danger} font-bold flex items-center justify-center gap-1.5 `}
+                  className={`py-2 px-3 rounded-xl ${activeTheme.button.danger} font-bold flex items-center justify-center gap-1.5`}
                 >
                   <FontAwesomeIcon icon={faTrashCan} />
                   Delete Card
@@ -152,14 +135,13 @@ export default function CardDetails(props) {
           </>
         )}
 
-        {/* Primary Operational Action Tray */}
+        {/* ── Action tray ── */}
         <div className="pt-2 space-y-2">
           {(toggleError || saveError) && (
             <p className={`text-xs ${activeTheme.text.danger} text-center`}>
               {toggleError || saveError}
             </p>
           )}
-
           {isEditing && (
             <button
               type="button"
@@ -173,7 +155,7 @@ export default function CardDetails(props) {
           )}
         </div>
 
-        {/* Inline Safety Confirmation Overlap Layer */}
+        {/* ── Confirmation overlay ── */}
         {confirmTarget && (
           <div className="absolute inset-0 z-50 rounded-xl bg-black/70 backdrop-blur-[1px] flex items-center justify-center p-4">
             <div
@@ -191,7 +173,6 @@ export default function CardDetails(props) {
                   ? "This completely removes the card and its historical memory weight scores from this deck. This action cannot be reversed."
                   : "This will wipe out current scheduler patterns, intervals, and history, reverting the card back into a fresh 'New' deck status state."}
               </p>
-
               <div className="mt-4 flex justify-end gap-2">
                 <button
                   type="button"
@@ -207,7 +188,11 @@ export default function CardDetails(props) {
                     else handleResetProgress?.();
                     setConfirmTarget(null);
                   }}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg text-white ${confirmTarget === "delete" ? (activeTheme.button.danger ?? "bg-red-600") : "bg-amber-600"}`}
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg text-white ${
+                    confirmTarget === "delete"
+                      ? (activeTheme.button.danger ?? "bg-red-600")
+                      : "bg-amber-600"
+                  }`}
                 >
                   Confirm
                 </button>
