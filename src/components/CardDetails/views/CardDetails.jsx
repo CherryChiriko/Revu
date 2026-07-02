@@ -47,9 +47,11 @@ export default function CardDetails(props) {
   } = useCardDetails({
     ...props,
     card: currentCard,
+    onClose, // 🌟 CRITICAL: Forwarding onClose down to the hook layout loop
     onUpdate: (updatedCard) => {
-      // Instantly update local state representation
-      setCurrentCard(updatedCard);
+      if (updatedCard) {
+        setCurrentCard(updatedCard);
+      }
 
       // Bubble changes back up to the parent pagination structures safely
       if (props.handleCardUpdate) props.handleCardUpdate(updatedCard);
@@ -88,7 +90,6 @@ export default function CardDetails(props) {
 
             {/* ── Edit + Suspend row ── */}
             <div className="flex gap-2">
-              {/* Edit — ghost/outline, low visual weight */}
               <button
                 type="button"
                 onClick={startEditing}
@@ -98,7 +99,6 @@ export default function CardDetails(props) {
                 Edit
               </button>
 
-              {/* Suspend — amber warning; Reactivate — green positive */}
               <button
                 type="button"
                 onClick={toggleSuspension}
@@ -179,6 +179,7 @@ export default function CardDetails(props) {
         {confirmTarget && (
           <ConfirmationDialog
             activeTheme={activeTheme}
+            positionMode="fixed"
             variant={confirmTarget === "delete" ? "danger" : "warning"}
             title={
               confirmTarget === "delete"
@@ -187,15 +188,18 @@ export default function CardDetails(props) {
             }
             description={
               confirmTarget === "delete"
-                ? "This will permanently delete the card along with its study progress."
-                : "This will wipe out your current progress, resetting the card to its 'new' status."
+                ? "This completely removes the card and its historical memory weight scores from this deck. This action cannot be reversed."
+                : "This will wipe out current scheduler patterns, intervals, and history, reverting the card back into a fresh 'New' deck status state."
             }
             confirmText="Confirm"
             cancelText="Cancel"
             onCancel={() => setConfirmTarget(null)}
-            onConfirm={() => {
-              if (confirmTarget === "delete") handleDeleteCard?.();
-              else handleResetProgress?.();
+            onConfirm={async () => {
+              if (confirmTarget === "delete") {
+                await handleDeleteCard();
+              } else {
+                await handleResetProgress();
+              }
               setConfirmTarget(null);
             }}
           />

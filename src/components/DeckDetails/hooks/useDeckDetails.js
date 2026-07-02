@@ -77,6 +77,14 @@ export function useDeckDetails(deckId) {
     for (let i = 0; i < visiblePages && i < totalPages; i++) {
       all.push(...(cardsByPage[i] ?? []));
     }
+    console.log(
+      filter,
+      all.filter((c) =>
+        filter === "suspended"
+          ? c.suspended
+          : c.status === filter && !c.suspended,
+      ),
+    );
     if (!filter) return all;
     return all.filter((c) =>
       filter === "suspended"
@@ -97,36 +105,66 @@ export function useDeckDetails(deckId) {
 
   const handleCardUpdate = useCallback(
     (updatedCard) => {
-      if (!updatedCard) return;
+      // 1. SCENARIO: CARD WAS DELETED (or explicitly nullified)
+      if (!updatedCard || updatedCard.isDeleted) {
+        const targetId = updatedCard?.id || updatedCard?.card_id;
+
+        setCardsByPage((prev) => {
+          const freshState = {};
+          Object.entries(prev).forEach(([pageKey, cardsArray]) => {
+            freshState[pageKey] = cardsArray.filter(
+              (c) => c.id !== targetId && c.card_id !== targetId,
+            );
+          });
+          return freshState;
+        });
+
+        if (deckId) dispatch(fetchDeckCounts());
+        return;
+      }
+
+      // 🌟 2. SCENARIO: CARD WAS MUTATED (Edit, Suspend, Reactivate, Reset)
+      // Extract both ID possibilities to prevent matching mismatches
+      const matchId = updatedCard.id || updatedCard.card_id;
 
       setCardsByPage((prev) => {
-        const pageEntries = Object.entries(prev);
-        // Fallback match check covering both root ids and relational mapping keys
-        const pageToUpdate = pageEntries.find(([_, cards]) =>
-          cards.some(
-            (c) => c.id === updatedCard.id || c.card_id === updatedCard.card_id,
-          ),
-        );
+        const freshState = { ...prev };
+        let foundAndUpdated = false;
 
-        if (pageToUpdate) {
-          const [pageKey, cards] = pageToUpdate;
-          return {
-            ...prev,
-            [pageKey]: cards.map((c) =>
-              c.id === updatedCard.id || c.card_id === updatedCard.card_id
-                ? updatedCard
-                : c,
-            ),
-          };
-        } else {
-          const pageZero = prev[0] ?? [];
-          return {
-            ...prev,
-            0: [updatedCard, ...pageZero],
-          };
+        // Scan through EVERY page chunk to locate the matching reference item
+        Object.entries(freshState).forEach(([pageKey, cardsArray]) => {
+          if (
+            cardsArray.some((c) => c.id === matchId || c.card_id === matchId)
+          ) {
+            freshState[pageKey] = cardsArray.map((c) => {
+              if (c.id === matchId || c.card_id === matchId) {
+                // Merge existing attributes with the database payload updates securely
+                return {
+                  ...c,
+                  ...updatedCard,
+                  id: matchId,
+                  card_id: matchId,
+                };
+              }
+              return c;
+            });
+            foundAndUpdated = true;
+          }
+        });
+
+        // 3. FALLBACK: If it's a completely new card that doesn't exist on any page yet
+        if (!foundAndUpdated) {
+          const pageZero = freshState[0] ?? [];
+          freshState[0] = [
+            { ...updatedCard, id: matchId, card_id: matchId },
+            ...pageZero,
+          ];
         }
+
+        return freshState;
       });
 
+      // Fire background count recalculation rules
       if (deckId) {
         dispatch(fetchDeckCounts());
       }

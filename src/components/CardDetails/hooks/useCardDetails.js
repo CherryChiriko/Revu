@@ -9,27 +9,30 @@ export const useCardDetails = ({
   userId,
   studyMode,
   progressTable,
-  cardsByPage,
   onUpdate,
+  onClose,
 }) => {
   const [isToggling, setIsToggling] = useState(false);
   const [toggleError, setToggleError] = useState(null);
 
   const [isEditing, setIsEditing] = useState(false);
-  const [editFront, setEditFront] = useState(card.front ?? "");
-  const [editBack, setEditBack] = useState(card.back ?? "");
-  const [editReading, setEditReading] = useState(card.reading ?? "");
+  const [editFront, setEditFront] = useState(card?.front ?? "");
+  const [editBack, setEditBack] = useState(card?.back ?? "");
+  const [editReading, setEditReading] = useState(card?.reading ?? "");
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState(null);
 
   const cardTable = `cards_${studyMode.toLowerCase()}`;
   const isC = studyMode === "C";
-  const isSusp = card.suspended;
+
+  // Use whatever ID fallback structure is populated from the parent context
+  const targetCardId = card?.id || card?.card_id;
+  const isSusp = card?.suspended ?? false;
 
   const startEditing = () => {
-    setEditFront(card.front ?? "");
-    setEditBack(card.back ?? "");
-    setEditReading(card.reading ?? "");
+    setEditFront(card?.front ?? "");
+    setEditBack(card?.back ?? "");
+    setEditReading(card?.reading ?? "");
     setSaveError(null);
     setIsEditing(true);
   };
@@ -39,19 +42,11 @@ export const useCardDetails = ({
     setSaveError(null);
   };
 
-  const getPageKey = (id) => {
-    if (!cardsByPage) return null; // Prevent the "undefined to object" error
-
-    return Object.keys(cardsByPage).find((key) =>
-      cardsByPage[key]?.some((c) => c.id === id),
-    );
-  };
-
   const handleSave = async () => {
+    if (!targetCardId) return;
     const front = editFront.trim();
     const back = editBack.trim();
 
-    // Add validation check for Chinese Mode during save
     if (isC && !hasCJKCharacter(front)) {
       setSaveError("Invalid character.");
       return;
@@ -85,11 +80,10 @@ export const useCardDetails = ({
         }
       }
 
-      // Add .select().single() to get the updated row back from Supabase
       const { data: updatedData, error: dbError } = await supabase
         .from(cardTable)
         .update(payload)
-        .eq("id", card.card_id)
+        .eq("id", targetCardId)
         .select("*")
         .single();
 
@@ -106,22 +100,25 @@ export const useCardDetails = ({
   };
 
   const toggleSuspension = async () => {
-    if (!userId) return;
+    if (!userId || !targetCardId) return;
     setIsToggling(true);
     setToggleError(null);
 
     try {
+      const nextSuspendedState = !isSusp;
+
+      // 🌟 FIX: We only upsert to progressTable since 'suspended' lives there!
       const progressPayload = {
         user_id: userId,
         deck_id: deckId,
-        card_id: card.card_id,
-        ease_factor: card.ease_factor ?? 2.5,
-        review_interval: card.review_interval ?? 0,
-        repetitions: card.repetitions ?? 0,
-        due_date: card.due_date ?? null,
-        last_studied: card.last_studied ?? null,
-        status: isSusp ? "waiting" : card.status,
-        suspended: !isSusp,
+        card_id: targetCardId,
+        ease_factor: card?.ease_factor ?? 2.5,
+        review_interval: card?.review_interval ?? 0,
+        repetitions: card?.repetitions ?? 0,
+        due_date: card?.due_date ?? null,
+        last_studied: card?.last_studied ?? null,
+        status: card?.status || "new",
+        suspended: nextSuspendedState,
       };
 
       const { error: dbError } = await supabase
@@ -130,12 +127,84 @@ export const useCardDetails = ({
 
       if (dbError) throw dbError;
 
-      await onUpdate({ ...card, ...progressPayload });
+      // Update frontend state context
+      await onUpdate({
+        ...card,
+        ...progressPayload,
+        id: targetCardId,
+        card_id: targetCardId,
+        suspended: nextSuspendedState,
+      });
     } catch (err) {
       console.error(err);
-      setToggleError("Could not save — please try again.");
+      setToggleError("Could not update suspension status.");
     } finally {
       setIsToggling(false);
+    }
+  };
+
+  const handleDeleteCard = async () => {
+    if (!targetCardId) return;
+    try {
+      // 1. Delete progress row tracking metrics
+      await supabase
+        .from(progressTable)
+        .delete()
+        .eq("card_id", targetCardId)
+        .eq("user_id", userId);
+
+      // 2. Delete base data card reference
+      const { error } = await supabase
+        .from(cardTable)
+        .delete()
+        .eq("id", targetCardId);
+
+      if (error) throw error;
+
+      // 3. Purge from local parent view state arrays
+      if (onUpdate) {
+        await onUpdate({
+          id: targetCardId,
+          card_id: targetCardId,
+          isDeleted: true,
+        });
+      }
+      onClose?.();
+    } catch (err) {
+      console.error("Delete failed:", err);
+    }
+  };
+
+  const handleResetProgress = async () => {
+    if (!userId || !targetCardId) return;
+    try {
+      const resetPayload = {
+        user_id: userId,
+        deck_id: deckId,
+        card_id: targetCardId,
+        ease_factor: 2.5,
+        review_interval: 0,
+        repetitions: 0,
+        due_date: null,
+        last_studied: null,
+        status: "new",
+        suspended: isSusp,
+      };
+
+      const { error } = await supabase
+        .from(progressTable)
+        .upsert(resetPayload, { onConflict: "user_id,card_id" });
+
+      if (error) throw error;
+
+      await onUpdate({
+        ...card,
+        ...resetPayload,
+        id: targetCardId,
+        card_id: targetCardId,
+      });
+    } catch (err) {
+      console.error("Reset failed:", err);
     }
   };
 
@@ -155,5 +224,7 @@ export const useCardDetails = ({
     cancelEditing,
     handleSave,
     toggleSuspension,
+    handleDeleteCard,
+    handleResetProgress,
   };
 };

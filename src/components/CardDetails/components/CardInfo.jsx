@@ -38,6 +38,7 @@ const MetaRow = ({ icon, label, value, activeTheme }) => {
 
 export function CardInfo({ card, isC, activeTheme }) {
   const tile = STATUS_TILE[card.status] ?? STATUS_TILE.new;
+  console.log(card.status);
   return (
     <>
       <section className="space-y-1.5">
