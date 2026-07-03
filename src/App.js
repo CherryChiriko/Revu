@@ -39,6 +39,7 @@ import ScrollToTop from "./components/General/routing/ScrollToTop";
 import DecksLoader from "./components/Loaders/DecksLoader";
 import StatsLoader from "./components/Loaders/StatsLoader";
 import ResetPasswordPage from "./components/ResetPasswordPage";
+import OnboardingModal from "./components/Tutorial/Tutorial";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
@@ -276,6 +277,11 @@ function App() {
     );
   }
 
+  // Show onboarding only once decks have successfully loaded, so it never
+  // flashes over the loading/error states above, and only for a profile
+  // that hasn't completed it yet.
+  const shouldShowOnboarding = !!profile && !profile.has_completed_onboarding;
+
   return (
     <>
       {shouldLoadDeckData && (
@@ -297,6 +303,9 @@ function App() {
           <AppRoutes {...routeProps} />
         </main>
       </div>
+      {shouldShowOnboarding && (
+        <OnboardingModal activeTheme={activeTheme} onClose={() => {}} />
+      )}
     </>
   );
 }

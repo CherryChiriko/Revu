@@ -87,7 +87,9 @@ const StatTile = ({ icon, label, value, note, activeTheme }) => (
         <FontAwesomeIcon icon={icon} className="w-5 h-5" />
       </div>
     </div>
-    {note && <p className={`${activeTheme.text.secondary} text-sm mt-4`}>{note}</p>}
+    {note && (
+      <p className={`${activeTheme.text.secondary} text-sm mt-4`}>{note}</p>
+    )}
   </div>
 );
 
@@ -117,7 +119,10 @@ export default function ActivityPage() {
   const currentStreak = useSelector(selectGlobalStreak);
   const bestStreak = useSelector(selectGlobalMaxStreak);
 
-  const recentDays = useMemo(() => getRecentDays(activityDays, 14), [activityDays]);
+  const recentDays = useMemo(
+    () => getRecentDays(activityDays, 14),
+    [activityDays],
+  );
   const maxDailyCards = Math.max(
     1,
     ...recentDays.map((day) => day.cardsStudied || 0),
@@ -147,7 +152,8 @@ export default function ActivityPage() {
       };
 
       current.decks += 1;
-      current.total += deck.cards_count || deck.cardsCount || deck.active_cards_count || 0;
+      current.total +=
+        deck.cards_count || deck.cardsCount || deck.active_cards_count || 0;
       current.mastered += deck.mastered || deck.mastered_count || 0;
       current.due += deck.due || deck.due_count || 0;
       current.newCards += deck.new || deck.new_count || 0;
@@ -158,12 +164,16 @@ export default function ActivityPage() {
     return Array.from(grouped.values())
       .map((item) => ({
         ...item,
-        progress: item.total ? Math.round((item.mastered / item.total) * 100) : 0,
+        progress: item.total
+          ? Math.round((item.mastered / item.total) * 100)
+          : 0,
       }))
       .sort((a, b) => b.total - a.total);
   }, [decks]);
 
-  const characterDeckCount = decks.filter((deck) => deck.study_mode === "C").length;
+  const characterDeckCount = decks.filter(
+    (deck) => deck.study_mode === "C",
+  ).length;
   const totalCards = decks.reduce(
     (sum, deck) => sum + (deck.cards_count || deck.cardsCount || 0),
     0,
@@ -193,17 +203,25 @@ export default function ActivityPage() {
               </p>
             </div>
             <div className="grid grid-cols-3 gap-2 min-w-[260px]">
-              <div className={`${activeTheme.background.canvas} rounded-xl p-3`}>
+              <div
+                className={`${activeTheme.background.canvas} rounded-xl p-3`}
+              >
                 <p className={`${activeTheme.text.secondary} text-xs`}>Today</p>
                 <p className="font-black">
                   {recentDays[recentDays.length - 1]?.cardsStudied || 0}
                 </p>
               </div>
-              <div className={`${activeTheme.background.canvas} rounded-xl p-3`}>
-                <p className={`${activeTheme.text.secondary} text-xs`}>14 days</p>
+              <div
+                className={`${activeTheme.background.canvas} rounded-xl p-3`}
+              >
+                <p className={`${activeTheme.text.secondary} text-xs`}>
+                  14 days
+                </p>
                 <p className="font-black">{consistencyScore}%</p>
               </div>
-              <div className={`${activeTheme.background.canvas} rounded-xl p-3`}>
+              <div
+                className={`${activeTheme.background.canvas} rounded-xl p-3`}
+              >
                 <p className={`${activeTheme.text.secondary} text-xs`}>Due</p>
                 <p className="font-black">{dueCards}</p>
               </div>
@@ -261,7 +279,10 @@ export default function ActivityPage() {
                 const inactive = day.cardsStudied === 0;
 
                 return (
-                  <div key={day.date} className="flex-1 h-full flex flex-col justify-end">
+                  <div
+                    key={day.date}
+                    className="flex-1 h-full flex flex-col justify-end"
+                  >
                     <div
                       title={`${formatDate(day.date, settings.dateFormat)}: ${
                         day.cardsStudied
@@ -277,16 +298,26 @@ export default function ActivityPage() {
                         style={{ height: learnedHeight }}
                       />
                     </div>
-                    <span className={`${activeTheme.text.secondary} text-[11px] mt-2 text-center`}>
+                    <span
+                      className={`${activeTheme.text.secondary} text-[11px] mt-2 text-center`}
+                    >
                       {day.date.slice(8)}
                     </span>
                   </div>
                 );
               })}
             </div>
-            <div className={`${activeTheme.text.secondary} flex gap-4 text-sm mt-4`}>
-              <span><span className="inline-block w-3 h-3 rounded-sm bg-purple-500 mr-1" />Learned</span>
-              <span><span className="inline-block w-3 h-3 rounded-sm bg-sky-500 mr-1" />Reviewed</span>
+            <div
+              className={`${activeTheme.text.secondary} flex gap-4 text-sm mt-4`}
+            >
+              <span>
+                <span className="inline-block w-3 h-3 rounded-sm bg-purple-500 mr-1" />
+                Learned
+              </span>
+              <span>
+                <span className="inline-block w-3 h-3 rounded-sm bg-sky-500 mr-1" />
+                Reviewed
+              </span>
             </div>
           </Section>
 
@@ -298,10 +329,14 @@ export default function ActivityPage() {
             <div className="space-y-5">
               <div>
                 <div className="flex justify-between text-sm mb-2">
-                  <span className={activeTheme.text.secondary}>Mastered cards</span>
+                  <span className={activeTheme.text.secondary}>
+                    Mastered cards
+                  </span>
                   <span className="font-semibold">{masteredPercent}%</span>
                 </div>
-                <div className={`${activeTheme.background.track} rounded-full h-3 overflow-hidden`}>
+                <div
+                  className={`${activeTheme.background.track} rounded-full h-3 overflow-hidden`}
+                >
                   <div
                     className="h-full bg-gradient-to-r from-sky-500 to-purple-500"
                     style={{ width: `${masteredPercent}%` }}
@@ -309,16 +344,24 @@ export default function ActivityPage() {
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <div className={`${activeTheme.background.canvas} rounded-xl p-4`}>
+                <div
+                  className={`${activeTheme.background.canvas} rounded-xl p-4`}
+                >
                   <FontAwesomeIcon icon={faGaugeHigh} className="mb-3" />
-                  <p className={`${activeTheme.text.secondary} text-sm`}>Avg cards per active day</p>
+                  <p className={`${activeTheme.text.secondary} text-sm`}>
+                    Avg cards per active day
+                  </p>
                   <p className="text-2xl font-black">
                     {averageCardsPerActiveDay}
                   </p>
                 </div>
-                <div className={`${activeTheme.background.canvas} rounded-xl p-4`}>
+                <div
+                  className={`${activeTheme.background.canvas} rounded-xl p-4`}
+                >
                   <FontAwesomeIcon icon={faStar} className="mb-3" />
-                  <p className={`${activeTheme.text.secondary} text-sm`}>Mastered total</p>
+                  <p className={`${activeTheme.text.secondary} text-sm`}>
+                    Mastered total
+                  </p>
                   <p className="text-2xl font-black">{masteredCards}</p>
                 </div>
               </div>
@@ -347,7 +390,7 @@ export default function ActivityPage() {
           </Section>
         </div>
 
-        <Section
+        {/* <Section
           title="Language Progress"
           icon={faLanguage}
           activeTheme={activeTheme}
@@ -387,7 +430,7 @@ export default function ActivityPage() {
               ))}
             </div>
           )}
-        </Section>
+        </Section> */}
       </div>
     </div>
   );

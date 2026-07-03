@@ -25,6 +25,7 @@ import { Heatmap } from "./Heatmap";
 import { XPBar } from "./XPBar";
 import { StatCard } from "./StatCard";
 import { Toast } from "primereact/toast";
+import {} from "../../utils/xp";
 
 const Dashboard = () => {
   const navigate = useNavigate();
