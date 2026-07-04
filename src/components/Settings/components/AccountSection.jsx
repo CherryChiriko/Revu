@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { SettingCard } from "../SettingsTemplates";
-import AccountEditView from "../views/AccountEditView"; // Path to your new modal component
+import AccountEditView from "../views/AccountEditView";
 
 export function AccountSection({ profile, activeTheme, dispatch }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -13,8 +13,8 @@ export function AccountSection({ profile, activeTheme, dispatch }) {
         title="Account"
         activeTheme={activeTheme}
         onSave={() => setIsModalOpen(true)}
-        saveState="idle"
-        saveLabel="Manage account"
+        saveState="idle" // Keeps button steady in its default style state
+        saveLabel="Manage account" // Customizes the action button text cleanly
       >
         <div className="space-y-4 text-left">
           {/* Username Snapshot Display */}
@@ -41,17 +41,6 @@ export function AccountSection({ profile, activeTheme, dispatch }) {
             </p>
           </div>
         </div>
-
-        {/* Action Button Segment Layer formatted exactly like the SettingCard footer wrapper */}
-        {/* <div className="pt-2">
-          <button
-            type="button"
-            onClick={() => setIsModalOpen(true)}
-            className={`w-full py-2 rounded-lg font-semibold text-sm transition-colors active:scale-[0.99] ${activeTheme.button.accent2}`}
-          >
-            Manage account
-          </button>
-        </div> */}
       </SettingCard>
 
       {/* Account Edit Modal Window Layer */}

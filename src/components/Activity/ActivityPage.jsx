@@ -327,22 +327,12 @@ export default function ActivityPage() {
             activeTheme={activeTheme}
           >
             <div className="space-y-5">
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span className={activeTheme.text.secondary}>
-                    Mastered cards
-                  </span>
-                  <span className="font-semibold">{masteredPercent}%</span>
-                </div>
-                <div
-                  className={`${activeTheme.background.track} rounded-full h-3 overflow-hidden`}
-                >
-                  <div
-                    className="h-full bg-gradient-to-r from-sky-500 to-purple-500"
-                    style={{ width: `${masteredPercent}%` }}
-                  />
-                </div>
-              </div>
+              <MasteryBreakdown
+                learning={learningCards}
+                reviewing={reviewingCards}
+                mastered={masteredCards}
+                activeTheme={activeTheme}
+              />
               <div className="grid grid-cols-2 gap-3">
                 <div
                   className={`${activeTheme.background.canvas} rounded-xl p-4`}

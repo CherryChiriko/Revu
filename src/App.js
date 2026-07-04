@@ -32,13 +32,13 @@ import StudySession from "./components/Study/views/StudySession";
 import { SettingsPage } from "./components/Settings/SettingsPage";
 import SettingsView from "./components/Settings/views/SettingsView";
 import ActivityPage from "./components/Activity/ActivityPage";
-import LoginPage from "./components/LoginPage";
+import LoginPage from "./components/Login/LoginPage";
 import NotFound404 from "./components/404";
 
 import ScrollToTop from "./components/General/routing/ScrollToTop";
 import DecksLoader from "./components/Loaders/DecksLoader";
 import StatsLoader from "./components/Loaders/StatsLoader";
-import ResetPasswordPage from "./components/ResetPasswordPage";
+import ResetPasswordPage from "./components/Login/ResetPasswordPage";
 import OnboardingModal from "./components/Tutorial/Tutorial";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -182,7 +182,28 @@ function App() {
     );
   }
 
-  if (!session && !isPublicPath) {
+  // Public paths (e.g. /reset-password) don't depend on deck/stats data at
+  // all, and may have no session (expired/invalid link) or a recovery-only
+  // session that never triggers a deck fetch. Bypassing the session/deck
+  // gating below means these routes always render immediately instead of
+  // potentially getting stuck behind a spinner that's waiting on deck data
+  // that will never arrive.
+  if (isPublicPath) {
+    return (
+      <div
+        style={{
+          backgroundColor: activeTheme.background.app,
+          color: activeTheme.text.primary,
+          minHeight: "100vh",
+        }}
+      >
+        <ScrollToTop />
+        <AppRoutes {...routeProps} />
+      </div>
+    );
+  }
+
+  if (!session) {
     return <LoginPage activeTheme={activeTheme} />;
   }
 

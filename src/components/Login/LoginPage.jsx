@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import useAuth from "../hooks/useAuth";
+import useAuth from "../../hooks/useAuth";
 
 const LoginPage = ({ activeTheme }) => {
   const [username, setUsername] = useState("");
@@ -8,8 +8,15 @@ const LoginPage = ({ activeTheme }) => {
   const [isSigningUp, setIsSigningUp] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
 
-  const { authLoading, error, successMessage, login, signup, resetPassword } =
-    useAuth();
+  const {
+    authLoading,
+    error,
+    successMessage,
+    login,
+    signup,
+    resetPassword,
+    loginWithGoogle,
+  } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,6 +31,12 @@ const LoginPage = ({ activeTheme }) => {
     } else {
       await login(username, password);
     }
+  };
+
+  const handleGoogleLogin = async () => {
+    await loginWithGoogle();
+    // On success, Supabase redirects the browser to Google immediately,
+    // so there's nothing further to do here.
   };
 
   const switchToResetMode = () => {
@@ -62,6 +75,46 @@ const LoginPage = ({ activeTheme }) => {
         >
           {isResetting ? "Reset Password" : isSigningUp ? "Sign Up" : "Login"}
         </h2>
+
+        {/* Google OAuth (not shown in reset-password mode) */}
+        {!isResetting && (
+          <>
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              disabled={authLoading}
+              className={`w-full flex items-center justify-center gap-2 border ${activeTheme.border.card} ${activeTheme.background.canvas} ${activeTheme.text.primary} py-2 rounded transition disabled:opacity-50 hover:opacity-90`}
+            >
+              <svg viewBox="0 0 24 24" width="18" height="18">
+                <path
+                  fill="#4285F4"
+                  d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.15-4.07 1.15-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.27 14.28A7.2 7.2 0 0 1 4.9 12c0-.79.14-1.56.37-2.28V6.63H1.29A11.98 11.98 0 0 0 0 12c0 1.94.47 3.77 1.29 5.37l3.98-3.09z"
+                />
+                <path
+                  fill="#EA4335"
+                  d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.94 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.63l3.98 3.09C6.22 6.86 8.87 4.75 12 4.75z"
+                />
+              </svg>
+              Continue with Google
+            </button>
+
+            <div className="flex items-center gap-3 my-4">
+              <div className={`flex-1 h-px ${activeTheme.border.card}`} />
+              <span className={`text-xs ${activeTheme.text.secondary}`}>
+                OR
+              </span>
+              <div className={`flex-1 h-px ${activeTheme.border.card}`} />
+            </div>
+          </>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Username (login + signup) */}
