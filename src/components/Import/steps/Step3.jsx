@@ -5,6 +5,7 @@ import {
   faArrowRight,
   faArrowLeft,
   faRightLeft,
+  faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
 
 const Step3 = ({ activeTheme, logic, onNext, onBack }) => {
@@ -12,6 +13,31 @@ const Step3 = ({ activeTheme, logic, onNext, onBack }) => {
   const firstRow = rows[0] || {};
 
   const fields = logic.getFields();
+
+  // Mirrors the type resolution in useImportLogic (existing deck's study_mode
+  // takes precedence over the picker's selectedStudyType)
+  const currentType =
+    logic.importMode === "existing"
+      ? logic.targetDeck?.study_mode === "C"
+        ? 2
+        : 1
+      : logic.selectedStudyType;
+  const isChineseMode = currentType === 2;
+
+  const requiredFieldsMapped = fields
+    .filter((f) => f.required)
+    .every((f) => logic.mappedColumns[f.key]);
+
+  // allCards is already filtered by hasCJKCharacter for Chinese mode inside
+  // useImportLogic, so if every required field is mapped but nothing
+  // survived, every row failed the CJK check
+  const hasNoValidCjkRows =
+    isChineseMode &&
+    requiredFieldsMapped &&
+    rows.length > 0 &&
+    logic.allCards.length === 0;
+
+  const isReady = requiredFieldsMapped && !hasNoValidCjkRows;
 
   // Build column options ONCE
   const columnOptions = Object.keys(firstRow).map((key) => {
@@ -23,10 +49,6 @@ const Step3 = ({ activeTheme, logic, onNext, onBack }) => {
       label: `${label} (e.g. "${sample}")`,
     };
   });
-
-  const isReady = fields
-    .filter((f) => f.required)
-    .every((f) => logic.mappedColumns[f.key]);
 
   return (
     <div className="space-y-6">
@@ -90,6 +112,43 @@ const Step3 = ({ activeTheme, logic, onNext, onBack }) => {
           </div>
         ))}
       </div>
+
+      {/* CJK validation error */}
+      {hasNoValidCjkRows && (
+        <div
+          className={`flex items-start gap-3 p-4 rounded-lg border border-red-500/40 bg-red-500/10`}
+        >
+          <FontAwesomeIcon
+            icon={faTriangleExclamation}
+            className="text-red-500 mt-0.5"
+          />
+          <div className="text-sm text-red-500 flex flex-col">
+            <span>
+              The front column you selected does not contain any valid
+              characters.
+            </span>{" "}
+            <span>
+              Double-check your column mapping, or make sure your file actually
+              contains Chinese characters.
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Existing partial-skip warning (non-blocking) */}
+      {!hasNoValidCjkRows && logic.cjkWarning && (
+        <div
+          className={`flex items-start gap-3 p-4 rounded-lg border ${activeTheme.border.default} ${activeTheme.background.secondary}`}
+        >
+          <FontAwesomeIcon
+            icon={faTriangleExclamation}
+            className="text-yellow-500 mt-0.5"
+          />
+          <div className={`text-sm ${activeTheme.text.secondary}`}>
+            {logic.cjkWarning}
+          </div>
+        </div>
+      )}
 
       {/* Preview */}
       {isReady && (

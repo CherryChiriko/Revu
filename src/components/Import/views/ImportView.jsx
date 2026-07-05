@@ -127,17 +127,25 @@ const ImportView = () => {
                     className={`rounded-full w-10 h-10 flex items-center justify-center border-2 transition-all duration-300
                       ${
                         logic.currentStep >= step
-                          ? `${activeTheme.button.primary}`
+                          ? `${activeTheme.button.primary} `
                           : `${activeTheme.button.disabled} ${activeTheme.border.secondary} ${activeTheme.text.secondary}`
                       }`}
                   >
                     {logic.currentStep > step ? (
                       <FontAwesomeIcon
                         icon={faCheckCircle}
-                        className={`w-5 h-5 ${activeTheme.text.primary}`}
+                        className={`w-5 h-5 ${activeTheme.text.activeButton}`}
                       />
                     ) : (
-                      idx + 1
+                      <div
+                        className={`${
+                          logic.currentStep >= step
+                            ? `${activeTheme.text.activeButton} font-semibold`
+                            : `${activeTheme.text.secondary} `
+                        } `}
+                      >
+                        {idx + 1}
+                      </div>
                     )}
                   </div>
                 )}

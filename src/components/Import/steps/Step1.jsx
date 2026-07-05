@@ -7,34 +7,7 @@ import {
   faSquarePlus,
 } from "@fortawesome/free-solid-svg-icons";
 
-import { useHanziWriter } from "../../Study/hooks/useHanziWriter";
-
-const CharacterSample = ({ activeTheme }) => {
-  const { containerRef } = useHanziWriter({
-    character: "字",
-    displayState: "animation",
-    onQuizComplete: () => {},
-    activeTheme,
-    strokeColor: `${activeTheme.isDark ? "rgb(212,212,212)" : "rgb(55, 65, 81)"}`,
-    revealed: true,
-    width: 100,
-    height: 100,
-  });
-
-  return (
-    <div
-      ref={containerRef}
-      className={`${activeTheme.background.canvas} border-4 ${activeTheme.border.card} rounded-xl shadow-lg transition-all duration-300 mx-auto`}
-      style={{
-        width: "100px",
-        height: "100px",
-        position: "relative",
-      }}
-      role="region"
-      aria-label="Character writing canvas"
-    />
-  );
-};
+import { CharacterDemo } from "../../General/ui/CharacterDemo";
 
 const Step1 = ({ activeTheme, logic, onNext }) => {
   const CARD_TYPES = [
@@ -60,7 +33,7 @@ const Step1 = ({ activeTheme, logic, onNext }) => {
               <div
                 className={`w-full rounded-lg p-3 border flex items-center justify-center ${activeTheme.border.default} ${activeTheme.background.accent1}`}
               >
-                <div className={`font-medium ${activeTheme.text.primary}`}>
+                <div className={`font-medium ${activeTheme.text.activeButton}`}>
                   Hola
                 </div>
               </div>
@@ -99,26 +72,11 @@ const Step1 = ({ activeTheme, logic, onNext }) => {
         );
       case 2:
         return (
-          <div className="flex flex-col items-center text-center ">
+          <div className="w-full max-w-[180px] mx-auto">
             <div
-              className={`rounded-xl shadow-sm flex flex-col items-center justify-between p-2 ${activeTheme.border.card} border`}
+              className={`rounded-xl p-3 ${activeTheme.background.secondary} border ${activeTheme.border.card}`}
             >
-              {/* Pinyin */}
-              <p
-                className={`text-sm font-bold leading-tight ${activeTheme.text.primary} flex-1`}
-              >
-                zì
-              </p>
-
-              {/* Character */}
-              <CharacterSample activeTheme={activeTheme} />
-
-              {/* Translation */}
-              <div className="flex flex-col w-full justify-center items-center px-4 mt-2 text-center space-y-3">
-                <p className={`text-sm italic ${activeTheme.text.secondary}`}>
-                  word
-                </p>
-              </div>
+              <CharacterDemo activeTheme={activeTheme} />
             </div>
           </div>
         );

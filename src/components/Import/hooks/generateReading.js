@@ -22,14 +22,14 @@ function pinyinToNum(input, markNeutral = true) {
         for (const [mark] of syllable.matchAll(/\p{M}/gu)) {
           // 1, 2, 3, or 4 (or 0 if not present in the list)
           const toneNumber = ["̄", "́", "̌", "̀"].indexOf(mark) + 1;
-          // if 0 (e.g. is umlaut), go to next mark
+          // if 0, go to next mark
           if (!toneNumber) continue;
           return `${syllable.replace(new RegExp(mark), "")}${toneNumber}`;
         }
 
         // if no mark found and syllable ends with letter, assume neutral tone
         return markNeutral && /\p{L}$/u.test(syllable)
-          ? `${syllable}5`
+          ? `${syllable}0`
           : syllable;
       })
       .join("")
@@ -61,7 +61,7 @@ export const generateReading = (
 
       result.tones = pinyinWithTones
         .split(" ")
-        .map((item) => parseInt(item.match(/\d/)?.[0] || 5));
+        .map((item) => parseInt(item.match(/\d/)?.[0] || 0));
 
       // Pleco Chinese Tone Colors
       const colors = {

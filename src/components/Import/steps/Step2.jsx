@@ -124,7 +124,7 @@ const Step2 = ({ activeTheme, logic, onNext, onBack }) => {
               <label
                 className={`
                   px-8 py-2.5 rounded-full font-bold cursor-pointer transition-all
-                  ${activeTheme.button.primary} ${activeTheme.text.primary} 
+                  ${activeTheme.button.primary} ${activeTheme.text.activeButton} 
                   hover:shadow-lg active:scale-95
                 `}
               >
