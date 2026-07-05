@@ -1,23 +1,56 @@
 import React from "react";
+import { supabase } from "../../../utils/supabaseClient";
 import { SettingCard, Toggle, LabelledSlider } from "../SettingsTemplates";
 import { updateSettings } from "../../../slices/settingsSlice";
+import { updateLocalProfile } from "../../../slices/userSlice"; // If keeping track in user state too
+import { useSettingSave } from "../hooks/useSettingsSave";
 import {
   faBolt,
   faClock,
   faGaugeHigh,
 } from "@fortawesome/free-solid-svg-icons";
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Section: Study flow
-// ─────────────────────────────────────────────────────────────────────────────
-
-export function StudyFlowSection({ settings, activeTheme, dispatch }) {
+export function StudyFlowSection({ profile, settings, activeTheme, dispatch }) {
   const set = (key, value) => dispatch(updateSettings({ [key]: value }));
 
+  // 🌟 Connect the exact same saving hook structure for UX consistency
+  const { handleSave, saveState } = useSettingSave(async () => {
+    if (!profile?.id) return;
+
+    // Update the database layout with current frontend configuration values
+    const { error } = await supabase
+      .from("profiles") // assuming profiles or user_settings is your target table
+      .update({
+        autoflip_mode_a: settings.autoflipModeA,
+        autoflip_speed: settings.autoflipSpeed,
+        character_animation_speed: settings.characterAnimationSpeed,
+      })
+      .eq("id", profile.id);
+
+    if (error) throw error;
+
+    // Optional: Synchronize your deep userSlice profile if needed
+    if (dispatch(updateLocalProfile)) {
+      dispatch(
+        updateLocalProfile({
+          autoflip_mode_a: settings.autoflipModeA,
+          autoflip_speed: settings.autoflipSpeed,
+          character_animation_speed: settings.characterAnimationSpeed,
+        }),
+      );
+    }
+  });
+
   return (
-    <SettingCard icon={faBolt} title="Study Flow" activeTheme={activeTheme}>
+    <SettingCard
+      icon={faBolt}
+      title="Study Flow"
+      activeTheme={activeTheme}
+      onSave={handleSave} // Added the explicit save trigger action
+      saveState={saveState} // Syncs loading/error styles on the button
+    >
       <div className="space-y-6">
-        {/* Autoflip toggle — mode A only */}
+        {/* Autoflip toggle */}
         <Toggle
           checked={settings.autoflipModeA}
           onChange={(v) => set("autoflipModeA", v)}
@@ -26,7 +59,7 @@ export function StudyFlowSection({ settings, activeTheme, dispatch }) {
           activeTheme={activeTheme}
         />
 
-        {/* Autoflip speed — only shown when autoflip is on */}
+        {/* Autoflip speed — conditionally rendered */}
         {settings.autoflipModeA && (
           <LabelledSlider
             icon={faClock}
@@ -41,7 +74,7 @@ export function StudyFlowSection({ settings, activeTheme, dispatch }) {
           />
         )}
 
-        {/* Character animation speed — mode C only, always shown */}
+        {/* Character animation speed */}
         <LabelledSlider
           icon={faGaugeHigh}
           label="Character animation speed"

@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
 import { AvatarSection } from "./components/AvatarSection";
-import { StudyLimitsSection } from "./components/StudyLimits";
+import { StudyLimitsSection } from "./components/StudyLimitsSection";
 import { ThemeSection } from "./components/ThemeSection";
 import { StudyFlowSection } from "./components/StudyFlowSection";
 import { DisplaySection } from "./components/DisplaySection";
