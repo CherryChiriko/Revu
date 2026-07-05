@@ -32,13 +32,13 @@ import StudySession from "./components/Study/views/StudySession";
 import { SettingsPage } from "./components/Settings/SettingsPage";
 import SettingsView from "./components/Settings/views/SettingsView";
 import ActivityPage from "./components/Activity/ActivityPage";
-import LoginPage from "./components/Login/LoginPage";
+import LoginPage from "./components/Login/components/LoginPage";
 import NotFound404 from "./components/404";
 
 import ScrollToTop from "./components/General/routing/ScrollToTop";
 import DecksLoader from "./components/Loaders/DecksLoader";
 import StatsLoader from "./components/Loaders/StatsLoader";
-import ResetPasswordPage from "./components/Login/ResetPasswordPage";
+import ResetPasswordPage from "./components/Login/components/ResetPasswordPage";
 import OnboardingModal from "./components/Tutorial/Tutorial";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
