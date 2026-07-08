@@ -19,12 +19,14 @@ export const updateProgress = createAsyncThunk(
     }
 
     try {
-      const { error } = await supabase.from(table).upsert(sessionUpdates, {
+      const progressUpdates = sessionUpdates.map(({ xp_earned, ...update }) => update);
+
+      const { error } = await supabase.from(table).upsert(progressUpdates, {
         onConflict: ["user_id", "card_id"],
       });
 
       if (error) throw error;
-      return sessionUpdates;
+      return progressUpdates;
     } catch (err) {
       console.error("updateProgress error:", err);
       return rejectWithValue(
@@ -57,11 +59,12 @@ const progressSlice = createSlice({
       .addCase(updateProgress.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.error = null;
-        const { cardId, updates } = action.payload;
-        state.byCardId[cardId] = {
-          ...state.byCardId[cardId],
-          ...updates,
-        };
+        for (const update of action.payload || []) {
+          state.byCardId[update.card_id] = {
+            ...state.byCardId[update.card_id],
+            ...update,
+          };
+        }
       })
       .addCase(updateProgress.rejected, (state, action) => {
         state.status = "failed";

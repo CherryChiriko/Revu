@@ -1,7 +1,7 @@
 /**
  * Determines a card's display status based on its stored progress.
  * @param {Object} progress - The card's progress object (from Redux/DB).
- * @returns {string} The computed status: 'due', 'waiting', 'new', or 'mastered'.
+ * @returns {string} The computed queue status: 'due', 'waiting', 'new', or 'suspended'.
  */
 export const getCardStatus = (progress) => {
   if (progress.suspended) return "suspended";
@@ -9,7 +9,6 @@ export const getCardStatus = (progress) => {
   const now = Date.now();
 
   switch (progress.status) {
-    case "mastered":
     case "new":
     case "due":
       return progress.status;

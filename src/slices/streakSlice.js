@@ -4,6 +4,7 @@ import {
   createSelector,
 } from "@reduxjs/toolkit";
 import { supabase } from "../utils/supabaseClient";
+import { getTodayISO, getUserTimezone } from "../utils/dateHelper";
 
 /* -------------------------------------------
    Thunk: fetch daily streak stats
@@ -23,17 +24,26 @@ export const fetchDailyStreakStats = createAsyncThunk(
         userId = userData.user.id;
       }
 
+      const userTimezone = getUserTimezone();
+      const today = getTodayISO(userTimezone);
+
+      await supabase.rpc("ensure_today_stats_for_user", {
+        p_user_id: userId,
+        p_user_timezone: userTimezone,
+      });
+
       const [deckRes, userRes] = await Promise.all([
         supabase
           .from("daily_deck_stats")
           .select("deck_id, deck_streak, max_streak, streak_state, date")
           .eq("user_id", userId)
-          .order("date", { ascending: false }), // Gets the newest records first
+          .eq("date", today),
 
         supabase
-          .from("profiles")
-          .select("global_streak, global_max_streak")
-          .eq("id", userId)
+          .from("daily_user_stats")
+          .select("global_streak, max_global_streak, streak_state")
+          .eq("user_id", userId)
+          .eq("date", today)
           .single(),
       ]);
 

@@ -13,6 +13,8 @@ import {
   faHandPointer,
 } from "@fortawesome/free-solid-svg-icons";
 import { completeOnboarding } from "../../slices/userSlice"; // adjust path if needed
+import { ONBOARDING_STEPS } from "./constants/steps";
+import { useTutorial } from "./hooks/useTutorial";
 
 /* ---------------------------------------------------------------------- */
 /*  Demo: Mode A — standard flip card                                     */
@@ -365,48 +367,12 @@ const STEPS = [
  * to the profiles table, rolling back on failure.
  */
 export default function OnboardingModal({ activeTheme, onClose }) {
-  const dispatch = useDispatch();
-  const [step, setStep] = useState(0);
-  const [finished, setFinished] = useState(false);
+  const { step, finished, isLastStep, handleNext, handleBack, handleFinish } =
+    useTutorial(ONBOARDING_STEPS.length, onClose);
 
-  const isLastStep = step === STEPS.length - 1;
   const current = STEPS[step];
   const stepIcon = current.icon;
   const Demo = current.demo;
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === "Escape") handleSkip();
-      if (e.key === "ArrowRight") handleNext();
-      if (e.key === "ArrowLeft") handleBack();
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [step, finished]);
-
-  const finish = () => {
-    dispatch(completeOnboarding());
-    onClose?.();
-  };
-
-  const handleNext = () => {
-    if (finished) return;
-    if (isLastStep) {
-      setFinished(true);
-    } else {
-      setStep((s) => Math.min(s + 1, STEPS.length - 1));
-    }
-  };
-
-  const handleBack = () => {
-    if (finished) return;
-    setStep((s) => Math.max(s - 1, 0));
-  };
-
-  const handleSkip = () => {
-    finish();
-  };
 
   return (
     <div
@@ -427,7 +393,7 @@ export default function OnboardingModal({ activeTheme, onClose }) {
             {!finished && (
               <button
                 type="button"
-                onClick={handleSkip}
+                onClick={handleFinish}
                 className={`text-sm ${activeTheme.text.muted} hover:${activeTheme.text.secondary} transition-colors px-2 py-1 rounded-md`}
               >
                 Skip
@@ -547,7 +513,7 @@ export default function OnboardingModal({ activeTheme, onClose }) {
           >
             <button
               type="button"
-              onClick={finish}
+              onClick={handleFinish}
               className={`flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium ${activeTheme.text.activeButton} ${activeTheme.button.primary}`}
             >
               <FontAwesomeIcon icon={faCheck} className="w-3.5 h-3.5" />

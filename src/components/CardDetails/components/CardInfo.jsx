@@ -1,21 +1,22 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faCalendarDays,
   faGaugeHigh,
   faRepeat,
+  faSeedling,
 } from "@fortawesome/free-solid-svg-icons";
 
 import { STATUS_TILE } from "../../DeckDetails/components/SharedStyles";
+import { getMasterySummary } from "../../../utils/cardMastery";
 
 const getCardStrengthLabel = (easeFactor, status) => {
   if (status === "new") return "New card";
   const ef = Number(easeFactor);
 
   if (ef < 1.7) return "Challenging";
-  if (ef < 2.2) return "Getting There";
+  if (ef < 2.2) return "Getting there";
   if (ef <= 2.6) return "Good";
-  return "Mastered 🎉";
+  return "Excellent";
 };
 
 const MetaRow = ({ icon, label, value, activeTheme }) => {
@@ -38,7 +39,9 @@ const MetaRow = ({ icon, label, value, activeTheme }) => {
 
 export function CardInfo({ card, isC, activeTheme }) {
   const tile = STATUS_TILE[card.status] ?? STATUS_TILE.new;
-  console.log(card.status);
+  const mastery = getMasterySummary(card);
+  const timesStudied = card.study_count ?? card.repetitions ?? 0;
+
   return (
     <>
       <section className="space-y-1.5">
@@ -115,22 +118,18 @@ export function CardInfo({ card, isC, activeTheme }) {
               activeTheme={activeTheme}
             />
           )}
-          {card.repetitions != null && (
-            <MetaRow
-              icon={faRepeat}
-              label="Times studied"
-              value={card.repetitions}
-              activeTheme={activeTheme}
-            />
-          )}
-          {card.due_date && (
-            <MetaRow
-              icon={faCalendarDays}
-              label="Due date for review"
-              value={new Date(card.due_date).toLocaleDateString()}
-              activeTheme={activeTheme}
-            />
-          )}
+          <MetaRow
+            icon={faSeedling}
+            label="Completeness"
+            value={`${mastery.label} (${mastery.progress}%)`}
+            activeTheme={activeTheme}
+          />
+          <MetaRow
+            icon={faRepeat}
+            label="Times studied"
+            value={timesStudied}
+            activeTheme={activeTheme}
+          />
         </div>
       </section>
     </>

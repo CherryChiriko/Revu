@@ -4,20 +4,14 @@ import {
   createAsyncThunk,
 } from "@reduxjs/toolkit";
 import { supabase } from "../utils/supabaseClient";
+import { getTodayISO } from "../utils/dateHelper";
 
 export const selectSettingsState = (state) => state.settings;
 
 /* -------------------------------------------
    Helper Functions
 -------------------------------------------- */
-const dateKey = () => {
-  const localDate = new Date();
-  const year = localDate.getFullYear();
-  const month = String(localDate.getMonth() + 1).padStart(2, "0");
-  const day = String(localDate.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-};
+const dateKey = () => getTodayISO();
 /* -------------------------------------------
    Initial State
 -------------------------------------------- */
@@ -50,7 +44,9 @@ export const fetchDailyActivity = createAsyncThunk(
 
       const { data, error } = await supabase
         .from("daily_user_stats")
-        .select("date, cards_reviewed, cards_learned, time_studied_seconds")
+        .select(
+          "date, cards_reviewed, cards_learned, time_studied_seconds, total_xp",
+        )
         .eq("user_id", userId)
         .gte("date", cutoffStr);
       if (error) return rejectWithValue(error.message);
@@ -83,6 +79,7 @@ export const activitySlice = createSlice({
         cardsReviewed: (existing.cardsReviewed || 0) + cardsReviewed,
         cardsLearned: (existing.cardsLearned || 0) + cardsLearned,
         timeStudiedSeconds: existing.timeStudiedSeconds || 0,
+        totalXP: existing.totalXP || 0,
         cardsStudied:
           (existing.cardsStudied || 0) + cardsReviewed + cardsLearned,
       };
@@ -97,13 +94,19 @@ export const activitySlice = createSlice({
     },
 
     updateDayFromRealtime: (state, action) => {
-      const { date, cards_reviewed, cards_learned, time_studied_seconds } =
-        action.payload;
+      const {
+        date,
+        cards_reviewed,
+        cards_learned,
+        time_studied_seconds,
+        total_xp,
+      } = action.payload;
       state.days[date] = {
         date,
         cardsReviewed: cards_reviewed || 0,
         cardsLearned: cards_learned || 0,
         timeStudiedSeconds: time_studied_seconds || 0,
+        totalXP: total_xp || 0,
         cardsStudied: (cards_reviewed || 0) + (cards_learned || 0),
       };
       state.lastUpdated = new Date().toISOString();
@@ -125,6 +128,7 @@ export const activitySlice = createSlice({
             cardsReviewed: d.cards_reviewed || 0,
             cardsLearned: d.cards_learned || 0,
             timeStudiedSeconds: d.time_studied_seconds || 0,
+            totalXP: d.total_xp || 0,
             cardsStudied: (d.cards_reviewed || 0) + (d.cards_learned || 0),
           };
         });
@@ -173,6 +177,7 @@ export const selectTodayActivity = createSelector(
         cardsLearned: 0,
         timeStudiedSeconds: 0,
         cardsStudied: 0,
+        totalXP: 0,
       }
     );
   },
@@ -188,6 +193,7 @@ export const selectActivityByDate = (date) =>
         cardsLearned: 0,
         timeStudiedSeconds: 0,
         cardsStudied: 0,
+        totalXP: 0,
       }
     );
   });
@@ -203,6 +209,7 @@ export const selectTotalActivity = createSelector(
         timeStudiedSeconds:
           acc.timeStudiedSeconds + (day.timeStudiedSeconds || 0),
         cardsStudied: acc.cardsStudied + day.cardsStudied,
+        totalXP: acc.totalXP + (day.totalXP || 0),
         totalDays: acc.totalDays + 1,
       }),
       {
@@ -210,6 +217,7 @@ export const selectTotalActivity = createSelector(
         cardsLearned: 0,
         timeStudiedSeconds: 0,
         cardsStudied: 0,
+        totalXP: 0,
         totalDays: 0,
       },
     );

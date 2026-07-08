@@ -10,7 +10,6 @@ import {
   faFire,
   faGaugeHigh,
   faLayerGroup,
-  faLanguage,
   faStar,
 } from "@fortawesome/free-solid-svg-icons";
 import { selectActiveTheme } from "../../slices/themeSlice";
@@ -22,30 +21,27 @@ import {
 import {
   selectDecks,
   selectTotalDueCards,
+  selectTotalFamiliarCards,
   selectTotalMasteredCards,
+  selectTotalSolidCards,
 } from "../../slices/deckSlice";
 import {
   selectGlobalMaxStreak,
   selectGlobalStreak,
+  selectGlobalStreakState,
 } from "../../slices/streakSlice";
 import { selectSettings } from "../../slices/settingsSlice";
-
-const DAY_MS = 24 * 60 * 60 * 1000;
-
-function dateKey(date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
+import { selectUserProfile } from "../../slices/userSlice";
+import { MasteryBreakdown } from "../Mastery/MasteryBar";
+import { addDaysToDateKey, getTodayISO } from "../../utils/dateHelper";
+import { getLevelProgress } from "../../utils/xp";
 
 function getRecentDays(days, count = 14) {
   const dayMap = new Map(days.map((day) => [day.date, day]));
-  const today = new Date();
+  const today = getTodayISO();
 
   return Array.from({ length: count }, (_, index) => {
-    const date = new Date(today.getTime() - (count - 1 - index) * DAY_MS);
-    const key = dateKey(date);
+    const key = addDaysToDateKey(today, -(count - 1 - index));
     return (
       dayMap.get(key) || {
         date: key,
@@ -53,6 +49,7 @@ function getRecentDays(days, count = 14) {
         cardsLearned: 0,
         cardsStudied: 0,
         timeStudiedSeconds: 0,
+        totalXP: 0,
       }
     );
   });
@@ -115,9 +112,13 @@ export default function ActivityPage() {
   const activeDays = useSelector(selectActiveDaysCount);
   const decks = useSelector(selectDecks);
   const dueCards = useSelector(selectTotalDueCards);
+  const familiarCards = useSelector(selectTotalFamiliarCards);
+  const solidCards = useSelector(selectTotalSolidCards);
   const masteredCards = useSelector(selectTotalMasteredCards);
   const currentStreak = useSelector(selectGlobalStreak);
   const bestStreak = useSelector(selectGlobalMaxStreak);
+  const streakState = useSelector(selectGlobalStreakState);
+  const profile = useSelector(selectUserProfile);
 
   const recentDays = useMemo(
     () => getRecentDays(activityDays, 14),
@@ -135,6 +136,8 @@ export default function ActivityPage() {
   const averageCardsPerActiveDay = activeDays
     ? Math.round(totalActivity.cardsStudied / activeDays)
     : 0;
+  const totalXP = profile?.lifetime_xp ?? totalActivity.totalXP ?? 0;
+  const levelProgress = getLevelProgress(totalXP);
 
   const languageStats = useMemo(() => {
     const grouped = new Map();
@@ -229,7 +232,7 @@ export default function ActivityPage() {
           </div>
         </header>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
           <StatTile
             icon={faCalendarDays}
             label="Active Days"
@@ -255,7 +258,14 @@ export default function ActivityPage() {
             icon={faFire}
             label="Best Streak"
             value={`${bestStreak || 0}d`}
-            note={`Current streak: ${currentStreak || 0}d`}
+            note={`Current streak: ${currentStreak || 0}d (${streakState || "inactive"})`}
+            activeTheme={activeTheme}
+          />
+          <StatTile
+            icon={faStar}
+            label="Lifetime XP"
+            value={totalXP}
+            note={`Level ${levelProgress.level} - ${levelProgress.xpIntoLevel}/${levelProgress.xpForNextLevel} XP`}
             activeTheme={activeTheme}
           />
         </div>
@@ -328,8 +338,8 @@ export default function ActivityPage() {
           >
             <div className="space-y-5">
               <MasteryBreakdown
-                learning={learningCards}
-                reviewing={reviewingCards}
+                familiar={familiarCards}
+                solid={solidCards}
                 mastered={masteredCards}
                 activeTheme={activeTheme}
               />
@@ -350,14 +360,16 @@ export default function ActivityPage() {
                 >
                   <FontAwesomeIcon icon={faStar} className="mb-3" />
                   <p className={`${activeTheme.text.secondary} text-sm`}>
-                    Mastered total
+                    Solid + mastered
                   </p>
-                  <p className="text-2xl font-black">{masteredCards}</p>
+                  <p className="text-2xl font-black">
+                    {solidCards + masteredCards}
+                  </p>
                 </div>
               </div>
               <p className={`${activeTheme.text.secondary} text-sm`}>
-                This view rewards steady days and manageable due queues. High
-                accuracy is useful, but consistency is what keeps memory alive.
+                Queue status tells you what is available today; completeness
+                tells you how resilient those memories are becoming.
               </p>
             </div>
           </Section>

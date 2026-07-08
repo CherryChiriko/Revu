@@ -28,6 +28,8 @@ const normalizeDeck = (deck) => {
     due: deck.due_count ?? 0,
     waiting: deck.waiting_count ?? 0,
     new: deck.new_count ?? 0,
+    familiar: deck.familiar_count ?? 0, // new
+    solid: deck.solid_count ?? 0, // new
     mastered: deck.mastered_count ?? 0,
     suspended: deck.suspended_count ?? 0,
   };
@@ -36,6 +38,8 @@ const normalizeDeck = (deck) => {
 const countsFromDeck = (deck) => ({
   deckId: deck.deck_id ?? deck.id,
   new: deck.new_count ?? 0,
+  familiar: deck.familiar_count ?? 0,
+  solid: deck.solid_count ?? 0,
   mastered: deck.mastered_count ?? 0,
   suspended: deck.suspended_count ?? 0,
   waiting: deck.waiting_count ?? 0,
@@ -80,7 +84,7 @@ export const fetchDeckCounts = createAsyncThunk(
       const { data, error } = await supabase
         .from("decks")
         .select(
-          "id, new_count, due_count, waiting_count, mastered_count, suspended_count",
+          "id, new_count, due_count, waiting_count, familiar_count, solid_count, mastered_count, suspended_count",
         )
         .eq("user_id", user_id);
 
@@ -115,14 +119,17 @@ export function updateDeckStatsFromRealtime(state, action) {
 
   const index = state.decks.findIndex((d) => d.deck_id === targetId);
   if (index !== -1) {
-    state.decks[index] = normalizeDeck({
-      ...state.decks[index],
-      due_count: row.due_count,
-      waiting_count: row.waiting_count,
-      new_count: row.new_count,
-      mastered_count: row.mastered_count ?? state.decks[index].mastered_count,
-      suspended_count: row.suspended_count,
-    });
+      state.decks[index] = normalizeDeck({
+        ...state.decks[index],
+        due_count: row.due_count,
+        waiting_count: row.waiting_count,
+        new_count: row.new_count,
+        familiar_count:
+          row.familiar_count ?? state.decks[index].familiar_count,
+        solid_count: row.solid_count ?? state.decks[index].solid_count,
+        mastered_count: row.mastered_count ?? state.decks[index].mastered_count,
+        suspended_count: row.suspended_count,
+      });
   }
 
   state.deckCounts[targetId] = {
@@ -130,6 +137,8 @@ export function updateDeckStatsFromRealtime(state, action) {
     due: row.due_count ?? 0,
     waiting: row.waiting_count ?? 0,
     new: row.new_count ?? 0,
+    familiar: row.familiar_count ?? state.deckCounts[targetId]?.familiar ?? 0,
+    solid: row.solid_count ?? state.deckCounts[targetId]?.solid ?? 0,
     mastered: row.mastered_count ?? state.deckCounts[targetId]?.mastered ?? 0,
     suspended: row.suspended_count ?? 0,
   };
@@ -325,6 +334,8 @@ export const selectDeckCountsById = (deckId) =>
         new: deck.new ?? 0,
         due: deck.due ?? 0,
         waiting: deck.waiting ?? 0,
+        familiar: deck.familiar ?? 0,
+        solid: deck.solid ?? 0,
         mastered: deck.mastered ?? 0,
         suspended: deck.suspended ?? 0,
       };
@@ -347,5 +358,13 @@ export const selectTotalMasteredCards = (state) => {
 };
 export const selectDeckStatus = (state) => state.decks.status;
 export const selectDeckError = (state) => state.decks.error;
+
+export const selectTotalFamiliarCards = (state) =>
+  Object.values(state.decks.deckCounts).reduce(
+    (t, d) => t + (d.familiar || 0),
+    0,
+  );
+export const selectTotalSolidCards = (state) =>
+  Object.values(state.decks.deckCounts).reduce((t, d) => t + (d.solid || 0), 0);
 
 export default deckSlice.reducer;

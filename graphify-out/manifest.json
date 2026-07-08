@@ -1,0 +1,902 @@
+{
+  "SQL_database/avatar_history_migration.sql": {
+    "mtime": 1780704937.169512,
+    "ast_hash": "85cae5dd432aff9fbc45770036e0960a",
+    "semantic_hash": ""
+  },
+  "SQL_database/avatar_migration.sql": {
+    "mtime": 1782728466.994982,
+    "ast_hash": "02513afa67d672b30fa733d324cdc1b1",
+    "semantic_hash": ""
+  },
+  "SQL_database/latest_SQL.sql": {
+    "mtime": 1782706318.4193034,
+    "ast_hash": "1860e295003a28a4e7658555c0793561",
+    "semantic_hash": ""
+  },
+  "SQL_database/mastery_migration.sql": {
+    "mtime": 1783416827.5964842,
+    "ast_hash": "57e0bed82c66b597b9b82a2a819a3ba3",
+    "semantic_hash": ""
+  },
+  "SQL_database/migration_display_database.sql": {
+    "mtime": 1781308326.051539,
+    "ast_hash": "fa518c5e7f0f34a4fe680896e89d3b86",
+    "semantic_hash": ""
+  },
+  "SQL_database/migration_onboarding.sql": {
+    "mtime": 1783068963.6141987,
+    "ast_hash": "5923d449036149d4bc9451ac7d7f061d",
+    "semantic_hash": ""
+  },
+  "SQL_database/new_temp_sql.sql": {
+    "mtime": 1780698130.3091784,
+    "ast_hash": "34281713988e397cf163479409f92b25",
+    "semantic_hash": ""
+  },
+  "SQL_database/supabase_sql.sql": {
+    "mtime": 1779601124.5771809,
+    "ast_hash": "045dc50c8748a6d11ebba7be9f05da7e",
+    "semantic_hash": ""
+  },
+  "SQL_database/table-schema.json": {
+    "mtime": 1779601070.1162686,
+    "ast_hash": "81cf78a8a80b7314daae559f1b06f19d",
+    "semantic_hash": ""
+  },
+  "SQL_database/temp_schema_breaking_changes.sql": {
+    "mtime": 1779617448.09421,
+    "ast_hash": "527908d4aef2a21ccb8e7a6d6898ba56",
+    "semantic_hash": ""
+  },
+  "firebase.json": {
+    "mtime": 1779598592.4471362,
+    "ast_hash": "fbbca328761831d4bc438dfddc92c192",
+    "semantic_hash": ""
+  },
+  "package.json": {
+    "mtime": 1779597860.1834178,
+    "ast_hash": "d2997909ef02de9cc5151bf3e96f70d0",
+    "semantic_hash": ""
+  },
+  "public/manifest.json": {
+    "mtime": 1779597860.1931102,
+    "ast_hash": "b74bcb5ae3f9250b84d498a69abae9d2",
+    "semantic_hash": ""
+  },
+  "skills-lock.json": {
+    "mtime": 1779520506.5198421,
+    "ast_hash": "e9da20e731b318a495a1eedc4895bb2b",
+    "semantic_hash": ""
+  },
+  "src/App.js": {
+    "mtime": 1783209093.0348594,
+    "ast_hash": "aa8be2b7dad0fee1b17aa86ac0470883",
+    "semantic_hash": ""
+  },
+  "src/App.test.js": {
+    "mtime": 1753303197.807237,
+    "ast_hash": "d18ac434afb00158b91831ac1e36c491",
+    "semantic_hash": ""
+  },
+  "src/app/store.js": {
+    "mtime": 1782816572.1457345,
+    "ast_hash": "f6911560e85a1f66c8c402ea55acd378",
+    "semantic_hash": ""
+  },
+  "src/assets/themes.js": {
+    "mtime": 1782556507.7008944,
+    "ast_hash": "3317526df21b8fd9768d3ced1821e4b1",
+    "semantic_hash": ""
+  },
+  "src/components/404.jsx": {
+    "mtime": 1779597860.2096786,
+    "ast_hash": "3f35dd47bc992deb7a493b94a8d1df87",
+    "semantic_hash": ""
+  },
+  "src/components/Activity/ActivityPage.jsx": {
+    "mtime": 1783072902.7960644,
+    "ast_hash": "69d7c84eb22f26a917f12b4a0cc7420f",
+    "semantic_hash": ""
+  },
+  "src/components/CardDetails/components/CardEdit.jsx": {
+    "mtime": 1782896312.997755,
+    "ast_hash": "2b51e8efd6722bbe4371838789454808",
+    "semantic_hash": ""
+  },
+  "src/components/CardDetails/components/CardInfo.jsx": {
+    "mtime": 1782965195.9401138,
+    "ast_hash": "ca02a0430344fcbae4fc87fccdf71858",
+    "semantic_hash": ""
+  },
+  "src/components/CardDetails/hooks/useCardDetails.js": {
+    "mtime": 1782963862.1465652,
+    "ast_hash": "c8506dbb875ab25bb69639549d2b51de",
+    "semantic_hash": ""
+  },
+  "src/components/CardDetails/views/CardDetails.jsx": {
+    "mtime": 1782963432.1310847,
+    "ast_hash": "8caf00518c3d01acfdddd04058e11514",
+    "semantic_hash": ""
+  },
+  "src/components/Dashboard/Achievements.jsx": {
+    "mtime": 1779597860.211702,
+    "ast_hash": "fe05d02792c58983282b7304e1303b6a",
+    "semantic_hash": ""
+  },
+  "src/components/Dashboard/Dashboard.jsx": {
+    "mtime": 1783072807.9110541,
+    "ast_hash": "bb858e73447a4ea2947e1f498ecfcfff",
+    "semantic_hash": ""
+  },
+  "src/components/Dashboard/Heatmap.jsx": {
+    "mtime": 1781431660.9399664,
+    "ast_hash": "5bb788adad584cc762b9941026cd4464",
+    "semantic_hash": ""
+  },
+  "src/components/Dashboard/StatCard.jsx": {
+    "mtime": 1782557222.045996,
+    "ast_hash": "6230a788dcf72213905e6e31171a714e",
+    "semantic_hash": ""
+  },
+  "src/components/Dashboard/XPBar.jsx": {
+    "mtime": 1780571108.2159123,
+    "ast_hash": "626685fd96e438e4a9dbb70996743dcc",
+    "semantic_hash": ""
+  },
+  "src/components/DeckDetails/components/AddCardMenu.jsx": {
+    "mtime": 1782896080.878246,
+    "ast_hash": "a63cf3bcb46f35d3d57675ee10f1fc65",
+    "semantic_hash": ""
+  },
+  "src/components/DeckDetails/components/DeckMetaEditor.jsx": {
+    "mtime": 1782602793.7475696,
+    "ast_hash": "0cc5613ddfd56c975ff17b0b74e2fa7d",
+    "semantic_hash": ""
+  },
+  "src/components/DeckDetails/components/SharedStyles.jsx": {
+    "mtime": 1782598477.4678962,
+    "ast_hash": "af93de282fbed7830ba2899eeb1217c3",
+    "semantic_hash": ""
+  },
+  "src/components/DeckDetails/components/sections/CardGridSection.jsx": {
+    "mtime": 1782636500.9705775,
+    "ast_hash": "0eeb82baee3abfed5c400c83f5c6b99e",
+    "semantic_hash": ""
+  },
+  "src/components/DeckDetails/components/sections/DeckHeaderSection.jsx": {
+    "mtime": 1782610859.0147154,
+    "ast_hash": "9a36ca9174289eac7596ef69529bcba6",
+    "semantic_hash": ""
+  },
+  "src/components/DeckDetails/components/sections/DeckStatsSection.jsx": {
+    "mtime": 1782630837.1946363,
+    "ast_hash": "161b3f9ef6084ba5dcbd31cc061678f8",
+    "semantic_hash": ""
+  },
+  "src/components/DeckDetails/components/tiles/AddCardTile.jsx": {
+    "mtime": 1782636548.780563,
+    "ast_hash": "a8a9d203418838405e45127b14fd0048",
+    "semantic_hash": ""
+  },
+  "src/components/DeckDetails/components/tiles/CardTile.jsx": {
+    "mtime": 1782721873.012491,
+    "ast_hash": "1871afe23c029bd219dd9f91f3d51bc2",
+    "semantic_hash": ""
+  },
+  "src/components/DeckDetails/components/tiles/EmptyTile.jsx": {
+    "mtime": 1782632121.390335,
+    "ast_hash": "44c1804521374faace79d8cbf3505862",
+    "semantic_hash": ""
+  },
+  "src/components/DeckDetails/hooks/useAddCard.js": {
+    "mtime": 1782895136.0803592,
+    "ast_hash": "68168599dca7f12f7e7de21dc289f3a9",
+    "semantic_hash": ""
+  },
+  "src/components/DeckDetails/hooks/useDeckDetails.js": {
+    "mtime": 1782965332.3704731,
+    "ast_hash": "ef1c0728c7f96ad31d35577292e82b32",
+    "semantic_hash": ""
+  },
+  "src/components/DeckDetails/views/DeckDetails.jsx": {
+    "mtime": 1782642816.301687,
+    "ast_hash": "a8ef3df9877daeeab55cd6216dcda47c",
+    "semantic_hash": ""
+  },
+  "src/components/DeckMenu/components/DeckDelete.jsx": {
+    "mtime": 1782901545.9441547,
+    "ast_hash": "9c9cabadeb93871983d7b7ddcaa5a428",
+    "semantic_hash": ""
+  },
+  "src/components/DeckMenu/components/DeckMenu.jsx": {
+    "mtime": 1782598253.492063,
+    "ast_hash": "3be49bf4bd66845adb0bf709f6356022",
+    "semantic_hash": ""
+  },
+  "src/components/DeckMenu/views/QuickCreateMenu.jsx": {
+    "mtime": 1781762532.969414,
+    "ast_hash": "e1db9c366b5296073fcb6272e0883b51",
+    "semantic_hash": ""
+  },
+  "src/components/Decks/components/DeckActions.jsx": {
+    "mtime": 1782556646.0256793,
+    "ast_hash": "04dd3ea9b5e07892d8496fcaf67432c1",
+    "semantic_hash": ""
+  },
+  "src/components/Decks/components/DeckBadges.jsx": {
+    "mtime": 1782557308.096529,
+    "ast_hash": "b469394990fb008a01b2617409ad63d5",
+    "semantic_hash": ""
+  },
+  "src/components/Decks/components/DeckCard.jsx": {
+    "mtime": 1782093535.3408952,
+    "ast_hash": "d2a86665d2b0050b5338589bdd1104e0",
+    "semantic_hash": ""
+  },
+  "src/components/Decks/components/DeckCardItem.jsx": {
+    "mtime": 1782598253.492063,
+    "ast_hash": "50db0ac33bedd9bc790aa050de1324d9",
+    "semantic_hash": ""
+  },
+  "src/components/Decks/components/ProgressBar.jsx": {
+    "mtime": 1782816805.4110284,
+    "ast_hash": "3c444c75aaa1652a08a48f854147c707",
+    "semantic_hash": ""
+  },
+  "src/components/Decks/components/variants/CompactVariant.jsx": {
+    "mtime": 1782598253.49854,
+    "ast_hash": "640615f4ace07e5b134513ef516e8cb5",
+    "semantic_hash": ""
+  },
+  "src/components/Decks/components/variants/FullVariant.jsx": {
+    "mtime": 1782598253.5457118,
+    "ast_hash": "930cab905bece8c09a4cd3dd522eb52a",
+    "semantic_hash": ""
+  },
+  "src/components/Decks/hooks/useDeckLogic.js": {
+    "mtime": 1782596139.020893,
+    "ast_hash": "b919f15d890b2633c188622ed44c913d",
+    "semantic_hash": ""
+  },
+  "src/components/Decks/hooks/useListController.js": {
+    "mtime": 1781421836.0002873,
+    "ast_hash": "3eea8da927d24a140f6b0cf2d679df83",
+    "semantic_hash": ""
+  },
+  "src/components/Decks/views/DeckListView.jsx": {
+    "mtime": 1782601317.8786383,
+    "ast_hash": "4ded0269b6dc0c247b83130ece600a6c",
+    "semantic_hash": ""
+  },
+  "src/components/General/routing/ScrollToTop.jsx": {
+    "mtime": 1779597860.2406263,
+    "ast_hash": "32c740c3e9afac100bdf758f28838de9",
+    "semantic_hash": ""
+  },
+  "src/components/General/ui/AvatarDisplay.jsx": {
+    "mtime": 1782814192.5158877,
+    "ast_hash": "e17848e0f10fea4106310b52715f9032",
+    "semantic_hash": ""
+  },
+  "src/components/General/ui/Bar.jsx": {
+    "mtime": 1779699197.6697967,
+    "ast_hash": "4b3c4416e5d22a6ca74f669a3bafde4f",
+    "semantic_hash": ""
+  },
+  "src/components/General/ui/CharacterDemo.jsx": {
+    "mtime": 1783213472.466814,
+    "ast_hash": "6a028e9343809cd1b73a94f6ed79acf5",
+    "semantic_hash": ""
+  },
+  "src/components/General/ui/ConfirmationDialog.jsx": {
+    "mtime": 1782901540.4359572,
+    "ast_hash": "18f412c1585abd53813a7e6a9eb1db2a",
+    "semantic_hash": ""
+  },
+  "src/components/General/ui/FormField.jsx": {
+    "mtime": 1782891305.241682,
+    "ast_hash": "5a16dc389dce36a28d850d741554b5a4",
+    "semantic_hash": ""
+  },
+  "src/components/General/ui/FormStyles.jsx": {
+    "mtime": 1783209517.5171516,
+    "ast_hash": "45fb1a77f4b525b63c710d17ca6af386",
+    "semantic_hash": ""
+  },
+  "src/components/General/ui/Head.jsx": {
+    "mtime": 1782798607.8110168,
+    "ast_hash": "13ee04cd69d8f9c54ab127b8ffd0f382",
+    "semantic_hash": ""
+  },
+  "src/components/General/ui/Header.jsx": {
+    "mtime": 1779597860.2450185,
+    "ast_hash": "68ae12f683388ed6c1b29bfc4b1afc67",
+    "semantic_hash": ""
+  },
+  "src/components/General/ui/Menu.jsx": {
+    "mtime": 1781762852.9738832,
+    "ast_hash": "69bec7fdedf05067d92689ced5515ce9",
+    "semantic_hash": ""
+  },
+  "src/components/General/ui/ModalTemplate.jsx": {
+    "mtime": 1782716801.1381998,
+    "ast_hash": "ccb5f57f6c3e01283fd24503ceeffcd8",
+    "semantic_hash": ""
+  },
+  "src/components/Import/components/CopyDeck.jsx": {
+    "mtime": 1782535558.184403,
+    "ast_hash": "9773780392b386f3bc173c4f2f024083",
+    "semantic_hash": ""
+  },
+  "src/components/Import/components/NewDeck.jsx": {
+    "mtime": 1782891374.2696655,
+    "ast_hash": "1994e3116081aecd3aae81ea57e9ebf6",
+    "semantic_hash": ""
+  },
+  "src/components/Import/components/copy_modes/ConvertMode.jsx": {
+    "mtime": 1782598433.4528954,
+    "ast_hash": "e7e4ca3023853d72cd75e8522002a50c",
+    "semantic_hash": ""
+  },
+  "src/components/Import/components/copy_modes/ConvertModeToC.jsx": {
+    "mtime": 1782529257.028568,
+    "ast_hash": "5271833074029e4a65f9ea9676213587",
+    "semantic_hash": ""
+  },
+  "src/components/Import/components/copy_modes/MissedMode.jsx": {
+    "mtime": 1782514496.6433198,
+    "ast_hash": "610319e6933479d1ebe2be2f802acb13",
+    "semantic_hash": ""
+  },
+  "src/components/Import/components/copy_modes/SwapMode.jsx": {
+    "mtime": 1782598455.1838894,
+    "ast_hash": "dda80e345a6dc9238f3805b26ae94224",
+    "semantic_hash": ""
+  },
+  "src/components/Import/components/copy_steps/StepCopy1.jsx": {
+    "mtime": 1782609469.820205,
+    "ast_hash": "6fd3ee5925b6696d6a090606f085e316",
+    "semantic_hash": ""
+  },
+  "src/components/Import/components/copy_steps/StepCopy2.jsx": {
+    "mtime": 1782598433.492428,
+    "ast_hash": "1f7c5e48ab97459f1487918f7ecd4dbe",
+    "semantic_hash": ""
+  },
+  "src/components/Import/components/copy_steps/SuccessView.jsx": {
+    "mtime": 1782287811.7333279,
+    "ast_hash": "393359e1dd6968d54f91ca9774d2c577",
+    "semantic_hash": ""
+  },
+  "src/components/Import/hooks/generateReading.js": {
+    "mtime": 1783239682.320011,
+    "ast_hash": "5a3e7c25b09ca18ab608bab4762c5b51",
+    "semantic_hash": ""
+  },
+  "src/components/Import/hooks/useCreateNew.js": {
+    "mtime": 1782194574.0874877,
+    "ast_hash": "3ea54969f2904c1a350208bd3a2800d7",
+    "semantic_hash": ""
+  },
+  "src/components/Import/hooks/useImportLogic.js": {
+    "mtime": 1782515747.7764359,
+    "ast_hash": "f0ffaeec994ed1c7a2caafde5dfbf6b1",
+    "semantic_hash": ""
+  },
+  "src/components/Import/hooks/useQuickCreate.js": {
+    "mtime": 1782535374.316259,
+    "ast_hash": "e891dd7b5bbb43aed807f0363393b3b4",
+    "semantic_hash": ""
+  },
+  "src/components/Import/steps/FinalStep.jsx": {
+    "mtime": 1782105170.6847107,
+    "ast_hash": "b4aad8d379a33babb48904577680c7d4",
+    "semantic_hash": ""
+  },
+  "src/components/Import/steps/Step0.jsx": {
+    "mtime": 1782089657.908571,
+    "ast_hash": "f99064aaf547d120ef73418962734663",
+    "semantic_hash": ""
+  },
+  "src/components/Import/steps/Step1.jsx": {
+    "mtime": 1783241930.5049624,
+    "ast_hash": "935b23f1539eb0a4561db133c5ff9818",
+    "semantic_hash": ""
+  },
+  "src/components/Import/steps/Step2.jsx": {
+    "mtime": 1783240756.6887057,
+    "ast_hash": "e69943c425ddd6084fca62e001bcb6ba",
+    "semantic_hash": ""
+  },
+  "src/components/Import/steps/Step3.jsx": {
+    "mtime": 1783242035.3307767,
+    "ast_hash": "10126fa5b22240eaff7b562d03677bbd",
+    "semantic_hash": ""
+  },
+  "src/components/Import/steps/Step4.jsx": {
+    "mtime": 1782195384.35509,
+    "ast_hash": "102c0c0c6a721826c4bf8b337b62bfc4",
+    "semantic_hash": ""
+  },
+  "src/components/Import/views/ImportView.jsx": {
+    "mtime": 1783240303.3898487,
+    "ast_hash": "e92b2be51eba391cf5308ca5d7fa2cd6",
+    "semantic_hash": ""
+  },
+  "src/components/Import/views/QuickCreateView.jsx": {
+    "mtime": 1782717045.7925763,
+    "ast_hash": "ff43f92c3c89d9bfa5d7aee311f82bc9",
+    "semantic_hash": ""
+  },
+  "src/components/Loaders/DecksLoader.jsx": {
+    "mtime": 1780692913.7330065,
+    "ast_hash": "5cdb67d1d0ac46228e448d2cda969e8d",
+    "semantic_hash": ""
+  },
+  "src/components/Loaders/StatsLoader.jsx": {
+    "mtime": 1780692913.7330065,
+    "ast_hash": "3be0421f7b87f51bfc60f06d3686f91f",
+    "semantic_hash": ""
+  },
+  "src/components/Login/components/LoginPage.jsx": {
+    "mtime": 1783210459.2717996,
+    "ast_hash": "7dc522ca3ff9cef38de23399582b5c64",
+    "semantic_hash": ""
+  },
+  "src/components/Login/components/ResetPasswordPage.jsx": {
+    "mtime": 1783210107.0497525,
+    "ast_hash": "0b0dda92a1c8452954fc6b08458540e1",
+    "semantic_hash": ""
+  },
+  "src/components/Login/hooks/useLogin.js": {
+    "mtime": 1783210236.0539708,
+    "ast_hash": "4be1c2c3a145e8a8a59c7c0edc1a6542",
+    "semantic_hash": ""
+  },
+  "src/components/Login/hooks/useResetPassword.js": {
+    "mtime": 1783209236.985097,
+    "ast_hash": "02088e2cbfd8653ef0cbf18ede500865",
+    "semantic_hash": ""
+  },
+  "src/components/Mastery/MasteryBar.jsx": {
+    "mtime": 1783074535.8773315,
+    "ast_hash": "8c33736d1c0ba36d06e2e133e9afc8f0",
+    "semantic_hash": ""
+  },
+  "src/components/Navbar/NavItem.jsx": {
+    "mtime": 1779597860.2701445,
+    "ast_hash": "3c3d2dca47ca54ad698de0d8ae1aff45",
+    "semantic_hash": ""
+  },
+  "src/components/Navbar/Navbar.jsx": {
+    "mtime": 1782814259.6681418,
+    "ast_hash": "f0865b62d053c64d63704b72d9960878",
+    "semantic_hash": ""
+  },
+  "src/components/Settings/SettingsPage.jsx": {
+    "mtime": 1783210612.6178398,
+    "ast_hash": "59d83ad8a30b2ebd4139094f61138a98",
+    "semantic_hash": ""
+  },
+  "src/components/Settings/SettingsTemplates.jsx": {
+    "mtime": 1782816141.3198457,
+    "ast_hash": "11305eba45924611e42deec7d9a18b8c",
+    "semantic_hash": ""
+  },
+  "src/components/Settings/components/AccountSection.jsx": {
+    "mtime": 1783208836.0788238,
+    "ast_hash": "b218852d7881fc8c093f332c9db37462",
+    "semantic_hash": ""
+  },
+  "src/components/Settings/components/AvatarPick.jsx": {
+    "mtime": 1782815256.1998177,
+    "ast_hash": "ca6d18e243d8d5e0e48ca29fd7890ec3",
+    "semantic_hash": ""
+  },
+  "src/components/Settings/components/AvatarSection.jsx": {
+    "mtime": 1782816130.741319,
+    "ast_hash": "1453738765def5d993c7462bd61183d7",
+    "semantic_hash": ""
+  },
+  "src/components/Settings/components/DisplaySection.jsx": {
+    "mtime": 1782696031.7815125,
+    "ast_hash": "8d609d520a95480e92e4a0d0b43a7ce1",
+    "semantic_hash": ""
+  },
+  "src/components/Settings/components/StudyFlowSection.jsx": {
+    "mtime": 1783210666.8922696,
+    "ast_hash": "71905c90510eb18b9657ebc78c38fde9",
+    "semantic_hash": ""
+  },
+  "src/components/Settings/components/StudyLimitsSection.jsx": {
+    "mtime": 1782706637.1863174,
+    "ast_hash": "4df28e009e8e76488cfda802f04b67bb",
+    "semantic_hash": ""
+  },
+  "src/components/Settings/components/ThemeSection.jsx": {
+    "mtime": 1780725893.9447217,
+    "ast_hash": "a6a5e26c693d9e362d154b659a9dc566",
+    "semantic_hash": ""
+  },
+  "src/components/Settings/hooks/useAccountSettings.js": {
+    "mtime": 1782716365.1683967,
+    "ast_hash": "34c9d68e4de015fe2571e6e0762cfce5",
+    "semantic_hash": ""
+  },
+  "src/components/Settings/hooks/useSettings.js": {
+    "mtime": 1782728414.2282386,
+    "ast_hash": "6dfb12caa8ec4efec0c78302400487ee",
+    "semantic_hash": ""
+  },
+  "src/components/Settings/hooks/useSettingsSave.js": {
+    "mtime": 1781431500.8542907,
+    "ast_hash": "c84ba5cedfa08731b73ed76950362ad0",
+    "semantic_hash": ""
+  },
+  "src/components/Settings/views/AccountEditView.jsx": {
+    "mtime": 1782717263.3080378,
+    "ast_hash": "b6ac58baf4eddb9c7690eed95c454899",
+    "semantic_hash": ""
+  },
+  "src/components/Settings/views/SettingsView.jsx": {
+    "mtime": 1782814134.7545638,
+    "ast_hash": "1c08e1e844e5368300ba20651c77c3e6",
+    "semantic_hash": ""
+  },
+  "src/components/Study/components/Card/CardRenderer.jsx": {
+    "mtime": 1782706713.6177077,
+    "ast_hash": "4cf3ccea2564972b0768b2b24907a26c",
+    "semantic_hash": ""
+  },
+  "src/components/Study/components/Card/CharacterCard.jsx": {
+    "mtime": 1780124299.2514503,
+    "ast_hash": "327d12a3749aa6e75d2a7c2a44261629",
+    "semantic_hash": ""
+  },
+  "src/components/Study/components/Card/FlipCard.jsx": {
+    "mtime": 1782965617.7761228,
+    "ast_hash": "023aea5c933deb6d73b038bc629d10ce",
+    "semantic_hash": ""
+  },
+  "src/components/Study/components/Card/HanziCanvas.jsx": {
+    "mtime": 1782714862.4603207,
+    "ast_hash": "edda347784ec1e04567ab5d3fb72f872",
+    "semantic_hash": ""
+  },
+  "src/components/Study/components/Controls/ContinueButton.jsx": {
+    "mtime": 1783242190.8462315,
+    "ast_hash": "e33576cd36ade2d67e9d67de8bc9a9c4",
+    "semantic_hash": ""
+  },
+  "src/components/Study/components/Controls/RatingButtons.jsx": {
+    "mtime": 1779597860.2868514,
+    "ast_hash": "7bf712be7cabc045def49a3d94241c34",
+    "semantic_hash": ""
+  },
+  "src/components/Study/components/Controls/RevealButton.jsx": {
+    "mtime": 1782714944.096653,
+    "ast_hash": "322b764351bc7c1051fd814c1a1f79de",
+    "semantic_hash": ""
+  },
+  "src/components/Study/components/Modals/SessionComplete.jsx": {
+    "mtime": 1779597860.2898507,
+    "ast_hash": "781ff9433c883339191d51c14af4f04b",
+    "semantic_hash": ""
+  },
+  "src/components/Study/hooks/useCharacterFlow.js": {
+    "mtime": 1780135618.379802,
+    "ast_hash": "a4c22c607bd2697100dbf196c3e6e371",
+    "semantic_hash": ""
+  },
+  "src/components/Study/hooks/useHanziWriter.js": {
+    "mtime": 1782706664.6089618,
+    "ast_hash": "65fce198c3c328e59472f8c62d62d4ed",
+    "semantic_hash": ""
+  },
+  "src/components/Study/hooks/useStudySession.js": {
+    "mtime": 1782816858.925735,
+    "ast_hash": "bb40e4226e3cc69c39fb79ee78113c99",
+    "semantic_hash": ""
+  },
+  "src/components/Study/views/SessionMode.jsx": {
+    "mtime": 1782706736.4053764,
+    "ast_hash": "053fc047952b39b37c504e56c173ef75",
+    "semantic_hash": ""
+  },
+  "src/components/Study/views/StudySession.jsx": {
+    "mtime": 1782124211.2433934,
+    "ast_hash": "13ecc9517eb613edc97836a0398f4f27",
+    "semantic_hash": ""
+  },
+  "src/components/Tutorial/Onbo.jsx": {
+    "mtime": 1783212884.8704236,
+    "ast_hash": "439b879d2bec3521b34567da30f743c1",
+    "semantic_hash": ""
+  },
+  "src/components/Tutorial/Tutorial.jsx": {
+    "mtime": 1783214853.1319036,
+    "ast_hash": "1d98a708a6d5d30ac7cc6bd7325fe4e6",
+    "semantic_hash": ""
+  },
+  "src/components/Tutorial/constants/steps.js": {
+    "mtime": 1783240028.1719272,
+    "ast_hash": "b8ea9cccd577c15678e5400ff4be72b1",
+    "semantic_hash": ""
+  },
+  "src/components/Tutorial/hooks/useTutorial.js": {
+    "mtime": 1783240047.8212392,
+    "ast_hash": "1a16d78fdeeb3c790f9f86e14efefc8d",
+    "semantic_hash": ""
+  },
+  "src/data/navigationItems.js": {
+    "mtime": 1780551981.93457,
+    "ast_hash": "a99dd89943600c4a115934440318927c",
+    "semantic_hash": ""
+  },
+  "src/data/userProgress.js": {
+    "mtime": 1753865026.4237547,
+    "ast_hash": "7820a2fea204f1785092c29922235344",
+    "semantic_hash": ""
+  },
+  "src/hooks/useAppBoot.js": {
+    "mtime": 1780642875.4005039,
+    "ast_hash": "6c6d0a2f4f4e9c7cd8d31ba9e3ebfa63",
+    "semantic_hash": ""
+  },
+  "src/hooks/useAuth.js": {
+    "mtime": 1783201925.9375973,
+    "ast_hash": "2f755fee8373ec9351da47ce07774f94",
+    "semantic_hash": ""
+  },
+  "src/hooks/useDeckLiveSync.js": {
+    "mtime": 1779597860.3222876,
+    "ast_hash": "2c9c4a3bd56406ac722754b09fa2bdc4",
+    "semantic_hash": ""
+  },
+  "src/hooks/useDecks.js": {
+    "mtime": 1779597860.3232768,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "src/hooks/useGlobalStatsLiveSync.js": {
+    "mtime": 1779597860.3245976,
+    "ast_hash": "a1bb9b0a950f871ecd3812e561f9eb68",
+    "semantic_hash": ""
+  },
+  "src/hooks/useUserProfile.js": {
+    "mtime": 1779597860.3270214,
+    "ast_hash": "96170b12f395e2f7cda19ea4625a9031",
+    "semantic_hash": ""
+  },
+  "src/index.js": {
+    "mtime": 1779597860.3310463,
+    "ast_hash": "fceeb28f652879318d4fcf20e4b0bb6f",
+    "semantic_hash": ""
+  },
+  "src/reportWebVitals.js": {
+    "mtime": 1753303198.2169533,
+    "ast_hash": "240e2381f826a9bb84d178b29b7b9abe",
+    "semantic_hash": ""
+  },
+  "src/setupTests.js": {
+    "mtime": 1753303198.3098788,
+    "ast_hash": "1a77571e1a8cf36018a41bcedf60db75",
+    "semantic_hash": ""
+  },
+  "src/slices/activitySlice.js": {
+    "mtime": 1782694362.4799354,
+    "ast_hash": "1b9c8a246c4beeb8c03d57486ad4ee91",
+    "semantic_hash": ""
+  },
+  "src/slices/cardSlice.js": {
+    "mtime": 1782641327.9827917,
+    "ast_hash": "c943639915b15af3d42cfaedd399bdde",
+    "semantic_hash": ""
+  },
+  "src/slices/deckSlice.js": {
+    "mtime": 1783074620.0770316,
+    "ast_hash": "bfa0ed4bbd53bc6640a2d456b9cb2076",
+    "semantic_hash": ""
+  },
+  "src/slices/progressSlice.js": {
+    "mtime": 1779597861.9551804,
+    "ast_hash": "6b901b7067491c01b4754e521936198b",
+    "semantic_hash": ""
+  },
+  "src/slices/settingsSlice.js": {
+    "mtime": 1782816600.2987509,
+    "ast_hash": "9dee636adb629b87cef063b23e7bc448",
+    "semantic_hash": ""
+  },
+  "src/slices/streakSlice.js": {
+    "mtime": 1782716060.6988797,
+    "ast_hash": "64bdd3cbf299259e2ccea12e45d135f1",
+    "semantic_hash": ""
+  },
+  "src/slices/themeSlice.js": {
+    "mtime": 1779597861.9583082,
+    "ast_hash": "38e4f8d79fcf5d91dde7b80cc67c4712",
+    "semantic_hash": ""
+  },
+  "src/slices/userSlice.js": {
+    "mtime": 1783068983.7820785,
+    "ast_hash": "af5222ca39802bb2a76ff7b0c8dcca90",
+    "semantic_hash": ""
+  },
+  "src/utils/cardMastery.js": {
+    "mtime": 1783074520.6886506,
+    "ast_hash": "0d756607af5396d868487c91ff4fb2f3",
+    "semantic_hash": ""
+  },
+  "src/utils/cardUtils.js": {
+    "mtime": 1779599779.8742986,
+    "ast_hash": "ef60c0999fb326647e703084eca109bf",
+    "semantic_hash": ""
+  },
+  "src/utils/cjkValidation.js": {
+    "mtime": 1782515605.5778308,
+    "ast_hash": "431cc1313af73a0e1c797b9980e05493",
+    "semantic_hash": ""
+  },
+  "src/utils/constants.js": {
+    "mtime": 1783059918.353618,
+    "ast_hash": "dcf157837984eec50077bcad0ad90988",
+    "semantic_hash": ""
+  },
+  "src/utils/dateHelper.js": {
+    "mtime": 1779664938.1552246,
+    "ast_hash": "0e2f6ba2397f223266911047dd50e427",
+    "semantic_hash": ""
+  },
+  "src/utils/excel/detectColumns.js": {
+    "mtime": 1779597861.9648302,
+    "ast_hash": "36e039b7e0507bea95cf2c1f674e3f04",
+    "semantic_hash": ""
+  },
+  "src/utils/excel/importSchemas.js": {
+    "mtime": 1779597861.9658296,
+    "ast_hash": "ef6ab81916ceb6fc1f8767be04462def",
+    "semantic_hash": ""
+  },
+  "src/utils/excel/seed.js": {
+    "mtime": 1779597861.967339,
+    "ast_hash": "26d1b6a1fb5c5da8368b5e9aff9a715c",
+    "semantic_hash": ""
+  },
+  "src/utils/srs.js": {
+    "mtime": 1779597861.9693663,
+    "ast_hash": "b4bd5f45f4678597b8f77bce619dd51f",
+    "semantic_hash": ""
+  },
+  "src/utils/supabaseClient.js": {
+    "mtime": 1779597861.9703503,
+    "ast_hash": "6727a9c7908636e2c658ea013363611d",
+    "semantic_hash": ""
+  },
+  "src/utils/xp.js": {
+    "mtime": 1783059926.5530424,
+    "ast_hash": "1c95a8815be737f579d5531a7cd49fb3",
+    "semantic_hash": ""
+  },
+  "tailwind.config.js": {
+    "mtime": 1753304604.7910788,
+    "ast_hash": "b04d86ac485cd8f2e049ab8559008379",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1753303198.685232,
+    "ast_hash": "33822368bfb3ad3de6fceb9cd76aa0dd",
+    "semantic_hash": ""
+  },
+  "SQL_database/README.md": {
+    "mtime": 1779601190.0079985,
+    "ast_hash": "fafe2f7ee03c2a58b515f70b92229c82",
+    "semantic_hash": ""
+  },
+  "app_description.txt": {
+    "mtime": 1779590256.2863724,
+    "ast_hash": "a7a40b0acb71b6850db0f73ff94ba296",
+    "semantic_hash": ""
+  },
+  "public/index.html": {
+    "mtime": 1779597466.769626,
+    "ast_hash": "f9576fa7f56f0e1b2683796957e14f28",
+    "semantic_hash": ""
+  },
+  "public/robots.txt": {
+    "mtime": 1753303198.917318,
+    "ast_hash": "fa1ded1ed7c11438a9b0385b1e112850",
+    "semantic_hash": ""
+  },
+  "src/assets/new_themes.txt": {
+    "mtime": 1780561587.7715652,
+    "ast_hash": "b1d7fdb5b6e3092597c957ccbd856025",
+    "semantic_hash": ""
+  },
+  "public/Revu_logo.png": {
+    "mtime": 1753374249.707612,
+    "ast_hash": "04e7baf060db21ffb71235416e2ff408",
+    "semantic_hash": ""
+  },
+  "public/avatars/avatar1.png": {
+    "mtime": 1781330526.109199,
+    "ast_hash": "dd6913dafaae33f7cff8ddcb701bdd2d",
+    "semantic_hash": ""
+  },
+  "public/avatars/avatar10.png": {
+    "mtime": 1781330602.375515,
+    "ast_hash": "dc1f57bafcaaa80d74c045183200e4d7",
+    "semantic_hash": ""
+  },
+  "public/avatars/avatar2.png": {
+    "mtime": 1781330537.735184,
+    "ast_hash": "e6c787b4a276c982fbff741e6cb8ecc5",
+    "semantic_hash": ""
+  },
+  "public/avatars/avatar3.png": {
+    "mtime": 1781330546.025749,
+    "ast_hash": "3037cb8420db12fabda3ba0e6e9e437c",
+    "semantic_hash": ""
+  },
+  "public/avatars/avatar4.png": {
+    "mtime": 1781330554.1062956,
+    "ast_hash": "3edb5ad26e69fbeb47c689f4c1fe12eb",
+    "semantic_hash": ""
+  },
+  "public/avatars/avatar5.png": {
+    "mtime": 1781330562.0673618,
+    "ast_hash": "4ad566393b7e5b28a0b9c37e8ec7e0b1",
+    "semantic_hash": ""
+  },
+  "public/avatars/avatar6.png": {
+    "mtime": 1781330570.6193824,
+    "ast_hash": "3200eb183046dc5086163067e9106829",
+    "semantic_hash": ""
+  },
+  "public/avatars/avatar7.png": {
+    "mtime": 1781330579.2826197,
+    "ast_hash": "b1920b06d6ac65274065f6b6329738d1",
+    "semantic_hash": ""
+  },
+  "public/avatars/avatar8.png": {
+    "mtime": 1781330587.3379285,
+    "ast_hash": "1d70356c54910020a7c6baaa2f1c1f37",
+    "semantic_hash": ""
+  },
+  "public/avatars/avatar9.png": {
+    "mtime": 1781330594.8110287,
+    "ast_hash": "ac3d168dde81612b2e154ff0c24c2723",
+    "semantic_hash": ""
+  },
+  "public/icons/icon-achievement.png": {
+    "mtime": 1779597860.1860893,
+    "ast_hash": "455ebd7c4c36850aa42fa803ab1f6f4d",
+    "semantic_hash": ""
+  },
+  "public/icons/icon-star-1.png": {
+    "mtime": 1779597860.1880877,
+    "ast_hash": "30381a3454d5ec180771396d6ed9ebcc",
+    "semantic_hash": ""
+  },
+  "public/icons/icon-star-2.png": {
+    "mtime": 1779597860.190613,
+    "ast_hash": "d258ad57faf3f2ea9e80f4d0fdb3404c",
+    "semantic_hash": ""
+  },
+  "src/assets/Revu_logo.png": {
+    "mtime": 1779597860.2027967,
+    "ast_hash": "04e7baf060db21ffb71235416e2ff408",
+    "semantic_hash": ""
+  },
+  "src/assets/revu2.png": {
+    "mtime": 1779597860.2048,
+    "ast_hash": "e19aad2dd9e3da35ccb28ff7cd8a916f",
+    "semantic_hash": ""
+  },
+  "src/logo.svg": {
+    "mtime": 1753303198.8649144,
+    "ast_hash": "06e733283fa43d1dd57738cfc409adbd",
+    "semantic_hash": ""
+  }
+}

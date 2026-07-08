@@ -73,6 +73,7 @@ async function loadCardsForDeck({
         ease_factor,
         review_interval,
         repetitions,
+        study_count,
         due_date,
         last_studied,
         status,
@@ -121,6 +122,7 @@ async function loadCardsForDeck({
       ease_factor: 2.5,
       review_interval: 0,
       repetitions: 0,
+      study_count: 0,
       due_date: null,
       last_studied: null,
       status: "new",
@@ -264,7 +266,7 @@ const cardSlice = createSlice({
         state.cards[cardId] = {
           ...state.cards[cardId],
           ...updates,
-          status: "waiting",
+          status: getCardStatus(updates),
         };
       }
     },

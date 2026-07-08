@@ -19,10 +19,13 @@ import {
   selectLearnLimit,
 } from "../../../slices/settingsSlice";
 import { computeSM2 } from "../../../utils/srs";
+import { getMasteryStage } from "../../../utils/cardMastery";
+import { getReviewXP } from "../../../utils/xp";
 import { supabase } from "../../../utils/supabaseClient";
-import { getTodayISO } from "../../../utils/dateHelper";
+import { getTodayISO, getUserTimezone } from "../../../utils/dateHelper";
 import { PHASES } from "../../../utils/constants";
 import { createSelector } from "@reduxjs/toolkit";
+import { fetchUserProfile } from "../../../slices/userSlice";
 
 // ----------------------
 // Memoized selector
@@ -223,12 +226,15 @@ export default function useStudySession({ deck, navMode, userId }) {
       if (!currentCard || !currentPhase?.allowRating) return;
 
       const updates = computeSM2(currentCard, rating);
+      const prevStage = getMasteryStage(currentCard);
+      const newStage = getMasteryStage({ ...currentCard, ...updates });
       const updatedCard = {
         user_id: currentCard.user_id,
         deck_id: currentCard.deck_id,
         card_id: currentCard.card_id,
         status: "waiting",
         suspended: false,
+        xp_earned: getReviewXP(rating, prevStage, newStage),
         ...updates,
       };
 
@@ -274,6 +280,7 @@ export default function useStudySession({ deck, navMode, userId }) {
         ).unwrap();
 
         // 2. Update streaks
+        const userTimezone = getUserTimezone();
         await supabase.rpc("update_streaks_after_session", {
           p_user_id: resolvedUserId,
           p_deck_results: [
@@ -281,11 +288,15 @@ export default function useStudySession({ deck, navMode, userId }) {
               deck_id: deckSnapshot.id,
               cards_reviewed: cardsReviewed,
               cards_learned: cardsLearned,
+              xp_earned: updatesSnapshot.reduce(
+                (total, update) => total + (update.xp_earned || 0),
+                0,
+              ),
             },
           ],
           p_review_limit: reviewLimit,
           p_learn_limit: learnLimit,
-          p_user_timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          p_user_timezone: userTimezone,
         });
 
         // 3. Update time studied
@@ -293,7 +304,7 @@ export default function useStudySession({ deck, navMode, userId }) {
           1,
           Math.round((Date.now() - sessionStartedAtRef.current) / 1000),
         );
-        const today = getTodayISO();
+        const today = getTodayISO(userTimezone);
         const { data: dailyStats } = await supabase
           .from("daily_user_stats")
           .select("time_studied_seconds")
@@ -328,6 +339,7 @@ export default function useStudySession({ deck, navMode, userId }) {
           dispatch(fetchDeckCounts({ user_id: resolvedUserId })).unwrap(),
           dispatch(fetchDailyStreakStats({ user_id: resolvedUserId })).unwrap(),
           dispatch(fetchDailyActivity({ user_id: resolvedUserId })),
+          dispatch(fetchUserProfile(resolvedUserId)),
         ]);
 
         batchPageRef.current = 1;

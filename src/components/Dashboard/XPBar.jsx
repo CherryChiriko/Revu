@@ -1,10 +1,9 @@
 import React from "react";
 import { Bar } from "../General/ui/Bar";
+import { getLevelProgress } from "../../utils/xp";
 
 export const XPBar = ({ totalXP = 100, activeTheme }) => {
-  const level = Math.floor(Math.sqrt(totalXP / 10));
-  const xpForLevel = (level + 1) ** 2 * 10;
-  const xpThisLevel = totalXP - level ** 2 * 10;
+  const { level, xpIntoLevel, xpForNextLevel } = getLevelProgress(totalXP);
 
   return (
     <>
@@ -30,8 +29,8 @@ export const XPBar = ({ totalXP = 100, activeTheme }) => {
       </div>
 
       <Bar
-        current={xpThisLevel}
-        total={xpForLevel}
+        current={xpIntoLevel}
+        total={xpForNextLevel}
         activeTheme={activeTheme}
         isLabelOn={false}
       />
@@ -39,7 +38,7 @@ export const XPBar = ({ totalXP = 100, activeTheme }) => {
       <div
         className={`mt-1 text-xs {activeTheme.text.secondary} text-center w-full max-w-xl`}
       >
-        {xpThisLevel} / {xpForLevel} XP
+        {xpIntoLevel} / {xpForNextLevel} XP
       </div>
     </>
   );
