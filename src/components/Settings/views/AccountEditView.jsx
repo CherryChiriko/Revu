@@ -1,6 +1,6 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLock, faCheck } from "@fortawesome/free-solid-svg-icons";
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { useAccountSettings } from "../hooks/useAccountSettings";
 import { inputCls } from "../../General/ui/FormStyles";
 import { ModalTemplate } from "../../General/ui/ModalTemplate";
@@ -63,7 +63,7 @@ export default function AccountEditView({
           <div className="flex gap-2">
             <input
               type="email"
-              value={state.email}
+              value={state.email || profile?.email || ""}
               onChange={(e) => {
                 state.setEmail(e.target.value);
                 state.setEmailStatus("idle");
@@ -82,18 +82,14 @@ export default function AccountEditView({
           </div>
         </FormField>
 
-        {/* Password Group Block */}
-        <div
-          className={`rounded-xl p-4 space-y-3 ${activeTheme.background.canvas}`}
+        {/* Password field shell encapsulation */}
+        <FormField
+          label="Change Password"
+          error={state.passwordError}
+          hint={state.passwordSuccess}
+          activeTheme={activeTheme}
         >
-          <p
-            className={`text-[10px] font-black uppercase tracking-widest ${activeTheme.text.accent3 ?? activeTheme.text.secondary}`}
-          >
-            <FontAwesomeIcon icon={faLock} className="mr-1.5" />
-            Change Password
-          </p>
-
-          <div className="space-y-2.5">
+          <div className="flex flex-col gap-2.5">
             {[
               {
                 placeholder: "Current password",
@@ -125,42 +121,31 @@ export default function AccountEditView({
                 className={baseInputCls}
               />
             ))}
+
+            <button
+              type="button"
+              onClick={state.handleSavePassword}
+              disabled={state.passwordStatus === "saving"}
+              className={`w-full mt-4 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-1.5 transition-all
+                ${
+                  state.passwordStatus === "saved"
+                    ? "bg-emerald-600/20 text-emerald-400 border border-emerald-500/30"
+                    : state.passwordStatus === "error"
+                      ? "bg-red-600/20 text-red-400 border border-red-500/30"
+                      : activeTheme.button.accent2
+                } disabled:opacity-50`}
+            >
+              {state.passwordStatus === "saved" && (
+                <FontAwesomeIcon icon={faCheck} className="w-3.5 h-3.5" />
+              )}
+              {state.passwordStatus === "saving"
+                ? "Saving…"
+                : state.passwordStatus === "saved"
+                  ? "Updated"
+                  : "Update password"}
+            </button>
           </div>
-
-          {state.passwordError && (
-            <p className="text-red-400 text-xs font-medium pt-1">
-              {state.passwordError}
-            </p>
-          )}
-          {state.passwordSuccess && (
-            <p className="text-emerald-400 text-xs font-medium pt-1">
-              {state.passwordSuccess}
-            </p>
-          )}
-
-          <button
-            type="button"
-            onClick={state.handleSavePassword}
-            disabled={state.passwordStatus === "saving"}
-            className={`w-full mt-2 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-1.5 transition-all
-              ${
-                state.passwordStatus === "saved"
-                  ? "bg-emerald-600/20 text-emerald-400 border border-emerald-500/30"
-                  : state.passwordStatus === "error"
-                    ? "bg-red-600/20 text-red-400 border border-red-500/30"
-                    : activeTheme.button.accent2
-              } disabled:opacity-50`}
-          >
-            {state.passwordStatus === "saved" && (
-              <FontAwesomeIcon icon={faCheck} className="w-3.5 h-3.5" />
-            )}
-            {state.passwordStatus === "saving"
-              ? "Saving…"
-              : state.passwordStatus === "saved"
-                ? "Updated"
-                : "Update password"}
-          </button>
-        </div>
+        </FormField>
       </div>
     </ModalTemplate>
   );

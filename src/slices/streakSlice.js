@@ -64,15 +64,6 @@ export const fetchDailyStreakStats = createAsyncThunk(
   },
 );
 
-export function updateGlobalStreakFromRealtime(state, action) {
-  const row = action.payload;
-  state.global = {
-    streak: row.global_streak,
-    maxStreak: row.max_global_streak,
-    streakState: row.streak_state,
-  };
-}
-
 /* -------------------------------------------
    Slice
 -------------------------------------------- */
@@ -110,6 +101,15 @@ const streakSlice = createSlice({
         streakState: row.streak_state,
       };
     },
+  },
+
+  updateGlobalStreakFromRealtime(state, action) {
+    const row = action.payload;
+    state.global = {
+      streak: row.global_streak,
+      maxStreak: row.max_global_streak,
+      streakState: row.streak_state,
+    };
   },
 
   extraReducers: (builder) => {
@@ -211,7 +211,10 @@ export const selectIsStreakLoading = createSelector(
 /* -------------------------------------------
    Actions
 -------------------------------------------- */
-export const { clearStreak, updateDeckStreakFromRealtime } =
-  streakSlice.actions;
+export const {
+  clearStreak,
+  updateDeckStreakFromRealtime,
+  updateGlobalStreakFromRealtime,
+} = streakSlice.actions;
 
 export default streakSlice.reducer;

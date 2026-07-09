@@ -18,6 +18,7 @@ import {
   faArrowLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import RevuLogo from "../../assets/revu2.png";
+import { selectTotalActivity } from "../../slices/activitySlice";
 
 import DeckCard from "../Decks/components/DeckCard";
 import { Heatmap } from "./Heatmap";
@@ -47,22 +48,33 @@ const Dashboard = () => {
 
   const gradient = `bg-gradient-to-r ${activeTheme.gradients.from} ${activeTheme.gradients.to}`;
 
-  // 1. Select the map of due counts { deckId: count, ... }
   const cards_due_today = useSelector(selectTotalDueCards);
   const mastered_cards = useSelector(selectTotalMasteredCards);
   const globalStreak = useSelector(selectGlobalStreak);
 
-  const totalXP = useMemo(
-    () => Math.max(0, mastered_cards * 5 + globalStreak * 10 + cards_due_today),
-    [mastered_cards, globalStreak, cards_due_today],
-  );
+  // Connect to the new, authoritative database-backed XP economy
+  const totalActivity = useSelector(selectTotalActivity);
+
+  const totalXP = useMemo(() => {
+    const baseXP = totalActivity?.totalXP || 0;
+
+    /* 
+      FUTURE MONETIZATION MULTIPLIERS (Bottleneck Hub)
+      -----------------------------------------------
+      If a user has a premium item active, apply multipliers here:
+      const premiumMultiplier = userIsPremium ? 1.5 : 1.0;
+      return Math.max(0, Math.round(baseXP * premiumMultiplier));
+    */
+
+    return Math.max(0, baseXP);
+  }, [totalActivity]);
 
   return (
     <div
       className={`min-h-screen ${activeTheme.background.app} ${activeTheme.text.primary} w-full py-8 px-6 font-inter`}
     >
       <div className="max-w-screen-xl mx-auto space-y-4">
-        {/* ===== TOP SECTION (Improved Compact Layout) ===== */}
+        {/* ===== TOP SECTION ===== */}
         <div
           className={`${activeTheme.background.secondary} rounded-2xl p-6 sm:p-8 shadow-xl flex items-center justify-between gap-6`}
         >
@@ -94,7 +106,7 @@ const Dashboard = () => {
           <StatCard
             icon={faFire}
             label="Current Streak"
-            value={`${globalStreak} day${globalStreak === 1 ? "" : "s"}`}
+            value={`${globalStreak} day${globalStreak === 1 ? "" : ""}`}
             activeTheme={activeTheme}
           />
           <StatCard
@@ -122,7 +134,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* ===== MAIN GRID (Vertically Centered) ===== */}
+        {/* ===== MAIN GRID ===== */}
         <div
           className={`grid grid-cols-1 lg:grid-cols-3 gap-6 ${
             decks.length > 2 ? "items-center" : ""
@@ -197,12 +209,11 @@ const Dashboard = () => {
             )}
           </div>
 
-          {/* Right: Heatmap + Achievements */}
+          {/* Right: Heatmap */}
           <div
             className={`${activeTheme.background.secondary} p-6 rounded-2xl shadow-lg flex flex-col space-y-6`}
           >
             <Heatmap activeTheme={activeTheme} />
-            {/* <Achievements activeTheme={activeTheme} /> */}
           </div>
         </div>
       </div>

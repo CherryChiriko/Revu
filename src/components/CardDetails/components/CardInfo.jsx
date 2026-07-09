@@ -40,7 +40,7 @@ const MetaRow = ({ icon, label, value, activeTheme }) => {
 export function CardInfo({ card, isC, activeTheme }) {
   const tile = STATUS_TILE[card.status] ?? STATUS_TILE.new;
   const mastery = getMasterySummary(card);
-  const timesStudied = card.study_count ?? card.repetitions ?? 0;
+  // const timesStudied = card.study_count ?? card.repetitions ?? 0;
 
   return (
     <>
@@ -124,12 +124,12 @@ export function CardInfo({ card, isC, activeTheme }) {
             value={`${mastery.label} (${mastery.progress}%)`}
             activeTheme={activeTheme}
           />
-          <MetaRow
+          {/* <MetaRow
             icon={faRepeat}
             label="Times studied"
             value={timesStudied}
             activeTheme={activeTheme}
-          />
+          /> */}
         </div>
       </section>
     </>

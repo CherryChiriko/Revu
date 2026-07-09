@@ -2,7 +2,7 @@ export const computeSM2 = (card, rating) => {
   let EF = card.ease_factor ?? 2.5;
   let interval = card.review_interval ?? 0;
   let reps = card.repetitions ?? 0;
-  const studyCount = (card.study_count ?? card.repetitions ?? 0) + 1;
+  // const studyCount = (card.study_count ?? card.repetitions ?? 0) + 1;
 
   if (rating === "again") {
     reps = 0;
@@ -34,7 +34,7 @@ export const computeSM2 = (card, rating) => {
     ease_factor: EF,
     review_interval: interval,
     repetitions: reps,
-    study_count: studyCount,
+    // study_count: studyCount,
     due_date: due_date.toISOString(),
     last_studied: now.toISOString(),
   };

@@ -23,9 +23,12 @@ const FlipCard = ({
   onPassComplete,
   autoFlipEnabled = false,
   autoFlipDelay = 3000,
+  variant = "standard", // "standard" | "demo"
 }) => {
   const [showAnswer, setShowAnswer] = useState(false);
   const timerRef = useRef(null);
+
+  const isDemo = variant === "demo";
 
   const clearTimer = () => {
     if (timerRef.current) {
@@ -34,27 +37,18 @@ const FlipCard = ({
     }
   };
 
-  // Reset flip state whenever the card changes
   useEffect(() => {
     clearTimer();
     setShowAnswer(false);
   }, [card?.id]);
 
-  // Autoflip: animation mode only, front → back after delay
   useEffect(() => {
-    if (!autoFlipEnabled) return;
-    if (displayState !== "animation") return;
-    if (showAnswer) return; // already flipped
-
+    if (!autoFlipEnabled || displayState !== "animation" || showAnswer) return;
     clearTimer();
-    timerRef.current = setTimeout(() => {
-      setShowAnswer(true);
-    }, autoFlipDelay);
-
+    timerRef.current = setTimeout(() => setShowAnswer(true), autoFlipDelay);
     return clearTimer;
   }, [autoFlipEnabled, displayState, showAnswer, autoFlipDelay, card?.id]);
 
-  // Cleanup on unmount
   useEffect(() => clearTimer, []);
 
   const handleReveal = () => {
@@ -83,20 +77,31 @@ const FlipCard = ({
         >
           {/* FRONT */}
           <div
-            className={`absolute inset-0 backface-hidden rounded-xl ${activeTheme.background.secondary} p-8 flex flex-col justify-center items-center shadow-2xl`}
+            className={`absolute inset-0 backface-hidden rounded-xl ${
+              activeTheme.background.secondary
+            } flex flex-col justify-center items-center ${
+              isDemo ? "p-2 border" : "p-8 shadow-2xl"
+            } ${activeTheme.border?.secondary || ""}`}
           >
             <span
-              className={`text-6xl font-extrabold ${activeTheme.text.primary} text-center p-4 max-w-full`}
+              className={`font-extrabold ${activeTheme.text.primary} text-center max-w-full ${
+                isDemo ? "text-3xl p-1" : "text-6xl p-4"
+              }`}
             >
               {card?.front}
             </span>
 
-            {/* Animation mode: show "Show" button; autoflip will also trigger if enabled */}
             {!showAnswer && displayState === "animation" && (
-              <div className="absolute bottom-8 w-full flex justify-center px-8">
+              <div
+                className={`absolute w-full flex justify-center px-4 ${isDemo ? "bottom-2" : "bottom-8"}`}
+              >
                 <button
                   onClick={handleReveal}
-                  className={`px-6 py-3 rounded-full font-semibold ${activeTheme.button.primary} ${activeTheme.text.activeButton} transition-all duration-300 shadow-md hover:shadow-lg`}
+                  className={`rounded-full font-semibold ${activeTheme.button.primary} ${
+                    activeTheme.text.activeButton
+                  } transition-all duration-300 shadow-md ${
+                    isDemo ? "px-4 py-1 text-xs" : "px-6 py-3"
+                  }`}
                 >
                   Show
                 </button>
@@ -105,10 +110,13 @@ const FlipCard = ({
 
             {/* Quiz mode: reveal button */}
             {!showAnswer && displayState === "quiz" && (
-              <div className="absolute bottom-8 w-full flex justify-center px-8">
+              <div
+                className={`absolute w-full flex justify-center px-4 ${isDemo ? "bottom-2" : "bottom-8"}`}
+              >
                 <RevealButton
                   onReveal={handleReveal}
                   activeTheme={activeTheme}
+                  variant={variant} // <--- Pass the variant down here!
                 />
               </div>
             )}
@@ -116,31 +124,45 @@ const FlipCard = ({
 
           {/* BACK */}
           <div
-            className={`absolute inset-0 backface-hidden rotate-y-180 rounded-xl ${activeTheme.background.secondary} p-8 flex flex-col justify-between items-center shadow-2xl`}
+            className={`absolute inset-0 backface-hidden rotate-y-180 rounded-xl ${
+              activeTheme.background.secondary
+            } flex flex-col justify-between items-center ${
+              isDemo ? "p-3 border" : "p-8 shadow-2xl"
+            } ${activeTheme.border?.secondary || ""}`}
           >
-            {showAnswer && (
-              <div className="flex flex-col justify-center items-center h-full pt-8">
+            {/* Term/Definition Slot */}
+            <div className="flex-1 flex flex-col justify-center items-center w-full">
+              {showAnswer && (
                 <p
-                  className={`text-4xl font-semibold ${activeTheme.text.primary} text-center mb-4`}
+                  className={`font-semibold ${activeTheme.text.primary} text-center ${isDemo ? "text-xl" : "text-4xl mb-4"}`}
                 >
                   {card?.back}
                 </p>
-              </div>
-            )}
+              )}
+            </div>
 
-            {/* User controls the back — no auto-advance */}
-            {showAnswer && allowRating && <RatingButtons onRate={handleRate} />}
-            {showAnswer && !allowRating && (
-              <button
-                onClick={handleNext}
-                className={`px-6 py-3 rounded-full font-semibold ${activeTheme.button.secondary} ${activeTheme.text.primary} transition-all duration-300 shadow-md hover:shadow-lg`}
-              >
-                Next
-                <FontAwesomeIcon
-                  icon={faFastForward}
-                  className="w-4 h-4 ml-2"
-                />
-              </button>
+            {/* Button Area Slot */}
+            {showAnswer && (
+              <div className="w-full flex justify-center">
+                {allowRating ? (
+                  <RatingButtons onRate={handleRate} variant={variant} />
+                ) : (
+                  <button
+                    onClick={handleNext}
+                    className={`rounded-full font-semibold ${activeTheme.button.secondary} ${
+                      activeTheme.text.primary
+                    } transition-all duration-300 shadow-md ${
+                      isDemo ? "px-4 py-1 text-xs mb-1" : "px-6 py-3"
+                    }`}
+                  >
+                    Next
+                    <FontAwesomeIcon
+                      icon={faFastForward}
+                      className="w-3 h-3 ml-1.5"
+                    />
+                  </button>
+                )}
+              </div>
             )}
           </div>
         </div>

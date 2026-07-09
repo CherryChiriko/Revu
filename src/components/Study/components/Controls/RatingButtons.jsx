@@ -1,4 +1,3 @@
-// src/components/CardRenderer/RatingButtons.jsx
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -35,19 +34,37 @@ const buttons = [
   },
 ];
 
-const RatingButtons = ({ onRate }) => (
-  <div className="absolute bottom-8 w-full flex justify-center space-x-4 px-8">
-    {buttons.map(({ label, icon, color, value }) => (
-      <button
-        key={value}
-        onClick={() => onRate(value)}
-        className={`flex-1 px-4 py-3 rounded-lg font-semibold text-white transition-colors duration-200 shadow-md ${color}`}
-      >
-        <FontAwesomeIcon icon={icon} className="w-5 h-5 mr-2" />
-        {label}
-      </button>
-    ))}
-  </div>
-);
+const RatingButtons = ({ onRate, variant = "standard" }) => {
+  const isDemo = variant === "demo";
+
+  return (
+    <div
+      className={
+        isDemo
+          ? "w-full flex justify-center gap-1 px-2 pb-2"
+          : "absolute bottom-8 w-full flex justify-center space-x-4 px-8"
+      }
+    >
+      {buttons.map(({ label, icon, color, value }) => (
+        <button
+          key={value}
+          onClick={(e) => {
+            e.stopPropagation(); // Stops any unwanted card flip triggers
+            onRate(value);
+          }}
+          className={`flex-1 flex items-center justify-center rounded-lg font-semibold text-white transition-colors duration-200 shadow-md ${color} ${
+            isDemo ? "px-1 py-1.5 text-[10px]" : "px-4 py-3"
+          }`}
+        >
+          <FontAwesomeIcon
+            icon={icon}
+            className={`min-w-3 min-h-3 ${isDemo ? "mr-1 text-[11px]" : "mr-2 w-5 h-5"}`}
+          />
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+};
 
 export default RatingButtons;
