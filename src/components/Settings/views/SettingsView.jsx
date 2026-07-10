@@ -1,28 +1,20 @@
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React from "react";
+import { useSelector } from "react-redux";
 import { Outlet, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import useAuth from "../../../hooks/useAuth";
 import { selectActiveTheme } from "../../../slices/themeSlice";
 import { selectUserProfile } from "../../../slices/userSlice";
-import {
-  selectSettings,
-  hydrateFromProfile,
-} from "../../../slices/settingsSlice";
+import { selectSettings } from "../../../slices/settingsSlice";
 import { AvatarDisplay } from "../../General/ui/AvatarDisplay";
 
 export default function SettingsView() {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { logout } = useAuth();
   const activeTheme = useSelector(selectActiveTheme);
   const profile = useSelector(selectUserProfile);
   const settings = useSelector(selectSettings);
-
-  useEffect(() => {
-    if (profile) dispatch(hydrateFromProfile(profile));
-  }, [profile, dispatch]);
 
   const handleLogout = async () => {
     await logout();

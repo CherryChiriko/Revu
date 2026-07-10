@@ -17,6 +17,7 @@ import { clearCards } from "./slices/cardSlice";
 import { clearProgress } from "./slices/progressSlice";
 import { clearStreak } from "./slices/streakSlice";
 import { resetActivity } from "./slices/activitySlice";
+import { hydrateFromProfile } from "./slices/settingsSlice";
 
 import useAuth from "./hooks/useAuth";
 import useDeckLiveSync from "./hooks/useDeckLiveSync";
@@ -149,6 +150,10 @@ function App() {
 
     previousUserIdRef.current = currentUserId;
   }, [dispatch, session?.user?.id]);
+
+  useEffect(() => {
+    if (profile) dispatch(hydrateFromProfile(profile));
+  }, [profile, dispatch]);
 
   useEffect(() => {
     const themeLink = document.getElementById("primereact-theme");
