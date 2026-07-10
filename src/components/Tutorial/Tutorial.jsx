@@ -10,153 +10,10 @@ import {
 import { ONBOARDING_STEPS } from "./constants/steps";
 import { useTutorial } from "./hooks/useTutorial";
 
-import FlipCard from "../Study/components/Card/FlipCard";
-import HanziCanvas from "../Study/components/Card/HanziCanvas"; // Direct production import
+import { TutorialCharDemo } from "./TutorialCharDemo";
+import { TutorialFlipCardDemo } from "./TutorialFlipDemo";
 
-/* ---------------------------------------------------------------------- */
-/* Step 1: Flip Card Demo Component                                       */
-/* ---------------------------------------------------------------------- */
-function OnboardingFlipCardDemo({ activeTheme }) {
-  const mockCard = {
-    id: "demo-card",
-    front: "Bonjour",
-    back: "Hello",
-  };
-
-  return (
-    <div className="w-full h-64 flex flex-col items-center justify-center overflow-hidden">
-      <div className="w-full h-40 relative">
-        <FlipCard
-          card={mockCard}
-          activeTheme={activeTheme}
-          displayState="quiz"
-          allowRating={true}
-          onRate={() => {}}
-          variant="demo"
-        />
-      </div>
-    </div>
-  );
-}
-
-/* ---------------------------------------------------------------------- */
-/* Step 2: Hanzi Canvas Demo Component                                    */
-/* ---------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------- */
-/* Step 2: Hanzi Canvas Demo Component                                    */
-/* ---------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------- */
-/* Step 2: Hanzi Canvas Demo Component                                    */
-/* ---------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------- */
-/* Step 2: Hanzi Canvas Demo Component                                    */
-/* ---------------------------------------------------------------------- */
-function OnboardingHanziDemo({ activeTheme }) {
-  const [displayState, setDisplayState] = useState("animation"); // "animation" | "outline" | "quiz"
-  const [canvasKey, setCanvasKey] = useState(0);
-  const [complete, setComplete] = useState(false);
-
-  const handleToggleState = (state) => {
-    setDisplayState(state);
-    setComplete(false);
-    setCanvasKey((k) => k + 1);
-  };
-
-  // Automatically restart the canvas loop 2 seconds after the user finishes drawing
-  useEffect(() => {
-    if (!complete) return;
-
-    const timeoutId = setTimeout(() => {
-      setComplete(false);
-      setCanvasKey((k) => k + 1); // Remounts the canvas to reset the quiz seamlessly
-    }, 2000); // 2000ms = 2 seconds display time
-
-    return () => clearTimeout(timeoutId);
-  }, [complete]);
-
-  return (
-    <div className="w-full h-full flex flex-col items-center overflow-hidden pt-1">
-      {/* State Switch Tab Layout */}
-      <div className="flex gap-1.5 h-7 items-center mb-1 z-10">
-        <button
-          type="button"
-          onClick={() => handleToggleState("animation")}
-          className={`rounded px-2.5 py-0.5 text-[11px] font-medium transition-colors ${
-            displayState === "animation"
-              ? `${activeTheme.text.activeButton} ${activeTheme.button.primary}`
-              : `${activeTheme.text.muted} ${activeTheme.background.secondary}`
-          }`}
-        >
-          1. Animation
-        </button>
-        <button
-          type="button"
-          onClick={() => handleToggleState("outline")}
-          className={`rounded px-2.5 py-0.5 text-[11px] font-medium transition-colors ${
-            displayState === "outline"
-              ? `${activeTheme.text.activeButton} ${activeTheme.button.primary}`
-              : `${activeTheme.text.muted} ${activeTheme.background.secondary}`
-          }`}
-        >
-          2. Outline
-        </button>
-        <button
-          type="button"
-          onClick={() => handleToggleState("quiz")}
-          className={`rounded px-2.5 py-0.5 text-[11px] font-medium transition-colors ${
-            displayState === "quiz"
-              ? `${activeTheme.text.activeButton} ${activeTheme.button.primary}`
-              : `${activeTheme.text.muted} ${activeTheme.background.secondary}`
-          }`}
-        >
-          3. Draw
-        </button>
-      </div>
-
-      {/* Centered canvas bounding container */}
-      <div className="w-full h-48 flex items-center justify-center overflow-hidden">
-        <div
-          style={{
-            width: "250px",
-            height: "250px",
-            transform: "scale(0.72)",
-            transformOrigin: "center center",
-          }}
-        >
-          <HanziCanvas
-            key={canvasKey}
-            character="人"
-            displayState={displayState}
-            activeTheme={activeTheme}
-            strokeColor={"#02B31C"}
-            revealed={false}
-            strokeAnimationSpeed={1.2}
-            onQuizComplete={() => setComplete(true)}
-          />
-        </div>
-      </div>
-
-      {/* Context Banner */}
-      <div className="h-5 flex items-center justify-center mt-1">
-        <span className={`text-[11px] ${activeTheme.text.secondary}`}>
-          {displayState === "animation" && "Watching stroke animation order..."}
-          {displayState === "outline" &&
-            "Trace the character over the outline."}
-          {displayState === "quiz" &&
-            !complete &&
-            "Draw the character on the canvas."}
-          {displayState === "quiz" &&
-            complete &&
-            "🎉 Perfect writing score registered!"}
-        </span>
-      </div>
-    </div>
-  );
-}
-/* ---------------------------------------------------------------------- */
-/* OnboardingModal Main Component Implementation                          */
-/* ---------------------------------------------------------------------- */
-export default function OnboardingModal({ activeTheme, onClose }) {
+export default function Tutorial({ activeTheme, onClose }) {
   const { step, finished, isLastStep, handleNext, handleBack, handleFinish } =
     useTutorial(ONBOARDING_STEPS.length, onClose);
 
@@ -267,10 +124,10 @@ export default function OnboardingModal({ activeTheme, onClose }) {
                 {showDemo ? (
                   <div className="w-full h-full flex items-center justify-center">
                     {step === 1 && (
-                      <OnboardingFlipCardDemo activeTheme={activeTheme} />
+                      <TutorialFlipCardDemo activeTheme={activeTheme} />
                     )}
                     {step === 2 && (
-                      <OnboardingHanziDemo activeTheme={activeTheme} />
+                      <TutorialCharDemo activeTheme={activeTheme} />
                     )}
                   </div>
                 ) : (
