@@ -29,17 +29,29 @@ export const getReviewXP = (rating, prevStage, newStage) => {
   return xp;
 };
 
-// Premium-safe economy: XP reflects learning work only. Cosmetics, boosts, or
-// subscriptions can multiply presentation/rewards later without selling memory.
-export const xpForLevel = (level) => Math.round(50 * Math.pow(level, 1.5));
+/**
+ * OPTIMIZED FOR SRS ONBOARDING:
+ * Level 1 starts at 0 XP.
+ * Level 2 requires 50 XP (achievable in 1-2 good early-stage sessions).
+ * Level 3 requires ~141 cumulative XP, matching your original progression curve perfectly.
+ */
+export const xpForLevel = (level) => {
+  if (level <= 1) return 0;
+  return Math.round(50 * Math.pow(level - 1, 1.5));
+};
 
 export const getLevelProgress = (totalXP = 0) => {
   let level = 1;
-  while (xpForLevel(level + 1) <= totalXP) level += 1;
+  // Safely increment levels as long as total accumulated XP meets the target threshold
+  while (xpForLevel(level + 1) <= totalXP) {
+    level += 1;
+  }
+
   const floor = xpForLevel(level);
   const ceiling = xpForLevel(level + 1);
-  const xpIntoLevel = Math.max(0, totalXP - floor);
-  const xpForNextLevel = Math.max(1, ceiling - floor);
+
+  const xpIntoLevel = totalXP - floor;
+  const xpForNextLevel = ceiling - floor;
 
   return {
     level,
