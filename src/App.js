@@ -32,7 +32,7 @@ import ImportView from "./components/Import/views/ImportView";
 import StudySession from "./components/Study/views/StudySession";
 import { SettingsPage } from "./components/Settings/SettingsPage";
 import SettingsView from "./components/Settings/views/SettingsView";
-import ActivityPage from "./components/Activity/ActivityPage";
+import ActivityPage from "./components/Activity/views/ActivityPage";
 import LoginPage from "./components/Login/components/LoginPage";
 import NotFound404 from "./components/404";
 

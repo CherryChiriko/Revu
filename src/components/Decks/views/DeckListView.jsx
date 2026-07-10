@@ -69,12 +69,13 @@ export default function DeckListView() {
 
   return (
     <div
-      className={`min-h-screen ${activeTheme.background.app} ${activeTheme.text.primary} w-full`}
+      className={`min-h-screen ${activeTheme.background.app} ${activeTheme.text.primary} w-full px-4 md:px-8 py-8`}
     >
-      <div className="max-w-screen-xl mx-auto px-4 md:px-8 py-8">
+      <div className="max-w-screen-xl mx-auto space-y-6">
         <Header
           title="Deck Manager"
           description="Create, edit, and manage your flashcard decks"
+          activeTheme={activeTheme}
         />
       </div>
 

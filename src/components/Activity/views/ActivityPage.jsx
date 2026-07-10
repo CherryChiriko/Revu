@@ -12,29 +12,34 @@ import {
   faLayerGroup,
   faStar,
 } from "@fortawesome/free-solid-svg-icons";
-import { selectActiveTheme } from "../../slices/themeSlice";
+import { selectActiveTheme } from "../../../slices/themeSlice";
 import {
   selectActiveDaysCount,
   selectSortedActivityDays,
   selectTotalActivity,
-} from "../../slices/activitySlice";
+} from "../../../slices/activitySlice";
 import {
   selectDecks,
   selectTotalDueCards,
   selectTotalFamiliarCards,
   selectTotalMasteredCards,
   selectTotalSolidCards,
-} from "../../slices/deckSlice";
+} from "../../../slices/deckSlice";
 import {
   selectGlobalMaxStreak,
   selectGlobalStreak,
   selectGlobalStreakState,
-} from "../../slices/streakSlice";
-import { selectSettings } from "../../slices/settingsSlice";
-import { selectUserProfile } from "../../slices/userSlice";
-import { MasteryBreakdown } from "../Mastery/MasteryBar";
-import { addDaysToDateKey, getTodayISO } from "../../utils/dateHelper";
-import { getLevelProgress } from "../../utils/xp";
+} from "../../../slices/streakSlice";
+import { selectSettings } from "../../../slices/settingsSlice";
+import { selectUserProfile } from "../../../slices/userSlice";
+import { MasteryBreakdown } from "../../Mastery/MasteryBar";
+import { addDaysToDateKey, getTodayISO } from "../../../utils/dateHelper";
+import { getLevelProgress } from "../../../utils/xp";
+
+import { StatTile } from "../components/StatTile";
+import { ActivitySection as Section } from "../components/ActivitySection";
+
+import Header from "../../General/ui/Header";
 
 function getRecentDays(days, count = 14) {
   const dayMap = new Map(days.map((day) => [day.date, day]));
@@ -70,39 +75,6 @@ function formatDate(value, format) {
     ? `${month}/${day}/${year}`
     : `${day}/${month}/${year}`;
 }
-
-const StatTile = ({ icon, label, value, note, activeTheme }) => (
-  <div
-    className={`${activeTheme.background.secondary} border ${activeTheme.border.card} rounded-2xl p-5 shadow-lg`}
-  >
-    <div className="flex items-start justify-between gap-4">
-      <div>
-        <p className={`${activeTheme.text.secondary} text-sm`}>{label}</p>
-        <p className="text-3xl font-black mt-1">{value}</p>
-      </div>
-      <div className="w-11 h-11 rounded-xl bg-white/10 flex items-center justify-center">
-        <FontAwesomeIcon icon={icon} className="w-5 h-5" />
-      </div>
-    </div>
-    {note && (
-      <p className={`${activeTheme.text.secondary} text-sm mt-4`}>{note}</p>
-    )}
-  </div>
-);
-
-const Section = ({ title, icon, children, activeTheme }) => (
-  <section
-    className={`${activeTheme.background.secondary} border ${activeTheme.border.card} rounded-2xl p-5 shadow-lg`}
-  >
-    <div className="flex items-center gap-3 mb-5">
-      <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
-        <FontAwesomeIcon icon={icon} />
-      </div>
-      <h2 className="text-xl font-bold">{title}</h2>
-    </div>
-    {children}
-  </section>
-);
 
 export default function ActivityPage() {
   const activeTheme = useSelector(selectActiveTheme);
@@ -190,49 +162,14 @@ export default function ActivityPage() {
       className={`min-h-screen ${activeTheme.background.app} ${activeTheme.text.primary} w-full px-4 md:px-8 py-8`}
     >
       <div className="max-w-screen-xl mx-auto space-y-6">
-        <header
-          className={`${activeTheme.background.secondary} rounded-2xl p-6 md:p-8 shadow-xl overflow-hidden relative`}
-        >
-          <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-sky-500 via-indigo-500 to-fuchsia-500" />
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-5">
-            <div>
-              <p className={`${activeTheme.text.accent1} font-semibold mb-2`}>
-                Study analytics
-              </p>
-              <h1 className="text-3xl md:text-4xl font-extrabold">Activity</h1>
-              <p className={`${activeTheme.text.secondary} mt-2 max-w-2xl`}>
-                A consistency-first view of your SRS work: what you reviewed,
-                what you learned, and where your decks are building momentum.
-              </p>
-            </div>
-            <div className="grid grid-cols-3 gap-2 min-w-[260px]">
-              <div
-                className={`${activeTheme.background.canvas} rounded-xl p-3`}
-              >
-                <p className={`${activeTheme.text.secondary} text-xs`}>Today</p>
-                <p className="font-black">
-                  {recentDays[recentDays.length - 1]?.cardsStudied || 0}
-                </p>
-              </div>
-              <div
-                className={`${activeTheme.background.canvas} rounded-xl p-3`}
-              >
-                <p className={`${activeTheme.text.secondary} text-xs`}>
-                  14 days
-                </p>
-                <p className="font-black">{consistencyScore}%</p>
-              </div>
-              <div
-                className={`${activeTheme.background.canvas} rounded-xl p-3`}
-              >
-                <p className={`${activeTheme.text.secondary} text-xs`}>Due</p>
-                <p className="font-black">{dueCards}</p>
-              </div>
-            </div>
-          </div>
-        </header>
+        <Header
+          title="Activity"
+          description="Track your learning streaks, historical review data, and daily
+                retention metrics."
+          activeTheme={activeTheme}
+        />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
           <StatTile
             icon={faCalendarDays}
             label="Active Days"
@@ -247,13 +184,13 @@ export default function ActivityPage() {
             note={`${totalActivity.cardsLearned} learned, ${totalActivity.cardsReviewed} reviewed`}
             activeTheme={activeTheme}
           />
-          <StatTile
+          {/* <StatTile
             icon={faClock}
             label="Time Studied"
             value={formatDuration(totalActivity.timeStudiedSeconds)}
             note="Tracked from completed study sessions"
             activeTheme={activeTheme}
-          />
+          /> */}
           <StatTile
             icon={faFire}
             label="Best Streak"
@@ -261,13 +198,13 @@ export default function ActivityPage() {
             note={`Current streak: ${currentStreak || 0}d (${streakState || "inactive"})`}
             activeTheme={activeTheme}
           />
-          <StatTile
+          {/* <StatTile
             icon={faStar}
             label="Lifetime XP"
             value={totalXP}
             note={`Level ${levelProgress.level} - ${levelProgress.xpIntoLevel}/${levelProgress.xpForNextLevel} XP`}
             activeTheme={activeTheme}
-          />
+          /> */}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

@@ -29,7 +29,7 @@ export function SettingCard({
 
   return (
     <section
-      className={`flex flex-col ${activeTheme.background.secondary} border ${activeTheme.border.card} rounded-2xl shadow-lg overflow-hidden`}
+      className={`flex flex-col ${activeTheme.background.secondary} border ${activeTheme.border.card} relative z-10 rounded-2xl shadow-lg overflow-hidden`}
     >
       {/* Header */}
       <div className="flex items-center gap-3 px-5 pt-5 pb-4">

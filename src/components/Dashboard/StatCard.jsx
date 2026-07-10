@@ -25,7 +25,7 @@ export const StatCard = ({ icon, label, value, activeTheme }) => {
 
   return (
     <div
-      className={`${activeTheme.background.secondary} rounded-2xl p-4 shadow-sm flex items-center gap-4`}
+      className={`shadow-md transition-all duration-200 hover:-translate-y-0.5 ${activeTheme.background.secondary} rounded-2xl p-4 flex items-center gap-4`}
     >
       {/* 2. Dynamically inject the computed classes into the icon container */}
       <div

@@ -8,6 +8,7 @@ import { selectActiveTheme } from "../../../slices/themeSlice";
 import { selectUserProfile } from "../../../slices/userSlice";
 import { selectSettings } from "../../../slices/settingsSlice";
 import { AvatarDisplay } from "../../General/ui/AvatarDisplay";
+import Header from "../../General/ui/Header";
 
 export default function SettingsView() {
   const navigate = useNavigate();
@@ -27,43 +28,30 @@ export default function SettingsView() {
     >
       <div className="max-w-screen-xl mx-auto space-y-6">
         {/* ── Header ── */}
-        <div
-          className={`${activeTheme.background.secondary} rounded-2xl p-6 md:p-8 shadow-xl overflow-hidden relative`}
-        >
-          <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-sky-500 via-indigo-500 to-fuchsia-500" />
-
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="flex items-center gap-5">
-              {/* Avatar preview */}
-              <div className="w-16 h-16 rounded-xl overflow-hidden shadow flex-shrink-0">
-                <AvatarDisplay
-                  settings={settings}
-                  username={profile?.username}
-                  className="w-full h-full text-2xl"
-                />
-              </div>
-              <div>
-                <h1 className="text-3xl md:text-4xl font-extrabold">
-                  Settings
-                </h1>
-                {profile?.username && (
-                  <p className={`text-sm mt-0.5 ${activeTheme.text.muted}`}>
-                    @{profile.username}
-                  </p>
-                )}
-              </div>
+        <Header
+          title="Settings"
+          activeTheme={activeTheme}
+          leftElement={
+            <div className="w-16 h-16 rounded-xl overflow-hidden shadow">
+              <AvatarDisplay
+                settings={settings}
+                username={profile?.username}
+                className="w-full h-full text-2xl"
+              />
             </div>
-
+          }
+          description={profile?.username ? `@${profile.username}` : undefined}
+          rightElement={
             <button
               type="button"
               onClick={handleLogout}
-              className={`inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg ${activeTheme.button.danger} font-semibold`}
+              className={`inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg ${activeTheme.button.danger} font-semibold transition-colors`}
             >
               <FontAwesomeIcon icon={faArrowRightFromBracket} />
               Logout
             </button>
-          </div>
-        </div>
+          }
+        />
 
         <Outlet />
       </div>

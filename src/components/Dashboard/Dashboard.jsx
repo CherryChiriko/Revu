@@ -26,7 +26,7 @@ import { Heatmap } from "./Heatmap";
 import { XPBar } from "./XPBar";
 import { StatCard } from "./StatCard";
 import { Toast } from "primereact/toast";
-import {} from "../../utils/xp";
+import Header from "../General/ui/Header";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -46,8 +46,6 @@ const Dashboard = () => {
     setDeckPage((prevPage) => Math.min(prevPage, totalDeckPages));
   }, [totalDeckPages]);
 
-  const gradient = `bg-gradient-to-r ${activeTheme.gradients.from} ${activeTheme.gradients.to}`;
-
   const cards_due_today = useSelector(selectTotalDueCards);
   const mastered_cards = useSelector(selectTotalMasteredCards);
   const globalStreak = useSelector(selectGlobalStreak);
@@ -57,86 +55,76 @@ const Dashboard = () => {
 
   const totalXP = useMemo(() => {
     const baseXP = totalActivity?.totalXP || 0;
-
-    /* 
-      FUTURE MONETIZATION MULTIPLIERS (Bottleneck Hub)
-      -----------------------------------------------
-      If a user has a premium item active, apply multipliers here:
-      const premiumMultiplier = userIsPremium ? 1.5 : 1.0;
-      return Math.max(0, Math.round(baseXP * premiumMultiplier));
-    */
-
     return Math.max(0, baseXP);
   }, [totalActivity]);
 
   return (
     <div
-      className={`min-h-screen ${activeTheme.background.app} ${activeTheme.text.primary} w-full py-8 px-6 font-inter`}
+      className={`min-h-screen ${activeTheme.background.app} ${activeTheme.text.primary} w-full px-4 md:px-8 py-8`}
     >
-      <div className="max-w-screen-xl mx-auto space-y-4">
+      <div className="max-w-screen-xl mx-auto space-y-6">
         {/* ===== TOP SECTION ===== */}
-        <div
-          className={`${activeTheme.background.secondary} rounded-2xl p-6 sm:p-8 shadow-xl flex items-center justify-between gap-6`}
-        >
-          {/* Logo */}
-          <div className="flex items-center w-32 h-20 relative shrink-0">
-            <div
-              className={`absolute inset-0 ${gradient}`}
-              style={{
-                WebkitMaskImage: `url(${RevuLogo})`,
-                WebkitMaskRepeat: "no-repeat",
-                WebkitMaskPosition: "center",
-                WebkitMaskSize: "contain",
-                maskImage: `url(${RevuLogo})`,
-                maskRepeat: "no-repeat",
-                maskPosition: "center",
-                maskSize: "contain",
-              }}
-            />
-          </div>
+        <Header
+          title=""
+          activeTheme={activeTheme}
+          leftElement={
+            <div className="flex items-center w-32 h-20 relative shrink-0">
+              <div
+                className={`absolute inset-0 bg-gradient-to-r ${activeTheme.gradients.from} ${activeTheme.gradients.to}`}
+                style={{
+                  WebkitMaskImage: `url(${RevuLogo})`,
+                  WebkitMaskRepeat: "no-repeat",
+                  WebkitMaskPosition: "center",
+                  WebkitMaskSize: "contain",
+                  maskImage: `url(${RevuLogo})`,
+                  maskRepeat: "no-repeat",
+                  maskPosition: "center",
+                  maskSize: "contain",
+                }}
+              />
+            </div>
+          }
+          rightElement={
+            <div className="w-full md:w-64 lg:w-80">
+              <XPBar totalXP={totalXP} activeTheme={activeTheme} />
+            </div>
+          }
+        />
 
-          {/* XP Bar */}
-          <div className="flex-1 max-w-lg">
-            <XPBar totalXP={totalXP} activeTheme={activeTheme} />
-          </div>
-        </div>
-
-        {/* Quick stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Quick stats panel - Added negative margin top option to stitch sections together tightly, or standard spacing */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative z-10">
           <StatCard
             icon={faFire}
             label="Current Streak"
-            value={`${globalStreak} day${globalStreak === 1 ? "" : ""}`}
+            value={`${globalStreak} day${globalStreak === 1 ? "" : "s"}`}
             activeTheme={activeTheme}
           />
+
           <StatCard
             icon={faClock}
             label="Cards Due"
             value={cards_due_today}
             activeTheme={activeTheme}
           />
+
           <StatCard
             icon={faBullseye}
             label="Mastered"
             value={mastered_cards}
             activeTheme={activeTheme}
           />
-          <div
-            className={`${activeTheme.background.secondary} rounded-2xl p-4 shadow-sm flex items-center gap-4`}
-          >
-            <div className="w-12 h-12 rounded-lg flex items-center justify-center">
-              <FontAwesomeIcon icon={faBookOpen} className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="text-sm opacity-75">Active Decks</div>
-              <div className="text-2xl font-bold">{decks.length}</div>
-            </div>
-          </div>
+
+          <StatCard
+            icon={faBookOpen}
+            label="Active Decks"
+            value={decks.length}
+            activeTheme={activeTheme}
+          />
         </div>
 
         {/* ===== MAIN GRID ===== */}
         <div
-          className={`grid grid-cols-1 lg:grid-cols-3 gap-6 ${
+          className={`mt-5 grid grid-cols-1 lg:grid-cols-3 gap-6 ${
             decks.length > 2 ? "items-center" : ""
           }`}
         >
