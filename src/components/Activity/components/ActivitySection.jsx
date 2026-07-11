@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export const ActivitySection = ({ title, icon, children, activeTheme }) => (
   <section
-    className={`${activeTheme.background.secondary} border ${activeTheme.border.card} rounded-2xl p-5 shadow-lg`}
+    className={`${activeTheme.background.secondary} border ${activeTheme.border.card} rounded-2xl p-5`}
   >
     <div className="flex items-center gap-3 mb-5">
       <div

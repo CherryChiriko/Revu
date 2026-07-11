@@ -1,6 +1,7 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { SettingCard, SegmentButton } from "../SettingsTemplates";
+import { SegmentButton } from "../SettingsTemplates";
+import { SettingCard } from "../../General/ui/SettingCard";
 import { updateSettings } from "../../../slices/settingsSlice";
 import { updateLocalProfile } from "../../../slices/userSlice";
 import { supabase } from "../../../utils/supabaseClient";

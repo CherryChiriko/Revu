@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
-import { SettingCard } from "../SettingsTemplates";
+import { SettingCard } from "../../General/ui/SettingCard";
 import AccountEditView from "../views/AccountEditView";
 
 export function AccountSection({ profile, activeTheme, dispatch }) {

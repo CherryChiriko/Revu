@@ -1,6 +1,7 @@
 import React from "react";
 import { supabase } from "../../../utils/supabaseClient";
-import { SettingCard, LabelledSlider } from "../SettingsTemplates";
+import { LabelledSlider } from "../SettingsTemplates";
+import { SettingCard } from "../../General/ui/SettingCard";
 import { updateSettings } from "../../../slices/settingsSlice";
 import { updateLocalProfile } from "../../../slices/userSlice";
 import { useSettingSave } from "../hooks/useSettingsSave";

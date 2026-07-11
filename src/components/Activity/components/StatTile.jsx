@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export const StatTile = ({ icon, label, value, note, activeTheme }) => (
   <div
-    className={`${activeTheme.background.secondary} border ${activeTheme.border.card} rounded-2xl p-5 shadow-lg relative z-10`}
+    className={`${activeTheme.background.secondary} border ${activeTheme.border.card} rounded-2xl p-5 relative z-10`}
   >
     <div className="flex items-start justify-between gap-4">
       <div>

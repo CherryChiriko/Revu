@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { faImage } from "@fortawesome/free-solid-svg-icons";
-import { SettingCard } from "../SettingsTemplates";
+import { SettingCard } from "../../General/ui/SettingCard";
 import { AvatarDisplay } from "../../General/ui/AvatarDisplay";
 import { AvatarPick } from "./AvatarPick";
 

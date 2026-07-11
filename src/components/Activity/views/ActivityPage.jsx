@@ -39,26 +39,10 @@ import { getLevelProgress } from "../../../utils/xp";
 import { StatTile } from "../components/StatTile";
 import { ActivitySection as Section } from "../components/ActivitySection";
 
+import { useActivityAnalytics } from "../hooks/useActivityAnalytics";
+
 import Header from "../../General/ui/Header";
-
-function getRecentDays(days, count = 14) {
-  const dayMap = new Map(days.map((day) => [day.date, day]));
-  const today = getTodayISO();
-
-  return Array.from({ length: count }, (_, index) => {
-    const key = addDaysToDateKey(today, -(count - 1 - index));
-    return (
-      dayMap.get(key) || {
-        date: key,
-        cardsReviewed: 0,
-        cardsLearned: 0,
-        cardsStudied: 0,
-        timeStudiedSeconds: 0,
-        totalXP: 0,
-      }
-    );
-  });
-}
+import { SettingCard } from "../../General/ui/SettingCard";
 
 function formatDuration(seconds = 0) {
   if (!seconds) return "0m";
@@ -77,7 +61,6 @@ function formatDate(value, format) {
 }
 
 export default function ActivityPage() {
-  const activeTheme = useSelector(selectActiveTheme);
   const settings = useSelector(selectSettings);
   const activityDays = useSelector(selectSortedActivityDays);
   const totalActivity = useSelector(selectTotalActivity);
@@ -87,79 +70,33 @@ export default function ActivityPage() {
   const familiarCards = useSelector(selectTotalFamiliarCards);
   const solidCards = useSelector(selectTotalSolidCards);
   const masteredCards = useSelector(selectTotalMasteredCards);
-  const currentStreak = useSelector(selectGlobalStreak);
-  const bestStreak = useSelector(selectGlobalMaxStreak);
   const streakState = useSelector(selectGlobalStreakState);
   const profile = useSelector(selectUserProfile);
 
-  const recentDays = useMemo(
-    () => getRecentDays(activityDays, 14),
-    [activityDays],
-  );
+  const {
+    activeTheme,
+    consistencyScore,
+    averageCardsPerActiveDay,
+    recentDays,
+    languageStats,
+    masteredPercent,
+    currentStreak,
+    bestStreak,
+    formatDuration,
+  } = useActivityAnalytics(14);
+
   const maxDailyCards = Math.max(
     1,
     ...recentDays.map((day) => day.cardsStudied || 0),
   );
 
-  const consistencyScore = useMemo(() => {
-    const studied = recentDays.filter((day) => day.cardsStudied > 0).length;
-    return Math.round((studied / recentDays.length) * 100);
-  }, [recentDays]);
-  const averageCardsPerActiveDay = activeDays
-    ? Math.round(totalActivity.cardsStudied / activeDays)
-    : 0;
-  const totalXP = profile?.lifetime_xp ?? totalActivity.totalXP ?? 0;
-  const levelProgress = getLevelProgress(totalXP);
-
-  const languageStats = useMemo(() => {
-    const grouped = new Map();
-
-    decks.forEach((deck) => {
-      const language = deck.language || "Unsorted";
-      const current = grouped.get(language) || {
-        language,
-        decks: 0,
-        total: 0,
-        mastered: 0,
-        due: 0,
-        newCards: 0,
-        waiting: 0,
-      };
-
-      current.decks += 1;
-      current.total +=
-        deck.cards_count || deck.cardsCount || deck.active_cards_count || 0;
-      current.mastered += deck.mastered || deck.mastered_count || 0;
-      current.due += deck.due || deck.due_count || 0;
-      current.newCards += deck.new || deck.new_count || 0;
-      current.waiting += deck.waiting || deck.waiting_count || 0;
-      grouped.set(language, current);
-    });
-
-    return Array.from(grouped.values())
-      .map((item) => ({
-        ...item,
-        progress: item.total
-          ? Math.round((item.mastered / item.total) * 100)
-          : 0,
-      }))
-      .sort((a, b) => b.total - a.total);
-  }, [decks]);
-
   const characterDeckCount = decks.filter(
     (deck) => deck.study_mode === "C",
   ).length;
-  const totalCards = decks.reduce(
-    (sum, deck) => sum + (deck.cards_count || deck.cardsCount || 0),
-    0,
-  );
-  const masteredPercent = totalCards
-    ? Math.round((masteredCards / totalCards) * 100)
-    : 0;
 
   return (
     <div
-      className={`min-h-screen ${activeTheme.background.app} ${activeTheme.text.primary} w-full px-4 md:px-8 py-8`}
+      className={`min-h-screen ${activeTheme.background.app} ${activeTheme.text.primary} w-full px-4 md:px-8 py-8  shadow-md`}
     >
       <div className="max-w-screen-xl mx-auto space-y-6">
         <Header
@@ -169,42 +106,53 @@ export default function ActivityPage() {
           activeTheme={activeTheme}
         />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-          <StatTile
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 z-10">
+          <SettingCard
             icon={faCalendarDays}
-            label="Active Days"
-            value={activeDays}
-            note={`${consistencyScore}% consistency across the last 14 days`}
+            title="Active Days"
             activeTheme={activeTheme}
-          />
-          <StatTile
+          >
+            <div className="space-y-6 flex align-middle justify-center flex-col text-center">
+              <h3 className={`${activeTheme.text.primary} text-3xl font-black`}>
+                {activeDays}
+              </h3>
+              <p className={`${activeTheme.text.secondary} text-sm`}>
+                {consistencyScore}% consistency across the last 14 days
+              </p>
+            </div>
+          </SettingCard>
+
+          <SettingCard
             icon={faBookOpen}
-            label="Cards Studied"
-            value={totalActivity.cardsStudied}
-            note={`${totalActivity.cardsLearned} learned, ${totalActivity.cardsReviewed} reviewed`}
+            title="Cards Studied"
             activeTheme={activeTheme}
-          />
-          {/* <StatTile
-            icon={faClock}
-            label="Time Studied"
-            value={formatDuration(totalActivity.timeStudiedSeconds)}
-            note="Tracked from completed study sessions"
-            activeTheme={activeTheme}
-          /> */}
-          <StatTile
+          >
+            <div className="space-y-6 flex align-middle justify-center flex-col text-center">
+              <h3 className={`${activeTheme.text.primary} text-3xl font-black`}>
+                {totalActivity.cardsStudied}
+              </h3>
+              <p className={`${activeTheme.text.secondary} text-sm`}>
+                {totalActivity.cardsLearned} learned,{" "}
+                {totalActivity.cardsReviewed} reviewed
+              </p>
+            </div>
+          </SettingCard>
+
+          <SettingCard
             icon={faFire}
-            label="Best Streak"
-            value={`${bestStreak || 0}d`}
-            note={`Current streak: ${currentStreak || 0}d (${streakState || "inactive"})`}
+            title="Best Streak"
             activeTheme={activeTheme}
-          />
-          {/* <StatTile
-            icon={faStar}
-            label="Lifetime XP"
-            value={totalXP}
-            note={`Level ${levelProgress.level} - ${levelProgress.xpIntoLevel}/${levelProgress.xpForNextLevel} XP`}
-            activeTheme={activeTheme}
-          /> */}
+          >
+            <div className="space-y-6 flex align-middle justify-center flex-col text-center">
+              <h3 className={`${activeTheme.text.primary} text-3xl font-black`}>
+                {bestStreak || 0}d
+              </h3>
+              <p className={`${activeTheme.text.secondary} text-sm`}>
+                Current streak: {currentStreak || 0}d (
+                {streakState || "inactive"})
+              </p>
+            </div>
+          </SettingCard>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

@@ -1,6 +1,7 @@
 import React from "react";
 import { supabase } from "../../../utils/supabaseClient";
-import { SettingCard, Toggle, LabelledSlider } from "../SettingsTemplates";
+import { Toggle, LabelledSlider } from "../SettingsTemplates";
+import { SettingCard } from "../../General/ui/SettingCard";
 import { updateSettings } from "../../../slices/settingsSlice";
 import { updateLocalProfile } from "../../../slices/userSlice"; // If keeping track in user state too
 import { useSettingSave } from "../hooks/useSettingsSave";

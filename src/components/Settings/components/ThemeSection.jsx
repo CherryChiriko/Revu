@@ -1,5 +1,5 @@
 import React from "react";
-import { SettingCard } from "../SettingsTemplates";
+import { SettingCard } from "../../General/ui/SettingCard";
 import { setTheme } from "../../../slices/themeSlice";
 import { faPalette } from "@fortawesome/free-solid-svg-icons";
 // ─────────────────────────────────────────────────────────────────────────────
