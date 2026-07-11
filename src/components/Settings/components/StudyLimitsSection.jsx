@@ -64,7 +64,7 @@ export function StudyLimitsSection({
         onChange={(v) => set("learnLimit", v)}
         activeTheme={activeTheme}
       />
-      <p className={`${activeTheme.text.muted} text-xs mt-1`}>
+      <p className={`${activeTheme.text.muted} text-xs mt-2`}>
         Complete at least your review <em>or</em> learning session to keep your
         daily streak going.
       </p>

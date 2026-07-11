@@ -318,7 +318,9 @@ export default function ActivityPage() {
           >
             <div className={`${activeTheme.background.canvas} rounded-xl p-5`}>
               <p className="text-3xl font-black">
-                {characterDeckCount > 0 ? "Ready" : "No character decks"}
+                {characterDeckCount > 0
+                  ? "Not available"
+                  : "No character decks"}
               </p>
               <p className={`${activeTheme.text.secondary} mt-3 text-sm`}>
                 {characterDeckCount > 0

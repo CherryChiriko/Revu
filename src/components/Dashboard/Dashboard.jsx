@@ -7,6 +7,7 @@ import {
   selectTotalDueCards,
   selectTotalMasteredCards,
 } from "../../slices/deckSlice";
+import { selectUserProfile } from "../../slices/userSlice";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -16,6 +17,7 @@ import {
   faBullseye,
   faArrowRight,
   faArrowLeft,
+  faCircleQuestion,
 } from "@fortawesome/free-solid-svg-icons";
 import RevuLogo from "../../assets/revu2.png";
 import { selectTotalActivity } from "../../slices/activitySlice";
@@ -27,10 +29,15 @@ import { XPBar } from "./XPBar";
 import { StatCard } from "./StatCard";
 import { Toast } from "primereact/toast";
 import Header from "../General/ui/Header";
+import DashboardTutorial from "../Tutorial/components/DashboardTutorial";
+
+const dashboardSpotlightKey = (userId) =>
+  `revu_dashboard_spotlight_seen_${userId}`;
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const activeTheme = useSelector(selectActiveTheme);
+  const profile = useSelector(selectUserProfile);
   const toast = useRef(null);
 
   const decks = useSelector(selectDecks);
@@ -57,6 +64,37 @@ const Dashboard = () => {
     const baseXP = totalActivity?.totalXP || 0;
     return Math.max(0, baseXP);
   }, [totalActivity]);
+
+  // ── Spotlight tour ───────────────────────────────────────────────────────
+  const statsRef = useRef(null);
+  const continueLearningRef = useRef(null);
+  const heatmapRef = useRef(null);
+  const xpBarRef = useRef(null);
+  const helpRef = useRef(null);
+  const spotlightRefs = {
+    stats: statsRef,
+    continueLearning: continueLearningRef,
+    heatmap: heatmapRef,
+    xpBar: xpBarRef,
+    help: helpRef,
+  };
+
+  const [showSpotlight, setShowSpotlight] = useState(false);
+
+  useEffect(() => {
+    if (!profile?.id || !profile.has_completed_onboarding) return;
+    const key = dashboardSpotlightKey(profile.id);
+    if (!localStorage.getItem(key)) {
+      setShowSpotlight(true);
+    }
+  }, [profile?.id, profile?.has_completed_onboarding]);
+
+  const closeSpotlight = () => {
+    setShowSpotlight(false);
+    if (profile?.id) {
+      localStorage.setItem(dashboardSpotlightKey(profile.id), "true");
+    }
+  };
 
   return (
     <div
@@ -85,14 +123,32 @@ const Dashboard = () => {
             </div>
           }
           rightElement={
-            <div className="w-full md:w-64 lg:w-80">
-              <XPBar totalXP={totalXP} activeTheme={activeTheme} />
+            <div className="flex items-center gap-3">
+              <div ref={xpBarRef} className="w-full md:w-64 lg:w-80 rounded-xl">
+                <XPBar totalXP={totalXP} activeTheme={activeTheme} />
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowSpotlight(true)}
+                title="Show me around"
+                aria-label="Show me around"
+                className={`flex items-center justify-center w-9 h-9 rounded-full shrink-0 transition-colors ${activeTheme.background.secondary} ${activeTheme.text.secondary} hover:${activeTheme.text.accent3}`}
+              >
+                <FontAwesomeIcon
+                  icon={faCircleQuestion}
+                  ref={helpRef}
+                  className="w-4 h-4"
+                />
+              </button>
             </div>
           }
         />
 
         {/* Quick stats panel - Added negative margin top option to stitch sections together tightly, or standard spacing */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative z-10">
+        <div
+          ref={statsRef}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative z-10 rounded-2xl"
+        >
           <StatCard
             icon={faFire}
             label="Current Streak"
@@ -116,7 +172,7 @@ const Dashboard = () => {
 
           <StatCard
             icon={faBookOpen}
-            label="Active Decks"
+            label="Decks"
             value={decks.length}
             activeTheme={activeTheme}
           />
@@ -129,7 +185,10 @@ const Dashboard = () => {
           }`}
         >
           {/* Left: Decks */}
-          <div className="lg:col-span-2 space-y-6">
+          <div
+            ref={continueLearningRef}
+            className="lg:col-span-2 space-y-6 rounded-2xl"
+          >
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold">Continue Learning</h2>
               <button
@@ -199,12 +258,21 @@ const Dashboard = () => {
 
           {/* Right: Heatmap */}
           <div
+            ref={heatmapRef}
             className={`${activeTheme.background.secondary} p-6 rounded-2xl shadow-lg flex flex-col space-y-6`}
           >
             <Heatmap activeTheme={activeTheme} />
           </div>
         </div>
       </div>
+
+      {showSpotlight && (
+        <DashboardTutorial
+          activeTheme={activeTheme}
+          refs={spotlightRefs}
+          onClose={closeSpotlight}
+        />
+      )}
     </div>
   );
 };

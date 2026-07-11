@@ -11,12 +11,14 @@ import {
   faSort,
   faThLarge,
   faList,
+  faCircleQuestion,
 } from "@fortawesome/free-solid-svg-icons";
 import Header from "../../General/ui/Header";
 import { Toast } from "primereact/toast";
 
 import QuickCreateMenu from "../../DeckMenu/views/QuickCreateMenu";
 import QuickCreateView from "../../Import/views/QuickCreateView";
+import DeckPageTutorial from "../../Tutorial/components/DeckPageTutorial";
 
 export default function DeckListView() {
   const activeTheme = useSelector(selectActiveTheme);
@@ -50,6 +52,7 @@ export default function DeckListView() {
 
   // ── Modal state ───────────────────────────────────────────────────────────
   const [mode, setMode] = useState(null);
+  const [showTutorial, setShowTutorial] = useState(false);
 
   // ── Highlight new deck ───────────────────────────────────────────────────────────
 
@@ -175,6 +178,17 @@ export default function DeckListView() {
               onNewDeck={() => setMode("new")}
               onCloneDeck={() => setMode("clone")}
             />
+
+            {/* Help / tutorial */}
+            <button
+              type="button"
+              onClick={() => setShowTutorial(true)}
+              title="How this page works"
+              aria-label="How this page works"
+              className={`flex items-center justify-center w-9 h-9 rounded-full shrink-0 transition-colors ${activeTheme.background.canvas} ${activeTheme.text.secondary} hover:${activeTheme.text.accent3}`}
+            >
+              <FontAwesomeIcon icon={faCircleQuestion} className="w-4 h-4" />
+            </button>
           </div>
         </div>
 
@@ -253,6 +267,13 @@ export default function DeckListView() {
         mode={mode}
         onClose={() => setMode(null)}
       />
+
+      {showTutorial && (
+        <DeckPageTutorial
+          activeTheme={activeTheme}
+          onClose={() => setShowTutorial(false)}
+        />
+      )}
     </div>
   );
 }

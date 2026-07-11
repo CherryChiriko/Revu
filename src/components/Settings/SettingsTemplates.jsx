@@ -46,7 +46,7 @@ export function SettingCard({
 
       {/* Save / action button — only rendered when onSave is provided */}
       {hasSave && (
-        <div className="px-5 py-5">
+        <div className="px-5 py-4">
           <button
             type="button"
             onClick={onSave}

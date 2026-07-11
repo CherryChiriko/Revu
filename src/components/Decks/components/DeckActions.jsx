@@ -2,7 +2,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGraduationCap, faRedo } from "@fortawesome/free-solid-svg-icons";
 
 export function DeckActions({
-  isMastered,
   showLearn,
   showReview,
   handleAction,
@@ -11,17 +10,6 @@ export function DeckActions({
   newCount = 0,
   large = false,
 }) {
-  if (isMastered) {
-    return (
-      <button
-        onClick={(e) => handleAction(e, "reset")}
-        className={`flex-1 py-2 rounded-lg font-semibold border ${activeTheme.text.primary}`}
-      >
-        Reset Progress
-      </button>
-    );
-  }
-
   const largeClasses =
     "flex-1 py-2 rounded-lg font-semibold flex items-center justify-center";
 
