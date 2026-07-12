@@ -1,7 +1,11 @@
 import { useState } from "react";
+import { useDispatch } from "react-redux"; // 🌟 ADDED to trigger counter dispatches
 import { supabase } from "../../../utils/supabaseClient";
 import { generateReading } from "../../Import/hooks/generateReading";
 import { hasCJKCharacter } from "../../../utils/cjkValidation";
+import { getTodayISO, getUserTimezone } from "../../../utils/dateHelper"; // 🌟 ADDED for timezone math
+import { fetchDeckCounts } from "../../../slices/deckSlice"; // 🌟 IMPORT your sync actions
+import { fetchDailyActivity } from "../../../slices/activitySlice";
 
 export const useCardDetails = ({
   card,
@@ -12,6 +16,7 @@ export const useCardDetails = ({
   onUpdate,
   onClose,
 }) => {
+  const dispatch = useDispatch(); // 🌟 ADDED
   const [isToggling, setIsToggling] = useState(false);
   const [toggleError, setToggleError] = useState(null);
 
@@ -25,7 +30,6 @@ export const useCardDetails = ({
   const cardTable = `cards_${studyMode.toLowerCase()}`;
   const isC = studyMode === "C";
 
-  // Use whatever ID fallback structure is populated from the parent context
   const targetCardId = card?.id || card?.card_id;
   const isSusp = card?.suspended ?? false;
 
@@ -107,7 +111,6 @@ export const useCardDetails = ({
     try {
       const nextSuspendedState = !isSusp;
 
-      // 🌟 FIX: We only upsert to progressTable since 'suspended' lives there!
       const progressPayload = {
         user_id: userId,
         deck_id: deckId,
@@ -127,7 +130,6 @@ export const useCardDetails = ({
 
       if (dbError) throw dbError;
 
-      // Update frontend state context
       await onUpdate({
         ...card,
         ...progressPayload,
@@ -146,14 +148,12 @@ export const useCardDetails = ({
   const handleDeleteCard = async () => {
     if (!targetCardId) return;
     try {
-      // 1. Delete progress row tracking metrics
       await supabase
         .from(progressTable)
         .delete()
         .eq("card_id", targetCardId)
         .eq("user_id", userId);
 
-      // 2. Delete base data card reference
       const { error } = await supabase
         .from(cardTable)
         .delete()
@@ -161,7 +161,6 @@ export const useCardDetails = ({
 
       if (error) throw error;
 
-      // 3. Purge from local parent view state arrays
       if (onUpdate) {
         await onUpdate({
           id: targetCardId,
@@ -175,9 +174,13 @@ export const useCardDetails = ({
     }
   };
 
+  // 🌟 MODIFIED: This function now actively pulls down today's counts and decrements them
   const handleResetProgress = async () => {
     if (!userId || !targetCardId) return;
     try {
+      // Keep track of what status the card was *before* wiping it out
+      const previousStatus = card?.status || "new";
+
       const resetPayload = {
         user_id: userId,
         deck_id: deckId,
@@ -191,12 +194,51 @@ export const useCardDetails = ({
         suspended: isSusp,
       };
 
+      // 1. Reset card status in progressTable
       const { error } = await supabase
         .from(progressTable)
         .upsert(resetPayload, { onConflict: "user_id,card_id" });
 
       if (error) throw error;
 
+      // 2. Adjust global aggregate counts for today
+      const userTimezone = getUserTimezone();
+      const today = getTodayISO(userTimezone);
+
+      const { data: currentStats } = await supabase
+        .from("daily_user_stats")
+        .select("cards_learned, cards_reviewed")
+        .eq("user_id", userId)
+        .eq("date", today)
+        .maybeSingle();
+
+      if (currentStats) {
+        // If the card was learned or reviewed, decrement the corresponding metric
+        const isLearned =
+          previousStatus === "learned" ||
+          (card?.repetitions > 0 && previousStatus === "waiting");
+        const isReviewed =
+          previousStatus === "review" || previousStatus === "reviewing";
+
+        await supabase
+          .from("daily_user_stats")
+          .update({
+            cards_learned: isLearned
+              ? Math.max(0, currentStats.cards_learned - 1)
+              : currentStats.cards_learned,
+            cards_reviewed: isReviewed
+              ? Math.max(0, currentStats.cards_reviewed - 1)
+              : currentStats.cards_reviewed,
+          })
+          .eq("user_id", userId)
+          .eq("date", today);
+      }
+
+      // 3. Dispatch changes so headers/sidebar counters reflect the change instantly
+      dispatch(fetchDeckCounts({ user_id: userId }));
+      dispatch(fetchDailyActivity({ user_id: userId }));
+
+      // 4. Update the local UI state context
       await onUpdate({
         ...card,
         ...resetPayload,

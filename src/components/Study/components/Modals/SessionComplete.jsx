@@ -56,7 +56,7 @@ export default function SessionComplete({
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.35 }}
-                className={`py-2 rounded-lg ${activeTheme.button.accent} transition`}
+                className={`py-2 rounded-lg ${activeTheme.button.accent} ${activeTheme.text.activeButton} transition`}
               >
                 Learn More
               </motion.button>

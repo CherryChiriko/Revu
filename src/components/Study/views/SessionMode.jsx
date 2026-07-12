@@ -89,8 +89,14 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
       <div
         className={`min-h-screen ${activeTheme.background.app} ${activeTheme.text.primary} w-full`}
       >
-        <div className="max-w-screen-xl mx-auto px-4 md:px-8 py-8">
-          <Header title={activeDeck.name} />
+        {/* <div className="max-w-screen-xl mx-auto px-4 md:px-8 py-8">
+          <Header title={activeDeck.name} /> */}
+        <div className="max-w-screen-xl mx-auto space-y-6">
+          <Header
+            title={activeDeck.name}
+            description=""
+            activeTheme={activeTheme}
+          />
           <div className="h-96 flex items-center justify-center">
             <p className="text-xl animate-pulse">Loading next card…</p>
           </div>
@@ -125,8 +131,14 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
     <div
       className={`min-h-screen ${activeTheme.background.app} ${activeTheme.text.primary} w-full`}
     >
-      <div className="max-w-screen-xl mx-auto px-4 md:px-8 py-8">
-        <Header title={activeDeck.name} />
+      {/* <div className="max-w-screen-xl mx-auto px-4 md:px-8 py-8">
+        <Header title={activeDeck.name} /> */}
+      <div className="max-w-screen-xl mx-auto space-y-6">
+        <Header
+          title={activeDeck.name}
+          description=""
+          activeTheme={activeTheme}
+        />
 
         <header className="flex justify-between items-center mb-10">
           <button

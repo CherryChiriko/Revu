@@ -101,15 +101,15 @@ const streakSlice = createSlice({
         streakState: row.streak_state,
       };
     },
-  },
 
-  updateGlobalStreakFromRealtime(state, action) {
-    const row = action.payload;
-    state.global = {
-      streak: row.global_streak,
-      maxStreak: row.max_global_streak,
-      streakState: row.streak_state,
-    };
+    updateGlobalStreakFromRealtime(state, action) {
+      const row = action.payload;
+      state.global = {
+        streak: row.global_streak,
+        maxStreak: row.max_global_streak,
+        streakState: row.streak_state,
+      };
+    },
   },
 
   extraReducers: (builder) => {

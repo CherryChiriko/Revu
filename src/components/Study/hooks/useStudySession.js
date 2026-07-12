@@ -184,13 +184,11 @@ export default function useStudySession({ deck, navMode, userId }) {
       batchPageRef.current = 1;
       isFetchingMoreRef.current = false;
 
-      if (advance) {
-        setSessionOffset((offset) => offset + modeLimit);
-      } else {
-        setSessionOffset(0);
-      }
+      // CHANGE THIS: Since Redux updates and moves fresh cards to the front,
+      // keeping the offset at 0 will correctly read the new elements.
+      setSessionOffset(0);
     },
-    [modeLimit],
+    [], // removed modeLimit dependency
   );
 
   // Reset session state when deck changes (not on every render)
