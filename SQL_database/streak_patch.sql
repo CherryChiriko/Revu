@@ -399,3 +399,339 @@ for each row execute function public._trg_cards_refresh();
 create trigger trg_cards_c
 after insert or update or delete on public.cards_c
 for each row execute function public._trg_cards_refresh();
+
+
+
+
+
+
+--------------------------------------------------------------------
+
+
+create or replace function public.refresh_deck_counts(
+  p_deck_id uuid,
+  p_user_timezone text
+)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user_id uuid;
+  v_today date := public.local_study_date(p_user_timezone);
+begin
+  select user_id into v_user_id
+  from public.decks
+  where id = p_deck_id;
+
+  if v_user_id is null then
+    return;
+  end if;
+
+  perform public.normalize_deck_card_states(p_deck_id);
+
+  insert into public.daily_deck_stats (user_id, deck_id, date, updated_at)
+  values (v_user_id, p_deck_id, v_today, now())
+  on conflict (user_id, deck_id, date) do nothing;
+
+  with unified_cards as (
+    select
+      c.id,
+      coalesce(cp.suspended, false) as suspended,
+      case
+        when cp.card_id is null then 'new'
+        when cp.last_studied is null
+          and coalesce(cp.repetitions, 0) = 0
+          and cp.due_date is null
+          then 'new'
+        when coalesce(cp.review_interval, 0) >= public.card_mastered_interval_days()
+          then 'mastered'
+        when cp.due_date is not null and cp.due_date <= now()
+          then 'due'
+        else 'waiting'
+      end as status,
+      cp.last_studied
+    from public.cards_a c
+    left join public.card_a_progress cp
+      on cp.card_id = c.id
+     and cp.user_id = v_user_id
+    where c.deck_id = p_deck_id
+
+    union all
+
+    select
+      c.id,
+      coalesce(cp.suspended, false) as suspended,
+      case
+        when cp.card_id is null then 'new'
+        when cp.last_studied is null
+          and coalesce(cp.repetitions, 0) = 0
+          and cp.due_date is null
+          then 'new'
+        when coalesce(cp.review_interval, 0) >= public.card_mastered_interval_days()
+          then 'mastered'
+        when cp.due_date is not null and cp.due_date <= now()
+          then 'due'
+        else 'waiting'
+      end as status,
+      cp.last_studied
+    from public.cards_c c
+    left join public.card_c_progress cp
+      on cp.card_id = c.id
+     and cp.user_id = v_user_id
+    where c.deck_id = p_deck_id
+  ),
+  counts as (
+    select
+      count(*)::integer as total_count,
+      count(*) filter (where status = 'new' and not suspended)::integer as new_count,
+      count(*) filter (where status = 'waiting' and not suspended)::integer as waiting_count,
+      count(*) filter (where status = 'due' and not suspended)::integer as due_count,
+      count(*) filter (where status = 'mastered' and not suspended)::integer as mastered_count,
+      count(*) filter (where suspended)::integer as suspended_count,
+      max(last_studied)::date as last_reviewed
+    from unified_cards
+  )
+  update public.decks d
+  set
+    cards_count = counts.total_count,
+    new_count = counts.new_count,
+    waiting_count = counts.waiting_count,
+    due_count = counts.due_count,
+    mastered_count = counts.mastered_count,
+    suspended_count = counts.suspended_count,
+    active_cards_count = counts.total_count - counts.suspended_count,
+    last_reviewed = counts.last_reviewed,
+    status = case
+      when counts.total_count - counts.suspended_count > 0
+        and counts.mastered_count = counts.total_count - counts.suspended_count
+        then 'mastered'
+      else 'learning'
+    end
+    /* 🌟 REMOVED: d.mastered_at column tracking assignment entirely */
+  from counts
+  where d.id = p_deck_id;
+
+  with unified_cards as (
+    select
+      coalesce(cp.suspended, false) as suspended,
+      case
+        when cp.card_id is null then 'new'
+        when cp.last_studied is null
+          and coalesce(cp.repetitions, 0) = 0
+          and cp.due_date is null
+          then 'new'
+        when coalesce(cp.review_interval, 0) >= public.card_mastered_interval_days()
+          then 'mastered'
+        when cp.due_date is not null and cp.due_date <= now()
+          then 'due'
+        else 'waiting'
+      end as status
+    from public.cards_a c
+    left join public.card_a_progress cp
+      on cp.card_id = c.id
+     and cp.user_id = v_user_id
+    where c.deck_id = p_deck_id
+
+    union all
+
+    select
+      coalesce(cp.suspended, false) as suspended,
+      case
+        when cp.card_id is null then 'new'
+        when cp.last_studied is null
+          and coalesce(cp.repetitions, 0) = 0
+          and cp.due_date is null
+          then 'new'
+        when coalesce(cp.review_interval, 0) >= public.card_mastered_interval_days()
+          then 'mastered'
+        when cp.due_date is not null and cp.due_date <= now()
+          then 'due'
+        else 'waiting'
+      end as status
+    from public.cards_c c
+    left join public.card_c_progress cp
+      on cp.card_id = c.id
+     and cp.user_id = v_user_id
+    where c.deck_id = p_deck_id
+  ),
+  counts as (
+    select
+      count(*) filter (where status = 'new' and not suspended)::integer as new_count,
+      count(*) filter (where status = 'waiting' and not suspended)::integer as waiting_count,
+      count(*) filter (where status = 'due' and not suspended)::integer as due_count,
+      count(*) filter (where suspended)::integer as suspended_count
+    from unified_cards
+  )
+  update public.daily_deck_stats dds
+  set
+    new_count = counts.new_count,
+    waiting_count = counts.waiting_count,
+    due_count = counts.due_count,
+    suspended_count = counts.suspended_count,
+    review_available_count = greatest(dds.review_available_count, counts.due_count),
+    learn_available_count = greatest(dds.learn_available_count, counts.new_count),
+    updated_at = now()
+  from counts
+  where dds.user_id = v_user_id
+    and dds.deck_id = p_deck_id
+    and dds.date = v_today;
+end;
+$$;
+
+
+create or replace function public.refresh_deck_counts(
+  p_deck_id uuid,
+  p_user_timezone text
+)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user_id uuid;
+  v_today date := public.local_study_date(p_user_timezone);
+begin
+  select user_id into v_user_id
+  from public.decks
+  where id = p_deck_id;
+
+  if v_user_id is null then
+    return;
+  end if;
+
+  perform public.normalize_deck_card_states(p_deck_id);
+
+  insert into public.daily_deck_stats (user_id, deck_id, date, updated_at)
+  values (v_user_id, p_deck_id, v_today, now())
+  on conflict (user_id, deck_id, date) do nothing;
+
+  with unified_cards as (
+    select
+      c.id,
+      coalesce(cp.suspended, false) as suspended,
+      case
+        when cp.card_id is null then 'new'
+        when cp.last_studied is null and coalesce(cp.repetitions, 0) = 0 and cp.due_date is null then 'new'
+        when coalesce(cp.review_interval, 0) >= public.card_mastered_interval_days() then 'mastered'
+        when cp.due_date is not null and cp.due_date <= now() then 'due'
+        else 'waiting'
+      end as status,
+      coalesce(cp.review_interval, 0) as interval, -- 🌟 Track the interval length
+      cp.last_studied
+    from public.cards_a c
+    left join public.card_a_progress cp
+      on cp.card_id = c.id and cp.user_id = v_user_id
+    where c.deck_id = p_deck_id
+
+    union all
+
+    select
+      c.id,
+      coalesce(cp.suspended, false) as suspended,
+      case
+        when cp.card_id is null then 'new'
+        when cp.last_studied is null and coalesce(cp.repetitions, 0) = 0 and cp.due_date is null then 'new'
+        when coalesce(cp.review_interval, 0) >= public.card_mastered_interval_days() then 'mastered'
+        when cp.due_date is not null and cp.due_date <= now() then 'due'
+        else 'waiting'
+      end as status,
+      coalesce(cp.review_interval, 0) as interval, -- 🌟 Track the interval length
+      cp.last_studied
+    from public.cards_c c
+    left join public.card_c_progress cp
+      on cp.card_id = c.id and cp.user_id = v_user_id
+    where c.deck_id = p_deck_id
+  ),
+  counts as (
+    select
+      count(*)::integer as total_count,
+      count(*) filter (where status = 'new' and not suspended)::integer as new_count,
+      count(*) filter (where status = 'waiting' and not suspended)::integer as waiting_count,
+      count(*) filter (where status = 'due' and not suspended)::integer as due_count,
+      count(*) filter (where suspended)::integer as suspended_count,
+      max(last_studied)::date as last_reviewed,
+      
+      -- 🌟 CALCULATE PROFICIENCY BUCKETS (Adjust the day thresholds if needed)
+      count(*) filter (where interval > 0 and interval < 21 and not suspended)::integer as familiar_count,
+      count(*) filter (where interval >= 21 and interval < 180 and not suspended)::integer as solid_count,
+      count(*) filter (where interval >= 180 and not suspended)::integer as mastered_count
+    from unified_cards
+  )
+  update public.decks d
+  set
+    cards_count = counts.total_count,
+    new_count = counts.new_count,
+    waiting_count = counts.waiting_count,
+    due_count = counts.due_count,
+    suspended_count = counts.suspended_count,
+    active_cards_count = counts.total_count - counts.suspended_count,
+    last_reviewed = counts.last_reviewed,
+    
+    -- 🌟 WRITE PROFICIENCY AGGREGATES TO THE PARENT DECK ROW
+    familiar_count = counts.familiar_count,
+    solid_count = counts.solid_count,
+    mastered_count = counts.mastered_count,
+    
+    status = case
+      when counts.total_count - counts.suspended_count > 0
+        and counts.mastered_count = counts.total_count - counts.suspended_count
+        then 'mastered'
+      else 'learning'
+    end
+  from counts
+  where d.id = p_deck_id;
+
+  -- (Keep the secondary daily_deck_stats aggregate logic exactly the same below...)
+  with unified_cards as (
+    select
+      coalesce(cp.suspended, false) as suspended,
+      case
+        when cp.card_id is null then 'new'
+        when cp.last_studied is null and coalesce(cp.repetitions, 0) = 0 and cp.due_date is null then 'new'
+        when coalesce(cp.review_interval, 0) >= public.card_mastered_interval_days() then 'mastered'
+        when cp.due_date is not null and cp.due_date <= now() then 'due'
+        else 'waiting'
+      end as status
+    from public.cards_a c
+    left join public.card_a_progress cp on cp.card_id = c.id and cp.user_id = v_user_id
+    where c.deck_id = p_deck_id
+    union all
+    select
+      coalesce(cp.suspended, false) as suspended,
+      case
+        when cp.card_id is null then 'new'
+        when cp.last_studied is null and coalesce(cp.repetitions, 0) = 0 and cp.due_date is null then 'new'
+        when coalesce(cp.review_interval, 0) >= public.card_mastered_interval_days() then 'mastered'
+        when cp.due_date is not null and cp.due_date <= now() then 'due'
+        else 'waiting'
+      end as status
+    from public.cards_c c
+    left join public.card_c_progress cp on cp.card_id = c.id and cp.user_id = v_user_id
+    where c.deck_id = p_deck_id
+  ),
+  counts as (
+    select
+      count(*) filter (where status = 'new' and not suspended)::integer as new_count,
+      count(*) filter (where status = 'waiting' and not suspended)::integer as waiting_count,
+      count(*) filter (where status = 'due' and not suspended)::integer as due_count,
+      count(*) filter (where suspended)::integer as suspended_count
+    from unified_cards
+  )
+  update public.daily_deck_stats dds
+  set
+    new_count = counts.new_count,
+    waiting_count = counts.waiting_count,
+    due_count = counts.due_count,
+    suspended_count = counts.suspended_count,
+    review_available_count = greatest(dds.review_available_count, counts.due_count),
+    learn_available_count = greatest(dds.learn_available_count, counts.new_count),
+    updated_at = now()
+  from counts
+  where dds.user_id = v_user_id
+    and dds.deck_id = p_deck_id
+    and dds.date = v_today;
+end;
+$$;

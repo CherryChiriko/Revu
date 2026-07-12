@@ -47,7 +47,7 @@ export default function CardDetails(props) {
   } = useCardDetails({
     ...props,
     card: currentCard,
-    onClose, // 🌟 CRITICAL: Forwarding onClose down to the hook layout loop
+    onClose,
     onUpdate: (updatedCard) => {
       if (updatedCard) {
         setCurrentCard(updatedCard);

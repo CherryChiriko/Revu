@@ -29,3 +29,19 @@ export const addDaysToDateKey = (dateKey, amount) => {
   const nextDay = String(date.getUTCDate()).padStart(2, "0");
   return `${nextYear}-${nextMonth}-${nextDay}`;
 };
+
+export function formatDate(value, format) {
+  const [year, month, day] = value.split("-");
+  return format === "mm/dd/yyyy"
+    ? `${month}/${day}/${year}`
+    : `${day}/${month}/${year}`;
+}
+
+export function formatDuration(seconds = 0) {
+  if (!seconds) return "0m";
+  const minutes = Math.round(seconds / 60);
+  if (minutes < 60) return `${minutes}m`;
+  const hours = Math.floor(minutes / 60);
+  const remaining = minutes % 60;
+  return remaining ? `${hours}h ${remaining}m` : `${hours}h`;
+}

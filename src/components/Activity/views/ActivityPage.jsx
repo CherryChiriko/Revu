@@ -1,88 +1,52 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBookOpen,
   faBullseye,
   faCalendarDays,
   faChartLine,
-  faClock,
   faFire,
   faGaugeHigh,
   faLayerGroup,
-  faStar,
 } from "@fortawesome/free-solid-svg-icons";
-import { selectActiveTheme } from "../../../slices/themeSlice";
 import {
   selectActiveDaysCount,
-  selectSortedActivityDays,
   selectTotalActivity,
 } from "../../../slices/activitySlice";
 import {
   selectDecks,
-  selectTotalDueCards,
   selectTotalFamiliarCards,
   selectTotalMasteredCards,
   selectTotalSolidCards,
 } from "../../../slices/deckSlice";
-import {
-  selectGlobalMaxStreak,
-  selectGlobalStreak,
-  selectGlobalStreakState,
-} from "../../../slices/streakSlice";
+import { selectGlobalStreakState } from "../../../slices/streakSlice";
 import { selectSettings } from "../../../slices/settingsSlice";
-import { selectUserProfile } from "../../../slices/userSlice";
-import { MasteryBreakdown } from "../../Mastery/MasteryBar";
-import { addDaysToDateKey, getTodayISO } from "../../../utils/dateHelper";
-import { getLevelProgress } from "../../../utils/xp";
-
-import { StatTile } from "../components/StatTile";
-import { ActivitySection as Section } from "../components/ActivitySection";
 
 import { useActivityAnalytics } from "../hooks/useActivityAnalytics";
 
 import Header from "../../General/ui/Header";
 import { SettingCard } from "../../General/ui/SettingCard";
+import { SegmentedBar } from "../../General/ui/SegmentedBar";
 
-function formatDuration(seconds = 0) {
-  if (!seconds) return "0m";
-  const minutes = Math.round(seconds / 60);
-  if (minutes < 60) return `${minutes}m`;
-  const hours = Math.floor(minutes / 60);
-  const remaining = minutes % 60;
-  return remaining ? `${hours}h ${remaining}m` : `${hours}h`;
-}
-
-function formatDate(value, format) {
-  const [year, month, day] = value.split("-");
-  return format === "mm/dd/yyyy"
-    ? `${month}/${day}/${year}`
-    : `${day}/${month}/${year}`;
-}
+import { formatDate } from "../../../utils/dateHelper";
 
 export default function ActivityPage() {
   const settings = useSelector(selectSettings);
-  const activityDays = useSelector(selectSortedActivityDays);
   const totalActivity = useSelector(selectTotalActivity);
   const activeDays = useSelector(selectActiveDaysCount);
   const decks = useSelector(selectDecks);
-  const dueCards = useSelector(selectTotalDueCards);
   const familiarCards = useSelector(selectTotalFamiliarCards);
   const solidCards = useSelector(selectTotalSolidCards);
   const masteredCards = useSelector(selectTotalMasteredCards);
   const streakState = useSelector(selectGlobalStreakState);
-  const profile = useSelector(selectUserProfile);
 
   const {
     activeTheme,
     consistencyScore,
     averageCardsPerActiveDay,
     recentDays,
-    languageStats,
-    masteredPercent,
     currentStreak,
     bestStreak,
-    formatDuration,
   } = useActivityAnalytics(14);
 
   const maxDailyCards = Math.max(
@@ -106,7 +70,7 @@ export default function ActivityPage() {
           activeTheme={activeTheme}
         />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 z-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 z-10">
           <SettingCard
             icon={faCalendarDays}
             title="Active Days"
@@ -139,6 +103,21 @@ export default function ActivityPage() {
           </SettingCard>
 
           <SettingCard
+            icon={faGaugeHigh}
+            title="Cards per Day"
+            activeTheme={activeTheme}
+          >
+            <div className="space-y-6 flex align-middle justify-center flex-col text-center">
+              <h3 className={`${activeTheme.text.primary} text-3xl font-black`}>
+                {averageCardsPerActiveDay}
+              </h3>
+              <p className={`${activeTheme.text.secondary} text-sm`}>
+                On average on an active day
+              </p>
+            </div>
+          </SettingCard>
+
+          <SettingCard
             icon={faFire}
             title="Best Streak"
             activeTheme={activeTheme}
@@ -156,19 +135,29 @@ export default function ActivityPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Section
-            title="Recent Work"
+          <SettingCard
             icon={faChartLine}
+            title="Recent Work"
             activeTheme={activeTheme}
           >
             <div className="flex items-end gap-2 h-56">
               {recentDays.map((day) => {
+                console.log(
+                  "day",
+                  day,
+                  "maxDailyCards",
+                  maxDailyCards,
+                  "cardsLearned",
+                  day.cardsLearned,
+                  "cardsReviewed",
+                  day.cardsReviewed,
+                );
                 const learnedHeight = `${Math.max(
-                  4,
+                  0,
                   (day.cardsLearned / maxDailyCards) * 100,
                 )}%`;
                 const reviewedHeight = `${Math.max(
-                  4,
+                  0,
                   (day.cardsReviewed / maxDailyCards) * 100,
                 )}%`;
                 const inactive = day.cardsStudied === 0;
@@ -185,11 +174,19 @@ export default function ActivityPage() {
                       className={`h-full rounded-lg flex flex-col justify-end overflow-hidden ${activeTheme.background.canvas}`}
                     >
                       <div
-                        className={inactive ? "bg-white/10" : "bg-sky-500"}
+                        className={
+                          inactive
+                            ? "bg-white/10"
+                            : activeTheme.background.accent1
+                        }
                         style={{ height: reviewedHeight }}
                       />
                       <div
-                        className={inactive ? "bg-white/10" : "bg-purple-500"}
+                        className={
+                          inactive
+                            ? "bg-white/10"
+                            : activeTheme.background.accent2
+                        }
                         style={{ height: learnedHeight }}
                       />
                     </div>
@@ -206,60 +203,86 @@ export default function ActivityPage() {
               className={`${activeTheme.text.secondary} flex gap-4 text-sm mt-4`}
             >
               <span>
-                <span className="inline-block w-3 h-3 rounded-sm bg-purple-500 mr-1" />
+                <span
+                  className={`inline-block w-3 h-3 rounded-sm ${activeTheme.background.accent2} mr-1`}
+                />
                 Learned
               </span>
               <span>
-                <span className="inline-block w-3 h-3 rounded-sm bg-sky-500 mr-1" />
+                <span
+                  className={`inline-block w-3 h-3 rounded-sm ${activeTheme.background.accent1} mr-1`}
+                />
                 Reviewed
               </span>
             </div>
-          </Section>
+          </SettingCard>
 
-          <Section
-            title="SRS Health"
+          <SettingCard
+            title="Mastery Progress"
             icon={faBullseye}
             activeTheme={activeTheme}
           >
             <div className="space-y-5">
-              <MasteryBreakdown
-                familiar={familiarCards}
-                solid={solidCards}
-                mastered={masteredCards}
-                activeTheme={activeTheme}
-              />
-              <div className="grid grid-cols-2 gap-3">
-                <div
-                  className={`${activeTheme.background.canvas} rounded-xl p-4`}
-                >
-                  <FontAwesomeIcon icon={faGaugeHigh} className="mb-3" />
-                  <p className={`${activeTheme.text.secondary} text-sm`}>
-                    Avg cards per active day
-                  </p>
-                  <p className="text-2xl font-black">
-                    {averageCardsPerActiveDay}
-                  </p>
-                </div>
-                <div
-                  className={`${activeTheme.background.canvas} rounded-xl p-4`}
-                >
-                  <FontAwesomeIcon icon={faStar} className="mb-3" />
-                  <p className={`${activeTheme.text.secondary} text-sm`}>
-                    Solid + mastered
-                  </p>
-                  <p className="text-2xl font-black">
-                    {solidCards + masteredCards}
-                  </p>
-                </div>
-              </div>
-              <p className={`${activeTheme.text.secondary} text-sm`}>
-                Queue status tells you what is available today; completeness
-                tells you how resilient those memories are becoming.
+              {(() => {
+                const total = familiarCards + solidCards + masteredCards;
+                const masteredPct = total
+                  ? Math.round((masteredCards / total) * 100)
+                  : 0;
+
+                const segments = [
+                  {
+                    key: "familiar",
+                    label: "familiar",
+                    count: familiarCards,
+                    colorClass: activeTheme.background.accent1,
+                  },
+                  {
+                    key: "solid",
+                    label: "solid",
+                    count: solidCards,
+                    colorClass: activeTheme.background.accent2,
+                  },
+                  {
+                    key: "mastered",
+                    label: "mastered",
+                    count: masteredCards,
+                    colorClass: activeTheme.background.accent3,
+                  },
+                ];
+
+                return (
+                  <>
+                    <div className="text-center">
+                      <h3
+                        className={`${activeTheme.text.primary} text-3xl font-black`}
+                      >
+                        {masteredPct}%
+                      </h3>
+                      <p
+                        className={`${activeTheme.text.secondary} text-sm mt-1`}
+                      >
+                        {masteredCards} of {total} studied cards mastered
+                      </p>
+                    </div>
+
+                    <SegmentedBar
+                      segments={segments}
+                      total={total}
+                      activeTheme={activeTheme}
+                      showLegend={true}
+                    />
+                  </>
+                );
+              })()}
+
+              <p className={`${activeTheme.text.muted} text-xs text-center`}>
+                Mastery reflects how resilient a memory has become — moving from
+                "familiar" to "solid" and finally "mastered".
               </p>
             </div>
-          </Section>
+          </SettingCard>
 
-          <Section
+          <SettingCard
             title="Character Accuracy"
             icon={faLayerGroup}
             activeTheme={activeTheme}
@@ -276,7 +299,7 @@ export default function ActivityPage() {
                   : "Once you study character decks, this panel can show writing accuracy and tough characters."}
               </p>
             </div>
-          </Section>
+          </SettingCard>
         </div>
 
         {/* <Section

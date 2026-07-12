@@ -174,11 +174,9 @@ export const useCardDetails = ({
     }
   };
 
-  // 🌟 MODIFIED: This function now actively pulls down today's counts and decrements them
   const handleResetProgress = async () => {
     if (!userId || !targetCardId) return;
     try {
-      // Keep track of what status the card was *before* wiping it out
       const previousStatus = card?.status || "new";
 
       const resetPayload = {
@@ -194,14 +192,23 @@ export const useCardDetails = ({
         suspended: isSusp,
       };
 
-      // 1. Reset card status in progressTable
-      const { error } = await supabase
+      // 1. Reset card status in card progress tracker table
+      const { error: progressError } = await supabase
         .from(progressTable)
         .upsert(resetPayload, { onConflict: "user_id,card_id" });
 
-      if (error) throw error;
+      if (progressError) throw progressError;
 
-      // 2. Adjust global aggregate counts for today
+      // 🌟 FIX 1: Trigger the Postgres count function to update the parent deck
+      // categories ('mastered', 'due', 'waiting') inside the DB instantly!
+      const { error: rpcError } = await supabase.rpc("refresh_deck_counts", {
+        p_deck_id: deckId,
+        p_user_timezone: getUserTimezone(),
+      });
+
+      if (rpcError) throw rpcError;
+
+      // 2. Adjust global daily user overview counters for today
       const userTimezone = getUserTimezone();
       const today = getTodayISO(userTimezone);
 
@@ -213,7 +220,6 @@ export const useCardDetails = ({
         .maybeSingle();
 
       if (currentStats) {
-        // If the card was learned or reviewed, decrement the corresponding metric
         const isLearned =
           previousStatus === "learned" ||
           (card?.repetitions > 0 && previousStatus === "waiting");
@@ -234,7 +240,7 @@ export const useCardDetails = ({
           .eq("date", today);
       }
 
-      // 3. Dispatch changes so headers/sidebar counters reflect the change instantly
+      // 3. Dispatch changes to Redux so UI layouts update instantly
       dispatch(fetchDeckCounts({ user_id: userId }));
       dispatch(fetchDailyActivity({ user_id: userId }));
 
@@ -246,7 +252,7 @@ export const useCardDetails = ({
         card_id: targetCardId,
       });
     } catch (err) {
-      console.error("Reset failed:", err);
+      console.error("Reset progress system failure:", err);
     }
   };
 

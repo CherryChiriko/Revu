@@ -14,6 +14,10 @@ export default function DeckHeaderSection({
   activeTheme,
   onDeckDeleted,
 }) {
+  // Pull from-to token combinations safely from your theme settings configuration wrapper
+  const gradientFrom = activeTheme?.gradients?.from || "from-indigo-500";
+  const gradientTo = activeTheme?.gradients?.to || "to-purple-500";
+
   const dispatch = useDispatch();
   const [isEditingMeta, setIsEditingMeta] = useState(false);
   const [pendingDelete, setPendingDelete] = useState(null);
@@ -40,7 +44,9 @@ export default function DeckHeaderSection({
       className={`${activeTheme.background.secondary} rounded-2xl shadow-xl border ${activeTheme.border.card} overflow-hidden relative p-6 md:p-8`}
     >
       {/* Top decorative gradient bar */}
-      <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-sky-500 via-indigo-500 to-fuchsia-500" />
+      <div
+        className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${gradientFrom} ${gradientTo}`}
+      />
 
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 w-full">
         {/* Main textual wrapper - explicitly forcing wrap behavior */}
