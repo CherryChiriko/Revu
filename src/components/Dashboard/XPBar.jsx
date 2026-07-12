@@ -23,9 +23,6 @@ export const XPBar = ({ totalXP = 100, activeTheme }) => {
             <div className="text-lg font-bold">Level {level}</div>
           </div>
         </div>
-        <div className={`text-sm ${activeTheme.text.secondary}`}>
-          {totalXP} XP
-        </div>
       </div>
 
       <Bar

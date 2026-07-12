@@ -6,17 +6,61 @@ import {
 import { supabase } from "../utils/supabaseClient";
 import { getTodayISO } from "../utils/dateHelper";
 
-/** Priority ordering */
+/** * Sort helper:
+ * If a deck has only new cards (or hasn't been studied yet), it uses created_at.
+ * Otherwise, it uses last_studied.
+ */
+const compareDeckRecency = (a, b) => {
+  // A deck is "purely new" if it only contains new cards and has no study footprint
+  const isPureNewA =
+    (a.new_count > 0 && a.due_count === 0 && a.waiting_count === 0) ||
+    !a.last_reviewed;
+  const isPureNewB =
+    (b.new_count > 0 && b.due_count === 0 && b.waiting_count === 0) ||
+    !b.last_reviewed;
+
+  // Derive stable millisecond timestamps
+  const timeA = isPureNewA
+    ? new Date(a.created_at).getTime()
+    : new Date(a.last_reviewed).getTime();
+
+  const timeB = isPureNewB
+    ? new Date(b.created_at).getTime()
+    : new Date(b.last_reviewed).getTime();
+
+  // If two active decks were reviewed on the exact same calendar day,
+  // break the tie using created_at so the order remains deterministic
+  if (timeA === timeB) {
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  }
+
+  return timeB - timeA; // Descending order (most recent first)
+};
+
+/** * Priority ordering:
+ * Tier 1: Decks with active reviews due (sorted by recency)
+ * Tier 2: Decks with ONLY new cards left to learn (sorted by creation date)
+ * Tier 3: Fully caught up or empty decks
+ */
 const orderDecksByPriority = (decks) => {
   if (!decks || decks.length === 0) return [];
 
-  const dueDecks = decks.filter((d) => d.due > 0).sort((a, b) => b.due - a.due);
-  const newDecks = decks.filter((d) => !dueDecks.includes(d) && d.new > 0);
-  const masteredDecks = decks.filter(
-    (d) => !dueDecks.includes(d) && !newDecks.includes(d),
-  );
+  // 1. Decks with active reviews due
+  const dueDecks = decks
+    .filter((d) => (d.due_count ?? 0) > 0)
+    .sort(compareDeckRecency);
 
-  return [...dueDecks, ...newDecks, ...masteredDecks];
+  // 2. Decks with no reviews due, but containing unlearned new cards
+  const newDecks = decks
+    .filter((d) => (d.due_count ?? 0) === 0 && (d.new_count ?? 0) > 0)
+    .sort(compareDeckRecency);
+
+  // 3. Decks that are fully caught up or completely empty
+  const completedDecks = decks
+    .filter((d) => (d.due_count ?? 0) === 0 && (d.new_count ?? 0) === 0)
+    .sort(compareDeckRecency);
+
+  return [...dueDecks, ...newDecks, ...completedDecks];
 };
 
 const normalizeDeck = (deck) => {
@@ -28,10 +72,11 @@ const normalizeDeck = (deck) => {
     due: deck.due_count ?? 0,
     waiting: deck.waiting_count ?? 0,
     new: deck.new_count ?? 0,
-    familiar: deck.familiar_count ?? 0, // new
-    solid: deck.solid_count ?? 0, // new
+    familiar: deck.familiar_count ?? 0,
+    solid: deck.solid_count ?? 0,
     mastered: deck.mastered_count ?? 0,
     suspended: deck.suspended_count ?? 0,
+    created_at: deck.created_at,
   };
 };
 
@@ -119,17 +164,16 @@ export function updateDeckStatsFromRealtime(state, action) {
 
   const index = state.decks.findIndex((d) => d.deck_id === targetId);
   if (index !== -1) {
-      state.decks[index] = normalizeDeck({
-        ...state.decks[index],
-        due_count: row.due_count,
-        waiting_count: row.waiting_count,
-        new_count: row.new_count,
-        familiar_count:
-          row.familiar_count ?? state.decks[index].familiar_count,
-        solid_count: row.solid_count ?? state.decks[index].solid_count,
-        mastered_count: row.mastered_count ?? state.decks[index].mastered_count,
-        suspended_count: row.suspended_count,
-      });
+    state.decks[index] = normalizeDeck({
+      ...state.decks[index],
+      due_count: row.due_count,
+      waiting_count: row.waiting_count,
+      new_count: row.new_count,
+      familiar_count: row.familiar_count ?? state.decks[index].familiar_count,
+      solid_count: row.solid_count ?? state.decks[index].solid_count,
+      mastered_count: row.mastered_count ?? state.decks[index].mastered_count,
+      suspended_count: row.suspended_count,
+    });
   }
 
   state.deckCounts[targetId] = {
