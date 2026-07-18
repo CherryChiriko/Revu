@@ -15,13 +15,16 @@ export default function CardGridSection({
   onCardClick,
   onAddCard,
   activeTheme,
+  refs,
 }) {
   // Empty deck: show only the add tile with a hint
   if (totalCount === 0 && !isLoading) {
     return (
       <div className="space-y-3">
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-          <AddCardTile onClick={onAddCard} activeTheme={activeTheme} />
+          <div ref={refs?.addRef} className="flex flex-col w-full h-full">
+            <AddCardTile onClick={onAddCard} activeTheme={activeTheme} />
+          </div>
         </div>
         <p className={`text-xs ${activeTheme.text.muted} text-center`}>
           No cards yet — add your first one above.
@@ -42,7 +45,9 @@ export default function CardGridSection({
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
           {/* Add tile always first */}
-          <AddCardTile onClick={onAddCard} activeTheme={activeTheme} />
+          <div ref={refs?.addRef} className="flex flex-col w-full h-full">
+            <AddCardTile onClick={onAddCard} activeTheme={activeTheme} />
+          </div>
 
           {cards.length === 0 ? (
             // Filter active but no matches
@@ -52,13 +57,18 @@ export default function CardGridSection({
               No matching cards found or loaded yet.
             </p>
           ) : (
-            cards.map((card) => (
-              <CardTile
-                key={card.card_id}
-                card={card}
-                onClick={onCardClick}
-                activeTheme={activeTheme}
-              />
+            cards.map((card, index) => (
+              <div
+                ref={index === 0 ? refs?.cardRef : null}
+                className="flex flex-col w-full h-full"
+              >
+                <CardTile
+                  key={card.card_id}
+                  card={card}
+                  onClick={onCardClick}
+                  activeTheme={activeTheme}
+                />
+              </div>
             ))
           )}
 

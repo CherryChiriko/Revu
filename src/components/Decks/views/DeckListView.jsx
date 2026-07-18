@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 import { selectActiveTheme } from "../../../slices/themeSlice";
 import useListController from "../hooks/useListController";
@@ -21,7 +21,6 @@ import QuickCreateView from "../../Import/views/QuickCreateView";
 import DeckPageTutorial from "../../Tutorial/components/DeckPageTutorial";
 
 import { selectUserProfile, completeTutorial } from "../../../slices/userSlice";
-import { useDispatch } from "react-redux";
 
 export default function DeckListView() {
   const activeTheme = useSelector(selectActiveTheme);

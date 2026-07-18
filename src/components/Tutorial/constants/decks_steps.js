@@ -6,6 +6,7 @@ import {
   faUpload,
   faLayerGroup,
   faArrowsLeftRight,
+  faCircleQuestion,
 } from "@fortawesome/free-solid-svg-icons";
 
 export const DECK_TOUR_STEPS = [
@@ -48,6 +49,7 @@ You will be guided step by step.`,
   },
   {
     target: "help",
+    icon: faCircleQuestion,
     title: "Help",
     body: `Click to see this tutorial again.`,
   },
