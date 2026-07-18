@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import HanziCanvas from "../Study/components/Card/HanziCanvas";
+import HanziCanvas from "../../Study/components/Card/HanziCanvas";
 
 export function TutorialCharDemo({ activeTheme }) {
   const [displayState, setDisplayState] = useState("animation"); // "animation" | "outline" | "quiz"

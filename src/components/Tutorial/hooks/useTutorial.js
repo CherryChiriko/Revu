@@ -1,14 +1,16 @@
 import { useDispatch } from "react-redux";
-import { completeOnboarding } from "../../../slices/userSlice";
+import { completeTutorial } from "../../../slices/userSlice";
 import { useTour } from "./useTour";
 
-export function useTutorial(totalSteps, onClose) {
+/**
+ * Wraps useTour with persistence: marks `tutorialKey` as complete in
+ * `completed_tutorials` whenever the tour is finished or skipped.
+ */
+export function useTutorial(totalSteps, tutorialKey, onClose) {
   const dispatch = useDispatch();
 
-  const tour = useTour(totalSteps, () => {
-    dispatch(completeOnboarding());
+  return useTour(totalSteps, () => {
+    if (tutorialKey) dispatch(completeTutorial(tutorialKey));
     onClose?.();
   });
-
-  return tour;
 }

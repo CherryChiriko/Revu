@@ -29,7 +29,6 @@ const ImportView = () => {
     logic.importMode === "existing" ? EXISTING_STEPS : NEW_STEPS;
 
   const renderStep = () => {
-    console.log("current step ", logic.currentStep);
     switch (logic.currentStep) {
       case 0:
         return (
@@ -80,7 +79,6 @@ const ImportView = () => {
       case 5:
         return <FinalStep activeTheme={activeTheme} logic={logic} />;
       default:
-        console.log("default");
         return null;
     }
   };

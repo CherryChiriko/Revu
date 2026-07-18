@@ -1,16 +1,16 @@
-import { useTour } from "../hooks/useTour";
+import { useTutorial } from "../hooks/useTutorial";
 import { DECK_TOUR_STEPS } from "../constants/decks_steps";
-import TourModal from "../../General/ui/TourModal";
+import SpotlightTourModal from "../../General/ui/SpotlightTourModal";
 
-export default function DeckPageTutorial({ activeTheme, onClose }) {
-  const tour = useTour(DECK_TOUR_STEPS.length, onClose);
-
+export default function DeckPageTutorial({ activeTheme, refs, onClose }) {
+  const tour = useTutorial(DECK_TOUR_STEPS.length, "decks", onClose);
+  console.log("executing");
   return (
-    <TourModal
+    <SpotlightTourModal
       activeTheme={activeTheme}
       steps={DECK_TOUR_STEPS}
+      refs={refs}
       tour={tour}
-      onClose={onClose}
     />
   );
 }

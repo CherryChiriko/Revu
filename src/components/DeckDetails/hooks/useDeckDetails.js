@@ -77,14 +77,6 @@ export function useDeckDetails(deckId) {
     for (let i = 0; i < visiblePages && i < totalPages; i++) {
       all.push(...(cardsByPage[i] ?? []));
     }
-    console.log(
-      filter,
-      all.filter((c) =>
-        filter === "suspended"
-          ? c.suspended
-          : c.status === filter && !c.suspended,
-      ),
-    );
     if (!filter) return all;
     return all.filter((c) =>
       filter === "suspended"

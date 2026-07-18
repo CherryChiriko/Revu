@@ -23,30 +23,50 @@ export const fetchUserProfile = createAsyncThunk(
 );
 
 /**
- * Persists has_completed_onboarding = true to the profiles table.
- * Updates local state optimistically so OnboardingModal can close
- * immediately; rolls back if the write fails so the modal reappears
- * next boot instead of silently losing the flag.
+ * 🌟 NEW: Dynamic Tutorial Completion Tracker
+ * Receives a tutorial key (e.g., 'general', 'dashboard', 'decks'),
+ * updates local state, and persists it into the DB JSONB payload object.
  */
-export const completeOnboarding = createAsyncThunk(
-  "user/completeOnboarding",
-  async (_, { getState, dispatch, rejectWithValue }) => {
-    const userId = getState().users?.profile?.id;
+export const completeTutorial = createAsyncThunk(
+  "user/completeTutorial",
+  async (tutorialKey, { getState, dispatch, rejectWithValue }) => {
+    const state = getState();
+    const profile = state.users?.profile;
+    const userId = profile?.id;
+
     if (!userId) return rejectWithValue("No user profile loaded");
 
-    dispatch(updateLocalProfile({ has_completed_onboarding: true }));
+    // Pull current object structure from state or default to an empty one
+    const currentTutorials = profile?.completed_tutorials || {};
+
+    // Guard: If it's already true, bypass database network traffic completely
+    if (currentTutorials[tutorialKey] === true) {
+      return currentTutorials;
+    }
+
+    // Build next state payload safely preserving other keys
+    const updatedTutorials = {
+      ...currentTutorials,
+      [tutorialKey]: true,
+    };
+
+    // 1. Optimistically update local UI layout frames instantly
+    dispatch(updateLocalProfile({ completed_tutorials: updatedTutorials }));
 
     try {
       const { error } = await supabase
         .from("profiles")
-        .update({ has_completed_onboarding: true })
+        .update({ completed_tutorials: updatedTutorials })
         .eq("id", userId);
+
       if (error) throw error;
-      return true;
+      return updatedTutorials;
     } catch (err) {
-      console.error("completeOnboarding error:", err);
-      dispatch(updateLocalProfile({ has_completed_onboarding: false }));
-      return rejectWithValue(err.message || "Failed to save onboarding status");
+      console.error(`completeTutorial error for [${tutorialKey}]:`, err);
+
+      // Rollback to prior clean backup structural definitions if connection drops
+      dispatch(updateLocalProfile({ completed_tutorials: currentTutorials }));
+      return rejectWithValue(err.message || "Failed to save tutorial status");
     }
   },
 );
@@ -96,7 +116,9 @@ export const selectUserProfile = (state) => state.users?.profile;
 export const selectUsername = (state) => state.users?.profile?.username;
 export const selectUserStatus = (state) => state.users?.status;
 export const selectUserError = (state) => state.users?.error;
-export const selectHasCompletedOnboarding = (state) =>
-  Boolean(state.users?.profile?.has_completed_onboarding);
+
+// 🌟 Updated Selector maps to evaluate individual structural keys
+export const selectCompletedTutorials = (state) =>
+  state.users?.profile?.completed_tutorials || {};
 
 export default userSlice.reducer;

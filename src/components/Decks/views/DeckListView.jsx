@@ -20,12 +20,17 @@ import QuickCreateMenu from "../../DeckMenu/views/QuickCreateMenu";
 import QuickCreateView from "../../Import/views/QuickCreateView";
 import DeckPageTutorial from "../../Tutorial/components/DeckPageTutorial";
 
+import { selectUserProfile, completeTutorial } from "../../../slices/userSlice";
+import { useDispatch } from "react-redux";
+
 export default function DeckListView() {
   const activeTheme = useSelector(selectActiveTheme);
   const controller = useListController();
   const location = useLocation();
   const navigate = useNavigate();
   const toast = useRef(null);
+  const dispatch = useDispatch();
+  const profile = useSelector(selectUserProfile);
 
   const {
     searchTerm,
@@ -52,7 +57,6 @@ export default function DeckListView() {
 
   // ── Modal state ───────────────────────────────────────────────────────────
   const [mode, setMode] = useState(null);
-  const [showTutorial, setShowTutorial] = useState(false);
 
   // ── Highlight new deck ───────────────────────────────────────────────────────────
 
@@ -69,6 +73,50 @@ export default function DeckListView() {
       return () => clearTimeout(timer);
     }
   }, [highlightedId, navigate, location.pathname]);
+
+  // ── Spotlight tour references ─────────────────────────────────────────────
+  const searchRef = useRef(null);
+  const sortRef = useRef(null);
+  const viewRef = useRef(null);
+  const importRef = useRef(null);
+  const helpRef = useRef(null);
+  const spotlightRefs = {
+    search: searchRef,
+    sort: sortRef,
+    view: viewRef,
+    import: importRef,
+    help: helpRef,
+  };
+
+  const [showSpotlight, setShowSpotlight] = useState(false);
+
+  useEffect(() => {
+    if (!profile) return;
+
+    // 1. Guard: Ensure they've finalized the introductory global tutorial first
+    const hasFinishedGeneralTour =
+      profile.completed_tutorials?.general === true;
+
+    // 2. Evaluate if they have viewed this dashboard layout context yet
+    const hasSeenDashboardTour = profile.completed_tutorials?.decks === true;
+
+    if (hasFinishedGeneralTour && !hasSeenDashboardTour) {
+      // Small architectural delay ensuring DOM ref spacing layouts settle cleanly
+      const timer = setTimeout(() => setShowSpotlight(true), 800);
+      return () => clearTimeout(timer);
+    }
+  }, [profile]);
+
+  // 🌟 Handles tour dismissal updates dynamically through Redux
+  const closeSpotlight = () => {
+    setShowSpotlight(false);
+    dispatch(completeTutorial("decks"));
+  };
+
+  // 🌟 Allows user to explicitly manual replay the workflow when pressing help icon
+  const handleManualReplayTour = () => {
+    setShowSpotlight(true);
+  };
 
   return (
     <div
@@ -87,7 +135,7 @@ export default function DeckListView() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 space-y-4 md:space-y-0 md:space-x-4">
           <div className="flex items-center space-x-4 w-full md:max-w-3xl">
             {/* Search */}
-            <div className="relative w-full">
+            <div className="relative w-full" ref={searchRef}>
               <FontAwesomeIcon
                 icon={faSearch}
                 className={`h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 ${activeTheme.text.secondary}`}
@@ -114,7 +162,7 @@ export default function DeckListView() {
             </select>
 
             {/* Sort */}
-            <div className="relative">
+            <div className="relative" ref={sortRef}>
               <FontAwesomeIcon
                 icon={faSort}
                 className={`h-4 w-4 absolute right-2 top-1/2 transform -translate-y-1/2 ${activeTheme.text.secondary}`}
@@ -137,6 +185,7 @@ export default function DeckListView() {
             {/* View toggle */}
             <div
               className={`border flex rounded-xl p-1 ${activeTheme.background.canvas}`}
+              ref={viewRef}
             >
               <button
                 onClick={() => toggleViewMode("grid")}
@@ -166,6 +215,7 @@ export default function DeckListView() {
             <button
               className={`flex items-center ${activeTheme.button.accent2} font-semibold py-2 px-3 rounded-lg`}
               title="Import"
+              ref={importRef}
               onClick={() => navigate("import")}
             >
               <FontAwesomeIcon icon={faUpload} className="h-5 w-5 mr-2" />
@@ -182,12 +232,16 @@ export default function DeckListView() {
             {/* Help / tutorial */}
             <button
               type="button"
-              onClick={() => setShowTutorial(true)}
-              title="How this page works"
-              aria-label="How this page works"
-              className={`flex items-center justify-center w-9 h-9 rounded-full shrink-0 transition-colors ${activeTheme.background.canvas} ${activeTheme.text.secondary} hover:${activeTheme.text.accent3}`}
+              onClick={handleManualReplayTour} // 🌟 Connected to our review callback logic
+              title="Show me around"
+              aria-label="Show me around"
+              className={`flex items-center justify-center w-9 h-9 rounded-full shrink-0 transition-colors ${activeTheme.background.app} ${activeTheme.text.secondary}`}
             >
-              <FontAwesomeIcon icon={faCircleQuestion} className="w-4 h-4" />
+              <FontAwesomeIcon
+                icon={faCircleQuestion}
+                ref={helpRef}
+                className="w-4 h-4"
+              />
             </button>
           </div>
         </div>
@@ -268,10 +322,11 @@ export default function DeckListView() {
         onClose={() => setMode(null)}
       />
 
-      {showTutorial && (
+      {showSpotlight && (
         <DeckPageTutorial
           activeTheme={activeTheme}
-          onClose={() => setShowTutorial(false)}
+          refs={spotlightRefs}
+          onClose={closeSpotlight}
         />
       )}
     </div>

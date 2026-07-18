@@ -142,16 +142,6 @@ export default function ActivityPage() {
           >
             <div className="flex items-end gap-2 h-56">
               {recentDays.map((day) => {
-                console.log(
-                  "day",
-                  day,
-                  "maxDailyCards",
-                  maxDailyCards,
-                  "cardsLearned",
-                  day.cardsLearned,
-                  "cardsReviewed",
-                  day.cardsReviewed,
-                );
                 const learnedHeight = `${Math.max(
                   0,
                   (day.cardsLearned / maxDailyCards) * 100,

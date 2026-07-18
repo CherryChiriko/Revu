@@ -112,7 +112,6 @@ export default function SpotlightTourModal({ activeTheme, steps, refs, tour }) {
     GAP,
     Math.min(popoverLeft, viewportW - POPOVER_WIDTH - GAP),
   );
-
   return (
     <div className="fixed inset-0 z-[60]" role="dialog" aria-modal="true">
       {/* Dark overlay with a spotlight cutout around the target */}
@@ -225,7 +224,7 @@ export default function SpotlightTourModal({ activeTheme, steps, refs, tour }) {
 
           <button
             type="button"
-            onClick={handleNext}
+            onClick={isLastStep ? handleFinish : handleNext}
             className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold shadow-sm transition-transform active:scale-95 ${activeTheme.text.activeButton} ${activeTheme.button.primary}`}
           >
             {isLastStep ? "Done" : "Next"}

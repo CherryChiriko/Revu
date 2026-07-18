@@ -1,11 +1,11 @@
-import { useTutorial } from "./hooks/useTutorial";
-import { ONBOARDING_STEPS } from "./constants/steps";
-import TourModal from "../General/ui/TourModal";
+import { useTutorial } from "../hooks/useTutorial";
+import { ONBOARDING_STEPS } from "../constants/steps";
+import TourModal from "../../General/ui/TourModal";
 import { TutorialCharDemo } from "./TutorialCharDemo";
 import { TutorialFlipCardDemo } from "./TutorialFlipDemo";
 
 export default function Tutorial({ activeTheme, onClose }) {
-  const tour = useTutorial(ONBOARDING_STEPS.length, onClose);
+  const tour = useTutorial(ONBOARDING_STEPS.length, "general", onClose);
 
   const renderDemo = (step) => {
     if (step === 1) return <TutorialFlipCardDemo activeTheme={activeTheme} />;

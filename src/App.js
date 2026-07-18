@@ -6,6 +6,7 @@ import {
   clearUser,
   fetchUserProfile,
   selectUserProfile,
+  completeTutorial, // 🌟 Updated to use our new single async thunk
 } from "./slices/userSlice";
 import { selectSettings } from "./slices/settingsSlice";
 import {
@@ -40,16 +41,12 @@ import ScrollToTop from "./components/General/routing/ScrollToTop";
 import DecksLoader from "./components/Loaders/DecksLoader";
 import StatsLoader from "./components/Loaders/StatsLoader";
 import ResetPasswordPage from "./components/Login/components/ResetPasswordPage";
-import Tutorial from "./components/Tutorial/Tutorial";
+import Tutorial from "./components/Tutorial/components/Tutorial";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
 // ─── Stable route tree ────────────────────────────────────────────────────────
-// Defined OUTSIDE App so React never sees a new component type on re-render.
-// If this were inside App, every App re-render would produce a new component
-// reference, forcing React to unmount and remount the entire route tree
-// (including StudySession), resetting all state.
 const AppRoutes = ({
   profile,
   settings,
@@ -122,7 +119,6 @@ function App() {
     const currentUserId = session?.user?.id || null;
 
     if (!currentUserId) {
-      console.log("[App] No active session. Purging local user state.");
       dispatch(clearUser());
       dispatch(clearDecks());
       dispatch(clearCards());
@@ -133,9 +129,6 @@ function App() {
       previousUserIdRef.current &&
       previousUserIdRef.current !== currentUserId
     ) {
-      console.log(
-        "[App] User ID switched. Purging residual account cache data safely.",
-      );
       dispatch(clearUser());
       dispatch(clearDecks());
       dispatch(clearCards());
@@ -187,12 +180,6 @@ function App() {
     );
   }
 
-  // Public paths (e.g. /reset-password) don't depend on deck/stats data at
-  // all, and may have no session (expired/invalid link) or a recovery-only
-  // session that never triggers a deck fetch. Bypassing the session/deck
-  // gating below means these routes always render immediately instead of
-  // potentially getting stuck behind a spinner that's waiting on deck data
-  // that will never arrive.
   if (isPublicPath) {
     return (
       <div
@@ -216,7 +203,6 @@ function App() {
   const shouldLoadDeckData = !!session && !isSettingsPath;
   const shouldLoadStatsData = !!session;
 
-  // Deck data still loading — show spinner but keep routes mounted for settings
   if (status === "loading" || status === "idle") {
     if (isSettingsPath && session) {
       return (
@@ -303,10 +289,14 @@ function App() {
     );
   }
 
-  // Show onboarding only once decks have successfully loaded, so it never
-  // flashes over the loading/error states above, and only for a profile
-  // that hasn't completed it yet.
-  const shouldShowTutorial = !!profile && !profile.has_completed_onboarding;
+  // 🌟 Check if 'general' key inside JSONB object is missing or false
+  const shouldShowGeneralTutorial =
+    !!profile && profile.completed_tutorials?.general !== true;
+
+  // 🌟 Clean presentation layer: Dispatches key directly to your thunk
+  const handleCloseGeneralTutorial = () => {
+    dispatch(completeTutorial("general"));
+  };
 
   return (
     <>
@@ -329,8 +319,12 @@ function App() {
           <AppRoutes {...routeProps} />
         </main>
       </div>
-      {shouldShowTutorial && (
-        <Tutorial activeTheme={activeTheme} onClose={() => {}} />
+
+      {shouldShowGeneralTutorial && (
+        <Tutorial
+          activeTheme={activeTheme}
+          onClose={handleCloseGeneralTutorial}
+        />
       )}
     </>
   );

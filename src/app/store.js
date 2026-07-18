@@ -20,7 +20,6 @@ const checkMidnightReset = () => {
     if (savedDate && savedDate !== today) {
       localStorage.removeItem("activeDeckId");
       localStorage.removeItem("activeDeckIdDate");
-      console.log("🌙 New day detected! Cleared cached active deck selection.");
     }
   } catch (error) {
     console.error(
@@ -44,7 +43,6 @@ checkMidnightReset();
  * of the wrong avatar/username.
  */
 export const resetAllUserState = () => (dispatch) => {
-  console.log("[store] resetAllUserState called");
   dispatch(clearDecks());
   dispatch(clearStreak());
   dispatch(resetActivity());

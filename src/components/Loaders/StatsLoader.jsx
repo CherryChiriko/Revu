@@ -9,7 +9,6 @@ export default function StatsLoader({ session, authLoading }) {
   const userId = session?.user?.id || null;
 
   useEffect(() => {
-    console.log("[StatsLoader] authLoading", authLoading, "userId", userId);
     if (authLoading || !userId) return;
 
     const run = async () => {
@@ -30,12 +29,6 @@ export default function StatsLoader({ session, authLoading }) {
           );
           return;
         }
-
-        // Proceed with Redux state updates once metrics rows are successfully initialized
-        console.log(
-          "[StatsLoader] dispatching daily stats fetches for user",
-          userId,
-        );
         dispatch(fetchDailyStreakStats({ user_id: userId }));
         dispatch(fetchDailyActivity({ user_id: userId }));
       } catch (err) {

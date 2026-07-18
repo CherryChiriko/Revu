@@ -92,7 +92,6 @@ export function useQuickCreate(onClose) {
     (cloneTypeId !== "convert" ||
       studyMode !== "C" ||
       (frontField && backField && frontField !== backField));
-  console.log("is valid? ", isValid);
 
   // ── Reset ─────────────────────────────────────────────────────────────────
 
@@ -210,7 +209,6 @@ export function useQuickCreate(onClose) {
       case "convert": {
         // C → A: No CJK validation required here
         if (sourceMode === "C") {
-          console.log("this is the first card ", sourceCards[0]);
           const mapped = sourceCards
             .map((c) => ({
               front: String(c[frontField] ?? "").trim(),

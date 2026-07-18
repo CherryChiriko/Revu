@@ -1,3 +1,4 @@
+// constants/decks_steps.js
 import {
   faSearch,
   faSort,
@@ -9,40 +10,51 @@ import {
 
 export const DECK_TOUR_STEPS = [
   {
+    target: "search",
     icon: faSearch,
     title: "Search & filter",
     body: `Use the search bar to quickly find a deck by name.
-The language dropdown next to it narrows your list down to decks in a specific language — handy once you're juggling several.`,
+  The language dropdown next to it narrows your list down to decks in a specific language.`,
   },
   {
+    target: "sort",
     icon: faSort,
     title: "Sorting",
     body: `The sort menu reorders your decks by last studied, name, or card count — ascending or descending.
-"Last Studied" is the default, keeping the decks you're actively working on near the top.`,
+  "Last Studied" is the default, keeping the decks you're actively working on near the top.`,
   },
   {
+    target: "view",
     icon: faThLarge,
     title: "Grid & list view",
     body: `Toggle between two layouts:
-- Grid view — larger cards with more detail, great for browsing.
-- List view — a compact, information-dense layout, better when you have many decks.`,
+  - Grid view — larger cards with more detail, great for browsing.
+  - List view — a compact, information-dense layout, better when you have many decks.
+  You can change the default view in the Settings.`,
   },
   {
+    target: "import",
     icon: faUpload,
     title: "Import",
-    body: `Bring in cards from a CSV or Excel file. You can create a brand new deck from the import, or append cards to an existing one.
-Column mapping and validation happen automatically as you go.`,
+    body: `Build a deck from a CSV or Excel file. You can create a new deck from the import, or add cards to an existing one.
+You will be guided step by step.`,
   },
   {
+    target: "create",
     icon: faLayerGroup,
     title: "Quick Create",
     body: `Prefer to start fresh? Create an empty deck and add cards later.
-Or clone an existing deck — copy it as-is, merge two decks together, convert between Standard and Character cards, or build a remedial deck from previously missed cards.`,
+  Or you can clone an existing deck — copy it as-is or build a variant (several options are proposed).`,
   },
   {
+    target: "help",
+    title: "Help",
+    body: `Click to see this tutorial again.`,
+  },
+  {
+    target: "decks",
     icon: faArrowsLeftRight,
-    title: "Managing a deck",
-    body: `Click any deck card to open it and manage its cards, settings, and study options.
-Decks with a lot of cards will paginate automatically — use the controls at the bottom to move between pages.`,
+    title: "Your deck",
+    body: `Click any deck card to open it and manage its cards. Click on "Learn" or "Study" to either learn or review cards.`,
   },
 ];

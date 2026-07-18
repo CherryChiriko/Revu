@@ -1,4 +1,4 @@
-import FlipCard from "../Study/components/Card/FlipCard";
+import FlipCard from "../../Study/components/Card/FlipCard";
 
 export function TutorialFlipCardDemo({ activeTheme }) {
   const mockCard = {

@@ -9,15 +9,6 @@ export default function DecksLoader({ session, authLoading }) {
   const userId = session?.user?.id || null;
 
   useEffect(() => {
-    console.log(
-      "[DecksLoader] authLoading",
-      authLoading,
-      "userId",
-      userId,
-      "previousUserId",
-      previousUserIdRef.current,
-    );
-
     if (authLoading || !userId) {
       previousUserIdRef.current = null;
       return;
@@ -36,9 +27,6 @@ export default function DecksLoader({ session, authLoading }) {
       } catch (err) {
         console.error("Failed to refresh daily stats", err);
       }
-
-      // 2. Load decks and deck counts from the same response
-      console.log("[DecksLoader] dispatching fetchDecks for user", userId);
       dispatch(fetchDecks({ user_id: userId }));
     };
 

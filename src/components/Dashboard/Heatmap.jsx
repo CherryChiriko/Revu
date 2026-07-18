@@ -162,6 +162,7 @@ export const Heatmap = ({ activeTheme }) => {
           <div key={wIdx} className="grid grid-cols-7 gap-1">
             {week.map((c, idx) => {
               const isToday = c.iso === TODAY_ISO;
+              const isUncoloredOrFuture = c.value === 0 || c.isFuture;
               return (
                 <div
                   key={idx}
@@ -170,11 +171,12 @@ export const Heatmap = ({ activeTheme }) => {
                   ${isToday ? `border-2 ${activeTheme.border.card}` : ""} ${
                     c.isFuture ? `border-2 ${activeTheme.border.muted}` : ""
                   }
-                  ${
-                    !activeTheme.isDark && c.isFuture
-                      ? `${activeTheme.text.muted}`
-                      : `${activeTheme.text.activeButton}`
-                  }`}
+                 ${
+                   !activeTheme.isDark && isUncoloredOrFuture
+                     ? `${activeTheme.text.secondary}`
+                     : `${activeTheme.text.activeButton}`
+                 }
+            `}
                   style={{
                     background: getColor(c.value, c.isFuture),
                   }}

@@ -64,12 +64,6 @@ export function useCharacterFlow({
 
   useLayoutEffect(() => {
     phaseGenerationRef.current += 1;
-    console.log(
-      "[useCharacterFlow] layoutEffect reset — card:",
-      card?.id,
-      "displayState:",
-      displayState,
-    ); // ADD THIS
 
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
@@ -100,10 +94,6 @@ export function useCharacterFlow({
 
       // Show the character strokes now that it's completed/revealed
       setRevealed(true);
-      console.log(
-        "[useCharacterFlow] setRevealed(true) — displayState at call time:",
-        displayState,
-      );
       onReveal?.();
       setMistakeList((prev) => [...prev, mistakes]);
       setCompletedChars((prev) => [...prev, currentCharacter]);

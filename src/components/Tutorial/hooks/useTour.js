@@ -10,11 +10,9 @@ export function useTour(totalSteps, onClose) {
   };
 
   const handleNext = () => {
-    console.log(finished, isLastStep);
     if (finished) return;
     if (isLastStep) {
       setFinished(true);
-      handleFinish();
     } else {
       setStep((s) => Math.min(s + 1, totalSteps - 1));
     }

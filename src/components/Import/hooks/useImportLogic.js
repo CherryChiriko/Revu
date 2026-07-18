@@ -40,14 +40,11 @@ export const useImportLogic = () => {
   // ── CJK warning for import mode ───────────────────────────────────────────
   const [cjkWarning, setCjkWarning] = useState(null); // string | null
 
-  console.log("[useImportLogic] render, currentStep:", currentStep);
-
   useEffect(() => {
     if (currentStep !== 5) {
       hasTriggeredRef.current = false;
       return;
     }
-    console.log("[useImportLogic] inside useEffect, currentStep:", currentStep);
     if (hasTriggeredRef.current || isProcessing) return;
 
     hasTriggeredRef.current = true;

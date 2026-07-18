@@ -11,11 +11,6 @@ import SessionMode from "./SessionMode";
 const StudySession = () => {
   const renderCount = React.useRef(0);
   renderCount.current++;
-  console.log("[StudySession] render #", renderCount.current);
-  React.useEffect(() => {
-    console.log("[StudySession] MOUNTED");
-    return () => console.log("[StudySession] UNMOUNTED");
-  }, []);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const params = searchParams.get("mode"); // "learn" or "review"
@@ -114,12 +109,6 @@ const StudySession = () => {
       </div>
     );
   }
-
-  console.log("[StudySession render]", {
-    status,
-    cardsLength: cards?.length,
-    activeDeckId: activeDeck?.id,
-  });
 
   // --- Session Mode ---
   if (status === "succeeded" && cards.length > 0 && navMode) {

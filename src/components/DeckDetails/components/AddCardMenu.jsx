@@ -21,7 +21,6 @@ export function AddCardMenu({
 
   const { fields, setField, isValid, isSubmitting, error, submit, reset } =
     useAddCard({ deckId, studyMode, totalCardCount, onSuccess, onClose });
-  console.log(isValid, isSubmitting);
   // Reset and focus when modal opens
   useEffect(() => {
     if (isOpen) {

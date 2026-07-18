@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux"; // 🌟 Added useDispatch
 import { selectActiveTheme } from "../../slices/themeSlice";
 import { selectGlobalStreak } from "../../slices/streakSlice";
 import {
@@ -7,7 +7,7 @@ import {
   selectTotalDueCards,
   selectTotalMasteredCards,
 } from "../../slices/deckSlice";
-import { selectUserProfile } from "../../slices/userSlice";
+import { selectUserProfile, completeTutorial } from "../../slices/userSlice"; // 🌟 Imported new thunk action
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -24,18 +24,15 @@ import { selectTotalActivity } from "../../slices/activitySlice";
 
 import DeckCard from "../Decks/components/DeckCard";
 import { Heatmap } from "./Heatmap";
-// import { Achievements } from "./Achievements";
 import { XPBar } from "./XPBar";
 import { StatCard } from "./StatCard";
 import { Toast } from "primereact/toast";
 import Header from "../General/ui/Header";
 import DashboardTutorial from "../Tutorial/components/DashboardTutorial";
 
-const dashboardSpotlightKey = (userId) =>
-  `revu_dashboard_spotlight_seen_${userId}`;
-
 const Dashboard = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch(); // 🌟 Hooks up dispatch handler
   const activeTheme = useSelector(selectActiveTheme);
   const profile = useSelector(selectUserProfile);
   const toast = useRef(null);
@@ -57,7 +54,6 @@ const Dashboard = () => {
   const mastered_cards = useSelector(selectTotalMasteredCards);
   const globalStreak = useSelector(selectGlobalStreak);
 
-  // Connect to the new, authoritative database-backed XP economy
   const totalActivity = useSelector(selectTotalActivity);
 
   const totalXP = useMemo(() => {
@@ -65,7 +61,7 @@ const Dashboard = () => {
     return Math.max(0, baseXP);
   }, [totalActivity]);
 
-  // ── Spotlight tour ───────────────────────────────────────────────────────
+  // ── Spotlight tour references ─────────────────────────────────────────────
   const statsRef = useRef(null);
   const continueLearningRef = useRef(null);
   const heatmapRef = useRef(null);
@@ -81,19 +77,34 @@ const Dashboard = () => {
 
   const [showSpotlight, setShowSpotlight] = useState(false);
 
+  // 🌟 Auto-trigger evaluation sequence
   useEffect(() => {
-    if (!profile?.id || !profile.has_completed_onboarding) return;
-    const key = dashboardSpotlightKey(profile.id);
-    if (!localStorage.getItem(key)) {
-      setShowSpotlight(true);
-    }
-  }, [profile?.id, profile?.has_completed_onboarding]);
+    if (!profile) return;
 
+    // 1. Guard: Ensure they've finalized the introductory global tutorial first
+    const hasFinishedGeneralTour =
+      profile.completed_tutorials?.general === true;
+
+    // 2. Evaluate if they have viewed this dashboard layout context yet
+    const hasSeenDashboardTour =
+      profile.completed_tutorials?.dashboard === true;
+
+    if (hasFinishedGeneralTour && !hasSeenDashboardTour) {
+      // Small architectural delay ensuring DOM ref spacing layouts settle cleanly
+      const timer = setTimeout(() => setShowSpotlight(true), 800);
+      return () => clearTimeout(timer);
+    }
+  }, [profile]);
+
+  // 🌟 Handles tour dismissal updates dynamically through Redux
   const closeSpotlight = () => {
     setShowSpotlight(false);
-    if (profile?.id) {
-      localStorage.setItem(dashboardSpotlightKey(profile.id), "true");
-    }
+    dispatch(completeTutorial("dashboard"));
+  };
+
+  // 🌟 Allows user to explicitly manual replay the workflow when pressing help icon
+  const handleManualReplayTour = () => {
+    setShowSpotlight(true);
   };
 
   return (
@@ -129,7 +140,7 @@ const Dashboard = () => {
               </div>
               <button
                 type="button"
-                onClick={() => setShowSpotlight(true)}
+                onClick={handleManualReplayTour} // 🌟 Connected to our review callback logic
                 title="Show me around"
                 aria-label="Show me around"
                 className={`flex items-center justify-center w-9 h-9 rounded-full shrink-0 transition-colors ${activeTheme.background.secondary} ${activeTheme.text.secondary} hover:${activeTheme.text.accent3}`}
@@ -144,7 +155,7 @@ const Dashboard = () => {
           }
         />
 
-        {/* Quick stats panel - Added negative margin top option to stitch sections together tightly, or standard spacing */}
+        {/* Quick stats panel */}
         <div
           ref={statsRef}
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative z-10 rounded-2xl"

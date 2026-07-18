@@ -45,7 +45,6 @@ export const generateReading = (
   preferences = "kana",
 ) => {
   const result = { reading: reading, tones: null, strokeColors: null };
-  console.log(char, language, reading, preferences);
   if (!char) return result;
 
   switch (language) {
@@ -90,7 +89,6 @@ export const generateReading = (
       result.reading = "";
       result.strokeColors = null;
       result.tones = null;
-      console.log("I'm default");
       return result;
   }
 };
