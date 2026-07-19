@@ -2,6 +2,40 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useHanziWriter } from "../../hooks/useHanziWriter";
 
+// Discrete breakpoints — tweak these numbers to taste
+function getSizeFromViewport(width) {
+  if (width < 640) return 200; // xs
+  if (width < 768) return 220; // sm
+  if (width < 1024) return 260; // md
+  return 300; // lg+
+}
+
+function useCanvasSize() {
+  const [size, setSize] = useState(() =>
+    typeof window !== "undefined"
+      ? getSizeFromViewport(window.innerWidth)
+      : 200,
+  );
+
+  useEffect(() => {
+    let ticking = false;
+
+    const onResize = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        setSize(getSizeFromViewport(window.innerWidth));
+        ticking = false;
+      });
+    };
+
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  return size;
+}
+
 const HanziCanvas = ({
   character,
   displayState,
@@ -11,24 +45,7 @@ const HanziCanvas = ({
   revealed,
   strokeAnimationSpeed = 1,
 }) => {
-  const wrapperRef = useRef(null);
-  const [canvasSize, setCanvasSize] = useState(200);
-
-  // Measure the actual space we have and use the largest square that fits
-  useEffect(() => {
-    const el = wrapperRef.current;
-    if (!el) return;
-
-    const ro = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const { width, height } = entry.contentRect;
-        setCanvasSize(Math.min(width, height));
-      }
-    });
-
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
+  const size = useCanvasSize();
 
   const { containerRef } = useHanziWriter({
     character,
@@ -38,24 +55,21 @@ const HanziCanvas = ({
     strokeColor,
     revealed,
     strokeAnimationSpeed,
-    width: canvasSize,
-    height: canvasSize,
+    width: size,
+    height: size,
   });
 
   const bgColor = activeTheme?.background?.canvas ?? "bg-white";
   const borderColor = activeTheme?.border?.card ?? "border-gray-200";
 
   return (
-    <div
-      ref={wrapperRef}
-      className="w-full h-full flex items-center justify-center"
-    >
+    <div className="w-full h-full flex items-center justify-center">
       <div
         ref={containerRef}
-        className={`${bgColor} border-4 ${borderColor} rounded-xl shadow-md transition-all duration-300`}
+        className={`${bgColor} border-4 ${borderColor} rounded-xl shadow-md`}
         style={{
-          width: `${canvasSize}px`,
-          height: `${canvasSize}px`,
+          width: `${size}px`,
+          height: `${size}px`,
           position: "relative",
         }}
         role="region"

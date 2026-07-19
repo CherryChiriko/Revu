@@ -11,19 +11,17 @@ const RevealButton = ({ onReveal, activeTheme, variant = "standard" }) => {
         e.stopPropagation();
         onReveal();
       }}
-      className={`rounded-full font-semibold transition-all duration-300 shadow-md hover:shadow-xl flex items-center justify-center active:scale-95 ${
-        activeTheme?.button?.primary ?? "bg-indigo-600"
-      } ${activeTheme?.text?.activeButton ?? "text-white"} ${
-        isDemo
-          ? "px-4 py-1.5 text-xs mb-1"
-          : "px-5 py-2 text-sm md:px-6 md:py-3"
-      }`}
+      className={`rounded-full font-semibold ${activeTheme.button.primary} ${activeTheme.text.activeButton} transition-all duration-300 shadow-md hover:shadow-lg active:scale-95 
+                  ${
+                    isDemo
+                      ? "px-4 py-1.5 text-xs mb-1"
+                      : "px-4 py-2 text-sm md:px-6 md:py-3 md:text-base"
+                  }
+      `}
     >
       <FontAwesomeIcon
         icon={faEye}
-        className={
-          isDemo ? "w-3 h-3 mr-1.5" : "w-4 h-4 mr-1.5 md:w-5 md:h-5 md:mr-2"
-        }
+        className={isDemo ? "w-3 h-3 mr-1.5" : "w-4 h-4 mx-2"}
       />
       Reveal Answer
     </button>

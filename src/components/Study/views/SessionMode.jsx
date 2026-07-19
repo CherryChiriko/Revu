@@ -72,7 +72,7 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
 
     return (
       <header
-        className={`mt-4 md:mt-8 ${activeTheme.background.secondary} rounded-2xl shadow-lg border ${activeTheme.border.card} overflow-hidden relative`}
+        className={`mt-4 md:mt-8 ${activeTheme.background.secondary} rounded-2xl shadow-md border ${activeTheme.border.card} overflow-hidden relative`}
       >
         {/* Top gradient accent */}
         <div

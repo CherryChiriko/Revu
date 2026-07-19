@@ -43,7 +43,7 @@ const RatingButtons = ({ onRate, variant = "standard" }) => {
       className={
         isDemo
           ? "w-full flex justify-center gap-1 px-2 pb-2"
-          : "absolute bottom-2 md:bottom-8 w-full flex justify-center gap-1.5 md:gap-2 md:space-x-4 px-3 md:px-8"
+          : "w-full flex justify-center gap-1.5 md:gap-3 px-1 md:px-2"
       }
     >
       {buttons.map(({ label, icon, color, value }) => (
@@ -53,21 +53,19 @@ const RatingButtons = ({ onRate, variant = "standard" }) => {
             e.stopPropagation();
             onRate(value);
           }}
-          className={`flex-1 flex flex-col md:flex-row items-center justify-center rounded-lg font-semibold text-white transition-colors duration-200 shadow-md active:scale-95 ${color} ${
+          className={`flex-1 flex items-center justify-center rounded-lg font-semibold text-white transition-colors duration-200 shadow-md active:scale-95 ${color} ${
             isDemo
               ? "px-1 py-1.5 text-[10px]"
-              : "px-1.5 py-2 md:px-4 md:py-3 text-[10px] md:text-base"
+              : "px-2 py-3 md:px-4 md:py-3 text-[10px] md:text-base"
           }`}
         >
           <FontAwesomeIcon
             icon={icon}
-            className={`min-w-3 min-h-3 ${
-              isDemo
-                ? "mr-1 text-[11px]"
-                : "mb-0.5 md:mb-0 md:mr-2 w-3.5 h-3.5 md:w-5 md:h-5"
-            }`}
+            className={
+              isDemo ? "mr-1 text-[11px]" : "w-5 h-5 md:w-5 md:h-5 md:mr-2"
+            }
           />
-          {label}
+          <span className={isDemo ? "" : "hidden md:inline"}>{label}</span>
         </button>
       ))}
     </div>

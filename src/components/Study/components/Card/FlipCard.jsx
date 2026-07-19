@@ -5,16 +5,6 @@ import RevealButton from "../Controls/RevealButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFastForward } from "@fortawesome/free-solid-svg-icons";
 
-const CardStyles = () => (
-  <style>{`
-    .perspective { perspective: 1000px; }
-    .preserve-3d { transform-style: preserve-3d; }
-    .backface-hidden { backface-visibility: hidden; }
-    .rotate-y-180 { transform: rotateY(180deg); }
-    .rotate-y-0 { transform: rotateY(0deg); }
-  `}</style>
-);
-
 const FlipCard = ({
   card,
   activeTheme,
@@ -67,109 +57,122 @@ const FlipCard = ({
     onRate?.(rating);
   };
 
+  // Shared footer slot — inner container is w-full so children can choose their own width
+  const FooterSlot = ({ children }) => (
+    <div className="absolute bottom-3 md:bottom-6 left-0 right-0 px-4 pointer-events-none">
+      <div className="pointer-events-auto w-full max-w-lg mx-auto flex justify-center">
+        {children}
+      </div>
+    </div>
+  );
+
   return (
-    <>
-      <CardStyles />
-      <div className="relative w-full h-full perspective">
+    <div className="relative w-full h-full" style={{ perspective: "1000px" }}>
+      <div
+        className="relative w-full h-full transition-transform duration-700"
+        style={{
+          transformStyle: "preserve-3d",
+          transform: showAnswer ? "rotateY(180deg)" : "rotateY(0deg)",
+        }}
+      >
+        {/* ─── FRONT ─── */}
         <div
-          className={`relative w-full h-full preserve-3d transition-transform duration-700 ${
-            showAnswer ? "rotate-y-180" : "rotate-y-0"
-          }`}
+          className={`absolute inset-0 rounded-2xl ${activeTheme.background.secondary} ${
+            activeTheme.border?.secondary || "border-gray-200"
+          } flex flex-col items-center p-3 md:p-6 pb-20 md:pb-24 shadow-md`}
+          style={{ backfaceVisibility: "hidden" }}
         >
-          {/* FRONT */}
-          <div
-            className={`absolute inset-0 backface-hidden rounded-xl ${
-              activeTheme.background.secondary
-            } flex flex-col justify-center items-center ${
-              isDemo ? "p-2 border" : "p-4 md:p-8 shadow-2xl"
-            } ${activeTheme.border?.secondary || ""}`}
-          >
+          <div className="shrink-0">
             <span
-              className={`font-extrabold ${activeTheme.text.primary} text-center max-w-full break-words ${
-                isDemo ? "text-3xl p-1" : "text-4xl md:text-6xl p-2 md:p-4"
+              className={`text-[10px] md:text-xs uppercase tracking-[0.2em] font-bold ${activeTheme.text.muted}`}
+            >
+              Question
+            </span>
+          </div>
+
+          <div className="flex-1 flex items-center justify-center w-full min-h-0 px-1">
+            <span
+              className={`font-extrabold ${activeTheme.text.primary} text-center break-words leading-tight ${
+                isDemo ? "text-3xl" : "text-4xl sm:text-5xl md:text-6xl"
               }`}
             >
               {card?.front}
             </span>
-
-            {!showAnswer && displayState === "animation" && (
-              <div
-                className={`absolute w-full flex justify-center px-4 ${isDemo ? "bottom-2" : "bottom-4 md:bottom-8"}`}
-              >
-                <button
-                  onClick={handleReveal}
-                  className={`rounded-full font-semibold ${activeTheme.button.primary} ${
-                    activeTheme.text.activeButton
-                  } transition-all duration-300 shadow-md ${
-                    isDemo ? "px-4 py-1 text-xs" : "px-5 py-2.5 md:px-6 md:py-3"
-                  }`}
-                >
-                  Show
-                </button>
-              </div>
-            )}
-
-            {!showAnswer && displayState === "quiz" && (
-              <div
-                className={`absolute w-full flex justify-center px-4 ${isDemo ? "bottom-2" : "bottom-4 md:bottom-8"}`}
-              >
-                <RevealButton
-                  onReveal={handleReveal}
-                  activeTheme={activeTheme}
-                  variant={variant}
-                />
-              </div>
-            )}
           </div>
 
-          {/* BACK */}
-          <div
-            className={`absolute inset-0 backface-hidden rotate-y-180 rounded-xl ${
-              activeTheme.background.secondary
-            } flex flex-col justify-between items-center ${
-              isDemo ? "p-3 border" : "p-4 md:p-8 shadow-2xl"
-            } ${activeTheme.border?.secondary || ""}`}
-          >
-            <div className="flex-1 flex flex-col justify-center items-center w-full min-h-0 overflow-y-auto">
-              {showAnswer && (
-                <p
-                  className={`font-semibold ${activeTheme.text.primary} text-center break-words ${
-                    isDemo ? "text-xl" : "text-2xl md:text-4xl mb-2 md:mb-4"
-                  }`}
-                >
-                  {card?.back}
-                </p>
-              )}
-            </div>
+          {!showAnswer && displayState === "animation" && (
+            <FooterSlot>
+              <button
+                onClick={handleReveal}
+                className={`rounded-full font-semibold ${activeTheme.button.primary} ${activeTheme.text.activeButton} transition-all duration-300 shadow-md hover:shadow-lg active:scale-95 px-4 py-2 text-sm md:px-6 md:py-3 md:text-base`}
+              >
+                Show
+              </button>
+            </FooterSlot>
+          )}
 
+          {!showAnswer && displayState === "quiz" && (
+            <FooterSlot>
+              <RevealButton
+                onReveal={handleReveal}
+                activeTheme={activeTheme}
+                variant={variant}
+              />
+            </FooterSlot>
+          )}
+        </div>
+
+        {/* ─── BACK ─── */}
+        <div
+          className={`absolute inset-0 rounded-2xl ${activeTheme.background.secondary} ${
+            activeTheme.border?.secondary || "border-gray-200"
+          } flex flex-col items-center p-3 md:p-6 pb-20 md:pb-24 shadow-md`}
+          style={{
+            backfaceVisibility: "hidden",
+            transform: "rotateY(180deg)",
+          }}
+        >
+          <div className="shrink-0">
+            <span
+              className={`text-[10px] md:text-xs uppercase tracking-[0.2em] font-bold ${activeTheme.text.muted}`}
+            >
+              Answer
+            </span>
+          </div>
+
+          <div className="flex-1 flex items-center justify-center w-full min-h-0 px-1 overflow-y-auto">
             {showAnswer && (
-              <div className="w-full flex justify-center flex-shrink-0">
-                {allowRating ? (
-                  <RatingButtons onRate={handleRate} variant={variant} />
-                ) : (
-                  <button
-                    onClick={handleNext}
-                    className={`rounded-full font-semibold ${activeTheme.button.secondary} ${
-                      activeTheme.text.primary
-                    } transition-all duration-300 shadow-md ${
-                      isDemo
-                        ? "px-4 py-1 text-xs mb-1"
-                        : "px-5 py-2.5 md:px-6 md:py-3"
-                    }`}
-                  >
-                    Next
-                    <FontAwesomeIcon
-                      icon={faFastForward}
-                      className="w-3 h-3 ml-1.5"
-                    />
-                  </button>
-                )}
-              </div>
+              <p
+                className={`font-semibold ${activeTheme.text.primary} text-center break-words leading-snug ${
+                  isDemo ? "text-xl" : "text-2xl sm:text-3xl md:text-4xl"
+                }`}
+              >
+                {card?.back}
+              </p>
             )}
           </div>
+
+          {showAnswer && (
+            <FooterSlot>
+              {allowRating ? (
+                <RatingButtons onRate={handleRate} variant={variant} />
+              ) : (
+                <button
+                  onClick={handleNext}
+                  className={`rounded-full font-semibold ${activeTheme.button.secondary} ${activeTheme.text.secondary} transition-all duration-300 shadow-md hover:shadow-lg active:scale-95 px-4 py-2 text-sm md:px-6 md:py-3 md:text-base`}
+                >
+                  Next
+                  <FontAwesomeIcon
+                    icon={faFastForward}
+                    className="w-4 h-4 ml-2"
+                  />
+                </button>
+              )}
+            </FooterSlot>
+          )}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
