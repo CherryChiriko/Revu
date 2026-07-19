@@ -118,12 +118,16 @@ const StudySession = () => {
 
   if (status === "succeeded" && cards.length > 0 && navMode) {
     return (
-      <SessionMode
-        mode={navMode}
-        activeTheme={activeTheme}
-        activeDeck={activeDeck}
-        session={session}
-      />
+      <div
+        className={`h-screen flex flex-col items-center justify-center px-4 text-center ${activeTheme.background.app}`}
+      >
+        <SessionMode
+          mode={navMode}
+          activeTheme={activeTheme}
+          activeDeck={activeDeck}
+          session={session}
+        />
+      </div>
     );
   }
 

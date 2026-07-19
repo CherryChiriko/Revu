@@ -1,25 +1,63 @@
 import { useCallback, useMemo, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { selectDecks } from "../../../slices/deckSlice";
-import { selectDefaultDeckView } from "../../../slices/settingsSlice";
+import { selectDefaultDeckView } from "../../../slices/settingsSlice"; // Selector from your settings slice
 
 export default function useListController({
-  initialView = "large",
   initialSort = "lastStudied-desc",
   initialLanguage = "All Languages",
   initialPage = 1,
 } = {}) {
   const decks = useSelector(selectDecks);
-  const preferredView = useSelector(selectDefaultDeckView);
+  const preferredView = useSelector(selectDefaultDeckView); // e.g., "large" or "compact"
+
+  // ── Responsive breakpoint state ──────────────────────────────────────────
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== "undefined" ? window.innerWidth < 768 : false,
+  );
+
+  // Fallback preference checks: if no view has been manually selected/set, default to preferredView.
+  // If the user is on mobile, force 'compact' (list mode) immediately.
+  const [viewMode, setViewMode] = useState(() => {
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      return "list"; // 'list' acts as the compact layout mapping
+    }
+    return preferredView || "large";
+  });
+
+  useEffect(() => {
+    const onResize = () => {
+      const nextIsMobile = window.innerWidth < 768;
+      setIsMobile(nextIsMobile);
+
+      if (nextIsMobile) {
+        // Enforce compact mode on mobile screens without triggering any database upload actions
+        setViewMode("list");
+      }
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  // Sync state if the user settings preferences change externally later
+  useEffect(() => {
+    if (!isMobile && preferredView) {
+      setViewMode(preferredView);
+    }
+  }, [preferredView, isMobile]);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedLanguage, setSelectedLanguage] = useState(initialLanguage);
   const [sortBy, setSortBy] = useState(initialSort);
   const [currentPage, setCurrentPage] = useState(initialPage);
-  const [viewMode, setViewMode] = useState(preferredView || initialView);
 
-  // decks per page based on view
-  const decksPerPage = useMemo(() => (viewMode === "grid" ? 3 : 8), [viewMode]);
+  // decks per page: fewer on mobile, more on desktop
+  const decksPerPage = useMemo(() => {
+    if (viewMode === "large") {
+      return 3; //  3 decks
+    }
+    return isMobile ? 4 : 8; //  4 cols × 2 rows
+  }, [viewMode, isMobile]);
 
   // unique languages (depend on decks)
   const uniqueLanguages = useMemo(() => {
@@ -53,26 +91,22 @@ export default function useListController({
     const [field, dir] = (sortBy || "lastStudied-desc").split("-");
     const direction = dir === "asc" ? 1 : -1;
 
-    // support date field lastStudied and numeric cardCount
     const compare = (a, b) => {
       const aVal = a?.[field];
       const bVal = b?.[field];
 
-      // date comparison
       if (field === "lastStudied") {
         const aTime = aVal ? new Date(aVal).getTime() : 0;
         const bTime = bVal ? new Date(bVal).getTime() : 0;
         return (aTime - bTime) * direction;
       }
 
-      // cardCount fallback (maybe stored as cardsCount)
       if (field === "cardCount") {
         const aNum = Number(a.cardsCount || 0);
         const bNum = Number(b.cardsCount || 0);
         return (aNum - bNum) * direction;
       }
 
-      // string compare
       const av = (aVal ?? "").toString().toLowerCase();
       const bv = (bVal ?? "").toString().toLowerCase();
       if (av < bv) return -1 * direction;
@@ -87,10 +121,10 @@ export default function useListController({
   const totalPages = Math.max(1, Math.ceil(sorted.length / decksPerPage));
   const currentPageSafe = Math.min(Math.max(1, currentPage), totalPages);
 
+  // reset to page 1 when filters, sort, view mode, or page size changes
   useEffect(() => {
-    // if filters / sort / view change, reset to page 1
     setCurrentPage(1);
-  }, [searchTerm, selectedLanguage, sortBy, viewMode]);
+  }, [searchTerm, selectedLanguage, sortBy, viewMode, decksPerPage]);
 
   const currentDecks = useMemo(() => {
     const start = (currentPageSafe - 1) * decksPerPage;
@@ -112,7 +146,6 @@ export default function useListController({
   }, []);
 
   return {
-    // state + setters
     searchTerm,
     setSearchTerm,
     selectedLanguage,
@@ -123,12 +156,11 @@ export default function useListController({
     setPage,
     viewMode,
     toggleViewMode,
-
-    // derived
     uniqueLanguages,
     decksPerPage,
     totalPages,
     currentDecks,
     allFilteredCount: sorted.length,
+    isMobile,
   };
 }
