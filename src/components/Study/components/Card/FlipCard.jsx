@@ -1,3 +1,4 @@
+// src/components/Study/components/Card/FlipCard.jsx
 import React, { useState, useEffect, useRef } from "react";
 import RatingButtons from "../Controls/RatingButtons";
 import RevealButton from "../Controls/RevealButton";
@@ -23,7 +24,7 @@ const FlipCard = ({
   onPassComplete,
   autoFlipEnabled = false,
   autoFlipDelay = 3000,
-  variant = "standard", // "standard" | "demo"
+  variant = "standard",
 }) => {
   const [showAnswer, setShowAnswer] = useState(false);
   const timerRef = useRef(null);
@@ -80,12 +81,12 @@ const FlipCard = ({
             className={`absolute inset-0 backface-hidden rounded-xl ${
               activeTheme.background.secondary
             } flex flex-col justify-center items-center ${
-              isDemo ? "p-2 border" : "p-8 shadow-2xl"
+              isDemo ? "p-2 border" : "p-4 md:p-8 shadow-2xl"
             } ${activeTheme.border?.secondary || ""}`}
           >
             <span
-              className={`font-extrabold ${activeTheme.text.primary} text-center max-w-full ${
-                isDemo ? "text-3xl p-1" : "text-6xl p-4"
+              className={`font-extrabold ${activeTheme.text.primary} text-center max-w-full break-words ${
+                isDemo ? "text-3xl p-1" : "text-4xl md:text-6xl p-2 md:p-4"
               }`}
             >
               {card?.front}
@@ -93,14 +94,14 @@ const FlipCard = ({
 
             {!showAnswer && displayState === "animation" && (
               <div
-                className={`absolute w-full flex justify-center px-4 ${isDemo ? "bottom-2" : "bottom-8"}`}
+                className={`absolute w-full flex justify-center px-4 ${isDemo ? "bottom-2" : "bottom-4 md:bottom-8"}`}
               >
                 <button
                   onClick={handleReveal}
                   className={`rounded-full font-semibold ${activeTheme.button.primary} ${
                     activeTheme.text.activeButton
                   } transition-all duration-300 shadow-md ${
-                    isDemo ? "px-4 py-1 text-xs" : "px-6 py-3"
+                    isDemo ? "px-4 py-1 text-xs" : "px-5 py-2.5 md:px-6 md:py-3"
                   }`}
                 >
                   Show
@@ -108,15 +109,14 @@ const FlipCard = ({
               </div>
             )}
 
-            {/* Quiz mode: reveal button */}
             {!showAnswer && displayState === "quiz" && (
               <div
-                className={`absolute w-full flex justify-center px-4 ${isDemo ? "bottom-2" : "bottom-8"}`}
+                className={`absolute w-full flex justify-center px-4 ${isDemo ? "bottom-2" : "bottom-4 md:bottom-8"}`}
               >
                 <RevealButton
                   onReveal={handleReveal}
                   activeTheme={activeTheme}
-                  variant={variant} // <--- Pass the variant down here!
+                  variant={variant}
                 />
               </div>
             )}
@@ -127,23 +127,23 @@ const FlipCard = ({
             className={`absolute inset-0 backface-hidden rotate-y-180 rounded-xl ${
               activeTheme.background.secondary
             } flex flex-col justify-between items-center ${
-              isDemo ? "p-3 border" : "p-8 shadow-2xl"
+              isDemo ? "p-3 border" : "p-4 md:p-8 shadow-2xl"
             } ${activeTheme.border?.secondary || ""}`}
           >
-            {/* Term/Definition Slot */}
-            <div className="flex-1 flex flex-col justify-center items-center w-full">
+            <div className="flex-1 flex flex-col justify-center items-center w-full min-h-0 overflow-y-auto">
               {showAnswer && (
                 <p
-                  className={`font-semibold ${activeTheme.text.primary} text-center ${isDemo ? "text-xl" : "text-4xl mb-4"}`}
+                  className={`font-semibold ${activeTheme.text.primary} text-center break-words ${
+                    isDemo ? "text-xl" : "text-2xl md:text-4xl mb-2 md:mb-4"
+                  }`}
                 >
                   {card?.back}
                 </p>
               )}
             </div>
 
-            {/* Button Area Slot */}
             {showAnswer && (
-              <div className="w-full flex justify-center">
+              <div className="w-full flex justify-center flex-shrink-0">
                 {allowRating ? (
                   <RatingButtons onRate={handleRate} variant={variant} />
                 ) : (
@@ -152,7 +152,9 @@ const FlipCard = ({
                     className={`rounded-full font-semibold ${activeTheme.button.secondary} ${
                       activeTheme.text.primary
                     } transition-all duration-300 shadow-md ${
-                      isDemo ? "px-4 py-1 text-xs mb-1" : "px-6 py-3"
+                      isDemo
+                        ? "px-4 py-1 text-xs mb-1"
+                        : "px-5 py-2.5 md:px-6 md:py-3"
                     }`}
                   >
                     Next

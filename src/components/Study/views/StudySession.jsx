@@ -1,3 +1,4 @@
+// src/components/Study/views/StudySession.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
@@ -13,7 +14,7 @@ const StudySession = () => {
   renderCount.current++;
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const params = searchParams.get("mode"); // "learn" or "review"
+  const params = searchParams.get("mode");
 
   const activeTheme = useSelector(selectActiveTheme);
   const activeDeck = useSelector(selectActiveDeck);
@@ -32,7 +33,7 @@ const StudySession = () => {
   if (!allDecks || allDecks.length === 0) {
     return (
       <div
-        className={`h-screen flex flex-col items-center justify-center p-6 text-center ${activeTheme.background.app}`}
+        className={`h-screen flex flex-col items-center justify-center p-4 md:p-6 text-center ${activeTheme.background.app}`}
       >
         <div className="max-w-md space-y-6">
           <div className="flex justify-center">
@@ -44,7 +45,7 @@ const StudySession = () => {
 
           <div className="space-y-2">
             <h2
-              className={`text-2xl font-bold tracking-tight ${activeTheme.text.primary}`}
+              className={`text-xl md:text-2xl font-bold tracking-tight ${activeTheme.text.primary}`}
             >
               Your collection is empty
             </h2>
@@ -58,7 +59,7 @@ const StudySession = () => {
 
           <button
             onClick={() => navigate("/decks?action=create")}
-            className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-500 rounded-lg shadow-md hover:shadow-lg transform active:scale-95 transition-all duration-200"
+            className="inline-flex items-center justify-center px-5 py-3 md:py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-500 rounded-lg shadow-md hover:shadow-lg transform active:scale-95 transition-all duration-200"
           >
             Create First Deck
           </button>
@@ -70,14 +71,16 @@ const StudySession = () => {
   if (!activeDeck) {
     return (
       <div
-        className={`h-screen flex flex-col items-center justify-center ${activeTheme.background.app}`}
+        className={`h-screen flex flex-col items-center justify-center px-4 ${activeTheme.background.app}`}
       >
-        <p className={`${activeTheme.text.primary} text-xl mb-4`}>
+        <p
+          className={`${activeTheme.text.primary} text-lg md:text-xl mb-4 text-center`}
+        >
           No active deck selected.
         </p>
         <button
           onClick={() => navigate("/decks")}
-          className={`flex items-center px-4 py-2 border rounded-lg ${activeTheme.text.muted} hover:${activeTheme.text.primary} transition-colors duration-200`}
+          className={`flex items-center px-4 py-3 md:py-2 border rounded-lg ${activeTheme.text.muted} hover:${activeTheme.text.primary} transition-colors duration-200`}
         >
           Return to Decks
         </button>
@@ -85,13 +88,14 @@ const StudySession = () => {
     );
   }
 
-  // --- Loading states ---
   if (status === "loading" || status === "idle") {
     return (
       <div
-        className={`h-screen flex items-center justify-center ${activeTheme.background.app}`}
+        className={`h-screen flex items-center justify-center px-4 ${activeTheme.background.app}`}
       >
-        <p className={`${activeTheme.text.primary} text-xl animate-pulse`}>
+        <p
+          className={`${activeTheme.text.primary} text-lg md:text-xl animate-pulse text-center`}
+        >
           Loading cards for "{activeDeck.name}"...
         </p>
       </div>
@@ -101,16 +105,17 @@ const StudySession = () => {
   if (status === "failed" || error) {
     return (
       <div
-        className={`h-screen flex items-center justify-center ${activeTheme.background.app}`}
+        className={`h-screen flex items-center justify-center px-4 ${activeTheme.background.app}`}
       >
-        <p className={`${activeTheme.text.primary} text-xl`}>
+        <p
+          className={`${activeTheme.text.primary} text-lg md:text-xl text-center`}
+        >
           Error: Could not load cards.
         </p>
       </div>
     );
   }
 
-  // --- Session Mode ---
   if (status === "succeeded" && cards.length > 0 && navMode) {
     return (
       <SessionMode
@@ -122,21 +127,24 @@ const StudySession = () => {
     );
   }
 
-  // --- No cards available fallback ---
   if (status === "succeeded") {
     return (
       <div
-        className={`h-screen flex flex-col items-center justify-center ${activeTheme.background.app}`}
+        className={`h-screen flex flex-col items-center justify-center px-4 text-center ${activeTheme.background.app}`}
       >
-        <p className={`${activeTheme.text.primary} text-2xl font-bold`}>
+        <p
+          className={`${activeTheme.text.primary} text-xl md:text-2xl font-bold`}
+        >
           All caught up!
         </p>
-        <p className={`${activeTheme.text.secondary} text-xl mt-2 mb-4`}>
+        <p
+          className={`${activeTheme.text.secondary} text-lg md:text-xl mt-2 mb-4`}
+        >
           "{activeDeck.name}" has no new or due cards.
         </p>
         <button
           onClick={() => navigate("/decks")}
-          className={`flex items-center ${activeTheme.text.muted} hover:${activeTheme.text.primary} transition-colors duration-200`}
+          className={`flex items-center py-2 ${activeTheme.text.muted} hover:${activeTheme.text.primary} transition-colors duration-200`}
         >
           Return to Decks
         </button>

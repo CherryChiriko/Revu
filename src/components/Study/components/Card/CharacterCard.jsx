@@ -1,11 +1,11 @@
-import React, { useRef, useCallback } from "react";
+// src/components/Study/components/Card/CharacterCard.jsx
+import React, { useRef, useCallback, useMemo } from "react";
 import HanziCanvas from "./HanziCanvas";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faVolumeHigh } from "@fortawesome/free-solid-svg-icons";
 import RevealButton from "../Controls/RevealButton";
 import ContinueButton from "../Controls/ContinueButton";
 import { useCharacterFlow } from "../../hooks/useCharacterFlow";
-import { useMemo } from "react";
 
 const CharacterCard = ({
   card,
@@ -21,9 +21,7 @@ const CharacterCard = ({
 
   const playAudio = useCallback(() => {
     if (audioRef.current && card?.audioUrl) {
-      audioRef.current.play().catch(() => {
-        // Silently ignore autoplay errors
-      });
+      audioRef.current.play().catch(() => {});
     }
   }, [card?.audioUrl]);
 
@@ -47,39 +45,37 @@ const CharacterCard = ({
 
   const showContinueButtons = useMemo(() => {
     if (revealed) return false;
-
     return displayState === "animation" || displayState === "outline";
   }, [displayState, revealed]);
 
   return (
     <div
-      className={`relative w-full rounded-xl ${activeTheme.background.secondary} p-8 flex flex-col justify-start items-center shadow-2xl transition-all duration-300`}
+      className={`relative w-full h-full rounded-xl ${activeTheme.background.secondary} p-2 md:p-8 flex flex-col justify-between items-center shadow-2xl transition-all duration-300 overflow-y-auto`}
     >
-      {/* Header with reading and audio button */}
-      <div className="w-full flex justify-between items-center mt-2 px-2 text-center gap-4">
-        <div className="w-8 flex-shrink-0" />
-
+      {/* Header — compact on mobile, centered reading, absolute audio */}
+      <div className="w-full flex items-center justify-center relative shrink-0 px-1 md:px-2">
         <p
-          className={`text-xl font-bold leading-tight ${activeTheme.text.primary} flex-1`}
+          className={`text-base md:text-xl font-bold leading-tight ${activeTheme.text.primary} text-center`}
         >
           {card?.reading}
         </p>
 
-        {card?.audioUrl ? (
+        {card?.audioUrl && (
           <button
             onClick={playAudio}
-            className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors flex-shrink-0"
+            className="absolute right-0 p-1.5 md:p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors"
             aria-label="Play audio"
           >
-            <FontAwesomeIcon icon={faVolumeHigh} className="w-5 h-5" />
+            <FontAwesomeIcon
+              icon={faVolumeHigh}
+              className="w-4 h-4 md:w-5 md:h-5"
+            />
           </button>
-        ) : (
-          <div className="w-8 flex-shrink-0" />
         )}
       </div>
 
-      {/* Canvas */}
-      <div className="relative flex justify-center items-center w-full mb-2">
+      {/* Canvas — flex-1 so it eats every spare pixel */}
+      <div className="relative flex-1 flex justify-center items-center w-full min-h-0 my-1">
         <HanziCanvas
           character={currentCharacter}
           displayState={displayState}
@@ -90,18 +86,17 @@ const CharacterCard = ({
         />
       </div>
 
-      {/* Controls and info */}
-      <div className="flex flex-col w-full justify-center items-center px-4 mt-4 text-center space-y-3">
-        {/* Character progress indicator */}
+      {/* Controls — compact, shrink-0 so they don't steal canvas space */}
+      <div className="flex flex-col w-full justify-center items-center shrink-0 px-1 md:px-4 mt-1 md:mt-4 text-center space-y-1.5 md:space-y-3">
         {renderWordProgress()}
 
-        {/* Translation */}
-        <p className={`text-sm italic ${activeTheme.text.secondary}`}>
+        <p
+          className={`text-xs md:text-sm italic ${activeTheme.text.secondary}`}
+        >
           {card?.back}
         </p>
 
-        {/* Action buttons */}
-        <div className="flex items-center justify-center">
+        <div className="flex items-center justify-center pb-1">
           {!showContinueButtons && !revealed && (
             <RevealButton onReveal={handleReveal} activeTheme={activeTheme} />
           )}
@@ -114,7 +109,6 @@ const CharacterCard = ({
         </div>
       </div>
 
-      {/* Hidden audio element */}
       <audio ref={audioRef} src={card?.audioUrl} />
     </div>
   );

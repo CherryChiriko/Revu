@@ -1,3 +1,4 @@
+// src/components/Study/components/Card/CardRenderer.jsx
 import React from "react";
 import CharacterCard from "./CharacterCard";
 import FlipCard from "./FlipCard";
@@ -19,10 +20,8 @@ const CardRenderer = ({
   onReveal,
   onRate,
   onPassComplete,
-  // Mode A autoflip settings
   autoFlipEnabled = false,
   autoFlipDelay = 3000,
-  // Mode C animation speed
   strokeAnimationSpeed = 1,
 }) => {
   switch (study_mode) {
