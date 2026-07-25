@@ -9,13 +9,13 @@ export function ModalTemplate({
   subtitle,
   activeTheme,
   children,
-  maxWidth = "max-w-md", // Allows you to scale up the modal size if needed
+  maxWidth = "max-w-md",
 }) {
   if (!isOpen) return null;
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-[2px]"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 backdrop-blur-[2px]"
       style={{
         backgroundColor: activeTheme.isDark
           ? "rgba(0, 0, 0, 0.5)"
@@ -24,16 +24,16 @@ export function ModalTemplate({
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div
-        className={`w-full ${maxWidth} rounded-2xl shadow-xl overflow-hidden border max-h-[90vh] flex flex-col
+        className={`w-full ${maxWidth} rounded-xl sm:rounded-2xl shadow-xl overflow-hidden border max-h-[92vh] sm:max-h-[90vh] flex flex-col
         ${activeTheme.background.secondary} ${activeTheme.border.secondary}`}
       >
-        {/* Universal Header Structure */}
+        {/* Header */}
         <div
-          className={`flex items-start justify-between px-6 pt-6 pb-4 border-b ${activeTheme.border.muted}`}
+          className={`flex items-start justify-between px-4 pt-4 pb-3 sm:px-6 sm:pt-6 sm:pb-4 border-b ${activeTheme.border.muted}`}
         >
-          <div className="flex flex-col text-left">
+          <div className="flex flex-col text-left min-w-0">
             <h2
-              className={`text-lg font-bold tracking-tight leading-tight ${activeTheme.text.primary}`}
+              className={`text-base sm:text-lg font-bold tracking-tight leading-tight ${activeTheme.text.primary}`}
             >
               {title}
             </h2>
@@ -49,15 +49,15 @@ export function ModalTemplate({
           <button
             type="button"
             onClick={onClose}
-            className={`p-1.5 -mr-1.5 -mt-1 rounded-lg transition-colors outline-none focus:ring-2 ${activeTheme.link.hoverBg} ${activeTheme.ring.focus} ${activeTheme.text.secondary}`}
+            className={`p-2 sm:p-1.5 -mr-1 -mt-1 rounded-lg transition-colors outline-none focus:ring-2 min-h-8 min-w-8 flex items-center justify-center ${activeTheme.link.hoverBg} ${activeTheme.ring.focus} ${activeTheme.text.secondary}`}
             aria-label="close"
           >
             <FontAwesomeIcon icon={faXmark} className="w-4 h-4 block" />
           </button>
         </div>
 
-        {/* Dynamic, Scrollable Content Body Area */}
-        <div className="px-6 pb-6 pt-4 overflow-y-auto custom-scrollbar flex-1 text-left">
+        {/* Scrollable Body */}
+        <div className="px-4 pb-4 pt-3 sm:px-6 sm:pb-6 sm:pt-4 overflow-y-auto custom-scrollbar flex-1 text-left">
           {children}
         </div>
       </div>

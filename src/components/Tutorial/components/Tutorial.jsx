@@ -1,3 +1,4 @@
+import React from "react";
 import { useTutorial } from "../hooks/useTutorial";
 import { ONBOARDING_STEPS } from "../constants/steps";
 import TourModal from "../../General/ui/TourModal";

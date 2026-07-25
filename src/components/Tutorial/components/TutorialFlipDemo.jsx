@@ -1,3 +1,4 @@
+import React from "react";
 import FlipCard from "../../Study/components/Card/FlipCard";
 
 export function TutorialFlipCardDemo({ activeTheme }) {
@@ -8,8 +9,8 @@ export function TutorialFlipCardDemo({ activeTheme }) {
   };
 
   return (
-    <div className="w-full h-64 flex flex-col items-center justify-center overflow-hidden">
-      <div className="w-full h-40 relative">
+    <div className="w-full h-auto min-h-[140px] flex flex-col items-center justify-center overflow-hidden py-2">
+      <div className="w-full h-32 sm:h-40 relative">
         <FlipCard
           card={mockCard}
           activeTheme={activeTheme}
