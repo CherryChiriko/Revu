@@ -1,3 +1,4 @@
+// src/components/Dashboard/Heatmap.jsx
 import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -8,11 +9,10 @@ import {
 import {
   selectDailyGoal,
   selectHeatmapMetric,
-  selectSettings, // 🌟 Added to pull the generic settings state for dateFormat
+  selectSettings,
 } from "../../slices/settingsSlice";
 import { getTodayISO } from "../../utils/dateHelper";
 
-// Generate calendar grid dynamically aligned to week preference
 function generateCalendarGrid(dataMap, weeksToShow = 4, weekStart = "monday") {
   const today = new Date();
   const baseTodayMidnight = new Date(
@@ -21,22 +21,18 @@ function generateCalendarGrid(dataMap, weeksToShow = 4, weekStart = "monday") {
     today.getDate(),
   );
 
-  const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  const dayOfWeek = today.getDay();
 
-  // Calculate days needed to stretch to the end of the current visible row
   let daysUntilEndOfWeek = 0;
   if (weekStart === "sunday") {
-    // Week ends on Saturday (6)
     daysUntilEndOfWeek = 6 - dayOfWeek;
   } else {
-    // Week ends on Sunday (0)
     daysUntilEndOfWeek = dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
   }
 
   const endDate = new Date(today);
   endDate.setDate(today.getDate() + daysUntilEndOfWeek);
 
-  // Start back from the end of the grid row space
   const startDate = new Date(endDate);
   startDate.setDate(endDate.getDate() - (weeksToShow * 7 - 1));
 
@@ -71,17 +67,15 @@ export const Heatmap = ({ activeTheme }) => {
   const activityDays = useSelector(selectActivityDays);
   const consistencyHeatmapData = useSelector(selectHeatmapData);
 
-  // 🌟 Read the week start preference. Defaults to 'monday' if not loaded.
   const settings = useSelector(selectSettings);
   const weekStart = settings?.dateFormat || "monday";
 
   const TODAY_ISO = useMemo(() => getTodayISO(), []);
 
-  // 🌟 Dynamically rotate labels depending on choice
   const weekdayLabels = useMemo(() => {
     return weekStart === "sunday"
-      ? ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
-      : ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+      ? ["S", "M", "T", "W", "T", "F", "S"]
+      : ["M", "T", "W", "T", "F", "S", "S"];
   }, [weekStart]);
 
   const heatmapData = useMemo(() => {
@@ -108,7 +102,6 @@ export const Heatmap = ({ activeTheme }) => {
     return m;
   }, [heatmapData]);
 
-  // 🌟 Regenerate calendar layout row grid cells whenever week preference switches
   const cells = useMemo(() => {
     return generateCalendarGrid(dataMap, 4, weekStart);
   }, [dataMap, weekStart]);
@@ -125,7 +118,6 @@ export const Heatmap = ({ activeTheme }) => {
     return COLORS[Math.min(nonzero_steps - 1, Math.max(0, raw)) + 1];
   };
 
-  // Split into structural weeks
   const weeks = useMemo(() => {
     const w = [];
     for (let i = 0; i < cells.length; i += 7) {
@@ -147,10 +139,10 @@ export const Heatmap = ({ activeTheme }) => {
         </div>
       </div>
 
-      {/* Weekday header - Dynamically Ordered */}
-      <div className="grid grid-cols-7 gap-1 text-xs opacity-60">
+      {/* Weekday header */}
+      <div className="grid grid-cols-7 gap-1 text-[10px] md:text-xs opacity-60">
         {weekdayLabels.map((label, idx) => (
-          <div key={idx} className="w-7 text-center">
+          <div key={idx} className="w-6 md:w-7 text-center">
             {label}
           </div>
         ))}
@@ -167,16 +159,11 @@ export const Heatmap = ({ activeTheme }) => {
                 <div
                   key={idx}
                   title={`${c.iso}: ${c.value}%`}
-                  className={`w-7 h-7 rounded-sm flex items-center justify-center text-xs font-medium
-                  ${isToday ? `border-2 ${activeTheme.border.card}` : ""} ${
-                    c.isFuture ? `border-2 ${activeTheme.border.muted}` : ""
-                  }
-                 ${
-                   !activeTheme.isDark && isUncoloredOrFuture
-                     ? `${activeTheme.text.secondary}`
-                     : `${activeTheme.text.activeButton}`
-                 }
-            `}
+                  className={`w-6 h-6 md:w-7 md:h-7 rounded-sm flex items-center justify-center text-[10px] md:text-xs font-medium
+                    ${isToday ? `border-2 ${activeTheme.border.card}` : ""}
+                    ${c.isFuture ? `border-2 ${activeTheme.border.muted}` : ""}
+                    ${!activeTheme.isDark && isUncoloredOrFuture ? activeTheme.text.secondary : activeTheme.text.activeButton}
+                  `}
                   style={{
                     background: getColor(c.value, c.isFuture),
                   }}
@@ -190,13 +177,13 @@ export const Heatmap = ({ activeTheme }) => {
       </div>
 
       {/* Legend */}
-      <div className="flex justify-between items-center text-xs opacity-60 pt-1">
+      <div className="flex justify-between items-center text-[10px] md:text-xs opacity-60 pt-1">
         <span>0%</span>
         <div className="flex space-x-1">
           {COLORS.map((hex, index) => (
             <div
               key={index}
-              className="w-4 h-4 rounded-sm"
+              className="w-3.5 h-3.5 md:w-4 md:h-4 rounded-sm"
               style={{ backgroundColor: hex }}
             />
           ))}
@@ -206,7 +193,7 @@ export const Heatmap = ({ activeTheme }) => {
 
       <Link
         to="/activity"
-        className={`inline-flex items-center justify-center w-full rounded-lg py-2 text-sm font-semibold no-underline ${activeTheme.button.secondary} ${activeTheme.text.secondary}`}
+        className={`inline-flex items-center justify-center w-full rounded-lg py-2 text-xs md:text-sm font-semibold no-underline ${activeTheme.button.secondary} ${activeTheme.text.secondary}`}
       >
         View activity
       </Link>

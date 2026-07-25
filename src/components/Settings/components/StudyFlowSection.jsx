@@ -11,7 +11,13 @@ import {
   faGaugeHigh,
 } from "@fortawesome/free-solid-svg-icons";
 
-export function StudyFlowSection({ profile, settings, activeTheme, dispatch }) {
+export function StudyFlowSection({
+  profile,
+  settings,
+  activeTheme,
+  dispatch,
+  isMobile,
+}) {
   const set = (key, value) => dispatch(updateSettings({ [key]: value }));
 
   // 🌟 Connect the exact same saving hook structure for UX consistency
@@ -49,6 +55,7 @@ export function StudyFlowSection({ profile, settings, activeTheme, dispatch }) {
       activeTheme={activeTheme}
       onSave={handleSave} // Added the explicit save trigger action
       saveState={saveState} // Syncs loading/error styles on the button
+      isMobile={isMobile}
     >
       <div className="space-y-6">
         {/* Autoflip toggle */}

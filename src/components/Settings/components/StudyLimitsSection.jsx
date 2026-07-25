@@ -16,6 +16,7 @@ export function StudyLimitsSection({
   settings,
   activeTheme,
   dispatch,
+  isMobile,
 }) {
   const set = (key, value) => dispatch(updateSettings({ [key]: value }));
 
@@ -42,6 +43,7 @@ export function StudyLimitsSection({
       activeTheme={activeTheme}
       onSave={handleSave}
       saveState={saveState}
+      isMobile={isMobile}
     >
       <LabelledSlider
         icon={faRotate}

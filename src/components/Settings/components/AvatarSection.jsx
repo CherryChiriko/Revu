@@ -4,7 +4,7 @@ import { SettingCard } from "../../General/ui/SettingCard";
 import { AvatarDisplay } from "../../General/ui/AvatarDisplay";
 import { AvatarPick } from "./AvatarPick";
 
-export function AvatarSection({ profile, settings, activeTheme }) {
+export function AvatarSection({ profile, settings, activeTheme, isMobile }) {
   const [pickerOpen, setPickerOpen] = useState(false);
 
   return (
@@ -16,6 +16,7 @@ export function AvatarSection({ profile, settings, activeTheme }) {
         onSave={() => setPickerOpen(true)}
         saveState="idle"
         saveLabel="Customize"
+        isMobile={isMobile}
       >
         <div className="flex justify-center">
           <div className="w-32 h-32 rounded-xl overflow-hidden flex-shrink-0 shadow-md">

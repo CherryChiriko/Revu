@@ -39,6 +39,7 @@ export default function ActivityPage() {
   const solidCards = useSelector(selectTotalSolidCards);
   const masteredCards = useSelector(selectTotalMasteredCards);
   const streakState = useSelector(selectGlobalStreakState);
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
   const {
     activeTheme,
@@ -75,6 +76,7 @@ export default function ActivityPage() {
             icon={faCalendarDays}
             title="Active Days"
             activeTheme={activeTheme}
+            isMobile={isMobile}
           >
             <div className="flex flex-col items-center text-center">
               <h3
@@ -94,6 +96,7 @@ export default function ActivityPage() {
             icon={faBookOpen}
             title="Cards Studied"
             activeTheme={activeTheme}
+            isMobile={isMobile}
           >
             <div className="flex flex-col items-center text-center">
               <h3
@@ -114,6 +117,7 @@ export default function ActivityPage() {
             icon={faGaugeHigh}
             title="Cards / Day"
             activeTheme={activeTheme}
+            isMobile={isMobile}
           >
             <div className="flex flex-col items-center text-center">
               <h3
@@ -133,6 +137,7 @@ export default function ActivityPage() {
             icon={faFire}
             title="Best Streak"
             activeTheme={activeTheme}
+            isMobile={isMobile}
           >
             <div className="flex flex-col items-center text-center">
               <h3
@@ -156,6 +161,7 @@ export default function ActivityPage() {
             icon={faChartLine}
             title="Recent Work"
             activeTheme={activeTheme}
+            isMobile={isMobile}
           >
             <div className="flex items-end gap-1.5 md:gap-2 h-40 md:h-56">
               {recentDays.map((day) => {
@@ -228,6 +234,7 @@ export default function ActivityPage() {
             title="Mastery Progress"
             icon={faBullseye}
             activeTheme={activeTheme}
+            isMobile={isMobile}
           >
             <div className="space-y-4 md:space-y-5">
               {(() => {
@@ -296,6 +303,7 @@ export default function ActivityPage() {
             title="Character Accuracy"
             icon={faLayerGroup}
             activeTheme={activeTheme}
+            isMobile={isMobile}
           >
             <div
               className={`${activeTheme.background.canvas} rounded-xl p-4 md:p-5`}

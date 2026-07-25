@@ -10,6 +10,7 @@ export function SettingCard({
   onSave,
   saveState,
   saveLabel,
+  isMobile,
 }) {
   const hasSave = Boolean(onSave);
 
@@ -25,26 +26,49 @@ export function SettingCard({
 
   return (
     <section
-      className={`flex flex-col ${activeTheme.background.secondary} border ${activeTheme.border.card} relative z-10 rounded-xl md:rounded-2xl shadow-md md:shadow-lg overflow-hidden`}
+      className={`flex flex-col ${activeTheme.background.secondary} border ${
+        activeTheme.border.card
+      } relative z-10 ${
+        isMobile ? "rounded-xl shadow-md" : "rounded-2xl shadow-lg"
+      } overflow-hidden`}
     >
-      {/* Header — Desktop bottom padding reduced from pb-4 to md:pb-1 */}
-      <div className="flex items-center gap-2 md:gap-3 px-3 pt-3 pb-2 md:px-5 md:pt-5 md:pb-1">
+      {/* Header */}
+      <div
+        className={`flex items-center ${
+          isMobile ? "gap-2 px-3 pt-3 pb-2" : "gap-3 px-5 pt-5 pb-4"
+        }`}
+      >
         <div
-          className={`w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl ${activeTheme.background.track} flex items-center justify-center shrink-0`}
+          className={`rounded-xl ${
+            activeTheme.background.track
+          } flex items-center justify-center shrink-0 ${
+            isMobile ? "w-8 h-8" : "w-10 h-10"
+          }`}
         >
-          <FontAwesomeIcon icon={icon} className="w-3.5 h-3.5 md:w-4 md:h-4" />
+          <FontAwesomeIcon
+            icon={icon}
+            className={isMobile ? "w-3.5 h-3.5" : "w-4 h-4"}
+          />
         </div>
-        <h2 className="text-sm md:text-lg font-bold truncate">{title}</h2>
+        <h2
+          className={`font-bold truncate ${isMobile ? "text-sm" : "text-lg"}`}
+        >
+          {title}
+        </h2>
       </div>
 
-      {/* Body — Desktop vertical gap modified from space-y-6 to md:space-y-4 */}
-      <div className="flex-1 px-3 pb-3 md:px-5 md:pb-5 space-y-3 md:space-y-4">
+      {/* Body */}
+      <div
+        className={`flex-1 ${
+          isMobile ? "px-3 pb-3 space-y-3" : "px-5 pb-4 space-y-6"
+        }`}
+      >
         {children}
       </div>
 
       {/* Save button */}
       {hasSave && (
-        <div className="px-3 py-3 md:px-5 md:py-4">
+        <div className={isMobile ? "px-3 py-3" : "px-5 py-4"}>
           <button
             type="button"
             onClick={onSave}

@@ -18,17 +18,24 @@ export function SettingsPage({
   currentThemeName,
   dispatch,
 }) {
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+
   return (
     <>
       {/* ── Row 3: Avatar · Account · Theme ────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <AccountSection profile={profile} activeTheme={activeTheme} />
+        <AccountSection
+          profile={profile}
+          activeTheme={activeTheme}
+          isMobile={isMobile}
+        />
 
         <AvatarSection
           profile={profile}
           settings={settings}
           activeTheme={activeTheme}
           dispatch={dispatch}
+          isMobile={isMobile}
         />
 
         <ThemeSection
@@ -36,6 +43,7 @@ export function SettingsPage({
           allThemes={allThemes}
           currentThemeName={currentThemeName}
           dispatch={dispatch}
+          isMobile={isMobile}
         />
       </div>
 
@@ -46,17 +54,20 @@ export function SettingsPage({
           settings={settings}
           activeTheme={activeTheme}
           dispatch={dispatch}
+          isMobile={isMobile}
         />
         <StudyFlowSection
           settings={settings}
           activeTheme={activeTheme}
           dispatch={dispatch}
+          isMobile={isMobile}
         />
         <DisplaySection
           profile={profile}
           settings={settings}
           activeTheme={activeTheme}
           dispatch={dispatch}
+          isMobile={isMobile}
         />
       </div>
     </>

@@ -1,5 +1,6 @@
+// src/components/Dashboard/Dashboard.jsx
 import React, { useMemo, useRef, useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux"; // 🌟 Added useDispatch
+import { useSelector, useDispatch } from "react-redux";
 import { selectActiveTheme } from "../../slices/themeSlice";
 import { selectGlobalStreak } from "../../slices/streakSlice";
 import {
@@ -7,7 +8,7 @@ import {
   selectTotalDueCards,
   selectTotalMasteredCards,
 } from "../../slices/deckSlice";
-import { selectUserProfile, completeTutorial } from "../../slices/userSlice"; // 🌟 Imported new thunk action
+import { selectUserProfile, completeTutorial } from "../../slices/userSlice";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -32,7 +33,7 @@ import DashboardTutorial from "../Tutorial/components/DashboardTutorial";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch(); // 🌟 Hooks up dispatch handler
+  const dispatch = useDispatch();
   const activeTheme = useSelector(selectActiveTheme);
   const profile = useSelector(selectUserProfile);
   const toast = useRef(null);
@@ -61,7 +62,6 @@ const Dashboard = () => {
     return Math.max(0, baseXP);
   }, [totalActivity]);
 
-  // ── Spotlight tour references ─────────────────────────────────────────────
   const statsRef = useRef(null);
   const continueLearningRef = useRef(null);
   const heatmapRef = useRef(null);
@@ -77,47 +77,39 @@ const Dashboard = () => {
 
   const [showSpotlight, setShowSpotlight] = useState(false);
 
-  // 🌟 Auto-trigger evaluation sequence
   useEffect(() => {
     if (!profile) return;
-
-    // 1. Guard: Ensure they've finalized the introductory global tutorial first
     const hasFinishedGeneralTour =
       profile.completed_tutorials?.general === true;
-
-    // 2. Evaluate if they have viewed this dashboard layout context yet
     const hasSeenDashboardTour =
       profile.completed_tutorials?.dashboard === true;
 
     if (hasFinishedGeneralTour && !hasSeenDashboardTour) {
-      // Small architectural delay ensuring DOM ref spacing layouts settle cleanly
       const timer = setTimeout(() => setShowSpotlight(true), 800);
       return () => clearTimeout(timer);
     }
   }, [profile]);
 
-  // 🌟 Handles tour dismissal updates dynamically through Redux
   const closeSpotlight = () => {
     setShowSpotlight(false);
     dispatch(completeTutorial("dashboard"));
   };
 
-  // 🌟 Allows user to explicitly manual replay the workflow when pressing help icon
   const handleManualReplayTour = () => {
     setShowSpotlight(true);
   };
 
   return (
     <div
-      className={`min-h-screen ${activeTheme.background.app} ${activeTheme.text.primary} w-full px-4 md:px-8 py-8`}
+      className={`min-h-screen ${activeTheme.background.app} ${activeTheme.text.primary} w-full px-4 md:px-8 py-6 md:py-8`}
     >
-      <div className="max-w-screen-xl mx-auto space-y-6">
-        {/* ===== TOP SECTION ===== */}
+      <div className="max-w-screen-xl mx-auto space-y-5 md:space-y-6">
+        {/* Header: logo shrinks on mobile, XPBar stacks below */}
         <Header
           title=""
           activeTheme={activeTheme}
           leftElement={
-            <div className="flex items-center w-32 h-20 relative shrink-0">
+            <div className="flex items-center w-20 h-12 md:w-32 md:h-20 relative shrink-0">
               <div
                 className={`absolute inset-0 bg-gradient-to-r ${activeTheme.gradients.from} ${activeTheme.gradients.to}`}
                 style={{
@@ -134,53 +126,50 @@ const Dashboard = () => {
             </div>
           }
           rightElement={
-            <div className="flex items-center gap-3">
-              <div ref={xpBarRef} className="w-full md:w-64 lg:w-80 rounded-xl">
+            <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto">
+              <div ref={xpBarRef} className="w-full md:w-64 lg:w-80">
                 <XPBar totalXP={totalXP} activeTheme={activeTheme} />
               </div>
               <button
                 type="button"
-                onClick={handleManualReplayTour} // 🌟 Connected to our review callback logic
+                onClick={handleManualReplayTour}
                 title="Show me around"
                 aria-label="Show me around"
-                className={`flex items-center justify-center w-9 h-9 rounded-full shrink-0 transition-colors ${activeTheme.background.secondary} ${activeTheme.text.secondary} hover:${activeTheme.text.accent3}`}
+                className={`flex items-center justify-center w-8 h-8 md:w-9 md:h-9 rounded-full shrink-0 transition-colors ${activeTheme.background.secondary} ${activeTheme.text.secondary} hover:${activeTheme.text.accent3}`}
               >
                 <FontAwesomeIcon
                   icon={faCircleQuestion}
                   ref={helpRef}
-                  className="w-4 h-4"
+                  className="w-3.5 h-3.5 md:w-4 md:h-4"
                 />
               </button>
             </div>
           }
         />
 
-        {/* Quick stats panel */}
+        {/* Stats */}
         <div
           ref={statsRef}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative z-10 rounded-2xl"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 relative z-10"
         >
           <StatCard
             icon={faFire}
-            label="Current Streak"
-            value={`${globalStreak} day${globalStreak === 1 ? "" : "s"}`}
+            label="Streak"
+            value={`${globalStreak}d`}
             activeTheme={activeTheme}
           />
-
           <StatCard
             icon={faClock}
-            label="Cards Due"
+            label="Due"
             value={cards_due_today}
             activeTheme={activeTheme}
           />
-
           <StatCard
             icon={faBullseye}
             label="Mastered"
             value={mastered_cards}
             activeTheme={activeTheme}
           />
-
           <StatCard
             icon={faBookOpen}
             label="Decks"
@@ -189,36 +178,40 @@ const Dashboard = () => {
           />
         </div>
 
-        {/* ===== MAIN GRID ===== */}
-        <div
-          className={`mt-5 grid grid-cols-1 lg:grid-cols-3 gap-6 ${
-            decks.length > 2 ? "items-center" : ""
-          }`}
-        >
-          {/* Left: Decks */}
+        {/* Main content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+          {/* Decks */}
           <div
             ref={continueLearningRef}
-            className="lg:col-span-2 space-y-6 rounded-2xl"
+            className="lg:col-span-2 space-y-4 md:space-y-6"
           >
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold">Continue Learning</h2>
+              <h2 className="text-xl md:text-2xl font-bold">
+                Continue Learning
+              </h2>
               <button
                 onClick={() => navigate("/decks")}
-                className={`text-sm ${activeTheme.text.link}`}
+                className={`text-xs md:text-sm ${activeTheme.text.link}`}
               >
-                Browse decks <FontAwesomeIcon icon={faArrowRight} />
+                Browse{" "}
+                <FontAwesomeIcon icon={faArrowRight} className="ml-0.5" />
               </button>
             </div>
 
             {decks.length === 0 ? (
               <div
-                className={`${activeTheme.background.secondary} text-center py-16 rounded-xl shadow-md`}
+                className={`${activeTheme.background.secondary} text-center py-12 md:py-16 rounded-xl shadow-md`}
               >
-                <FontAwesomeIcon icon={faBookOpen} className="text-4xl mb-3" />
-                <p className="font-semibold mb-3">No decks yet</p>
+                <FontAwesomeIcon
+                  icon={faBookOpen}
+                  className="text-3xl md:text-4xl mb-3"
+                />
+                <p className="font-semibold mb-3 text-sm md:text-base">
+                  No decks yet
+                </p>
                 <button
                   onClick={() => navigate("/decks")}
-                  className={`px-6 py-2 rounded-full font-semibold ${activeTheme.button.primary}`}
+                  className={`px-5 py-2 md:px-6 md:py-2 rounded-full text-sm font-semibold ${activeTheme.button.primary}`}
                 >
                   Create Deck
                 </button>
@@ -229,24 +222,26 @@ const Dashboard = () => {
                   decks={pageDecks}
                   activeTheme={activeTheme}
                   variant="compact"
-                  gridClasses={"grid grid-cols-1 md:grid-cols-2 gap-4"}
+                  gridClasses="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4"
                   toast={toast}
                 />
 
                 {totalDeckPages > 1 && (
-                  <div className="flex items-center justify-between mt-4 gap-2">
+                  <div className="flex items-center justify-between mt-3 md:mt-4 gap-2">
                     <button
                       type="button"
                       onClick={() =>
                         setDeckPage((prev) => Math.max(1, prev - 1))
                       }
                       disabled={deckPage <= 1}
-                      className={`flex items-center justify-center w-10 h-10 rounded-full ${activeTheme.button.secondary} ${activeTheme.text.secondary} ${deckPage <= 1 ? "opacity-50 cursor-not-allowed" : "hover:shadow-lg"}`}
+                      className={`flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-full ${activeTheme.button.secondary} ${activeTheme.text.secondary} ${deckPage <= 1 ? "opacity-50 cursor-not-allowed" : "hover:shadow-lg"}`}
                     >
-                      <FontAwesomeIcon icon={faArrowLeft} />
+                      <FontAwesomeIcon icon={faArrowLeft} className="text-sm" />
                     </button>
-                    <div className={`${activeTheme.text.secondary} text-sm`}>
-                      Page {deckPage} of {totalDeckPages}
+                    <div
+                      className={`${activeTheme.text.secondary} text-xs md:text-sm`}
+                    >
+                      {deckPage} / {totalDeckPages}
                     </div>
                     <button
                       type="button"
@@ -256,9 +251,12 @@ const Dashboard = () => {
                         )
                       }
                       disabled={deckPage >= totalDeckPages}
-                      className={`flex items-center justify-center w-10 h-10 rounded-full ${activeTheme.button.secondary} ${activeTheme.text.secondary} ${deckPage >= totalDeckPages ? "opacity-50 cursor-not-allowed" : "hover:shadow-lg"}`}
+                      className={`flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-full ${activeTheme.button.secondary} ${activeTheme.text.secondary} ${deckPage >= totalDeckPages ? "opacity-50 cursor-not-allowed" : "hover:shadow-lg"}`}
                     >
-                      <FontAwesomeIcon icon={faArrowRight} />
+                      <FontAwesomeIcon
+                        icon={faArrowRight}
+                        className="text-sm"
+                      />
                     </button>
                   </div>
                 )}
@@ -267,10 +265,10 @@ const Dashboard = () => {
             )}
           </div>
 
-          {/* Right: Heatmap */}
+          {/* Heatmap */}
           <div
             ref={heatmapRef}
-            className={`${activeTheme.background.secondary} p-6 rounded-2xl shadow-lg flex flex-col space-y-6`}
+            className={`${activeTheme.background.secondary} p-4 md:p-6 rounded-xl md:rounded-2xl shadow-lg flex flex-col space-y-4 md:space-y-6`}
           >
             <Heatmap activeTheme={activeTheme} />
           </div>

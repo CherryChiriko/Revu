@@ -12,7 +12,13 @@ import {
   faRotate,
 } from "@fortawesome/free-solid-svg-icons";
 
-export function DisplaySection({ profile, settings, activeTheme, dispatch }) {
+export function DisplaySection({
+  profile,
+  settings,
+  activeTheme,
+  dispatch,
+  isMobile,
+}) {
   const set = (key, value) => dispatch(updateSettings({ [key]: value }));
 
   const { handleSave, saveState } = useSettingSave(async () => {
@@ -47,6 +53,7 @@ export function DisplaySection({ profile, settings, activeTheme, dispatch }) {
       activeTheme={activeTheme}
       onSave={handleSave}
       saveState={saveState}
+      isMobile={isMobile}
     >
       {/* Week start */}
       <div>

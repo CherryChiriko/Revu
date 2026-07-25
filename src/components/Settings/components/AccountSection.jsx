@@ -3,9 +3,9 @@ import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { SettingCard } from "../../General/ui/SettingCard";
 import AccountEditView from "../views/AccountEditView";
 
-export function AccountSection({ profile, activeTheme, dispatch }) {
+export function AccountSection({ profile, activeTheme, dispatch, isMobile }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  console.log(isMobile);
   return (
     <>
       <SettingCard
@@ -15,6 +15,7 @@ export function AccountSection({ profile, activeTheme, dispatch }) {
         onSave={() => setIsModalOpen(true)}
         saveState="idle" // Keeps button steady in its default style state
         saveLabel="Manage account" // Customizes the action button text cleanly
+        isMobile={isMobile}
       >
         <div className="space-y-4 text-left">
           {/* Username Snapshot Display */}

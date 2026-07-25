@@ -1,3 +1,4 @@
+// src/components/Study/components/Card/ProgressBar.jsx
 import React from "react";
 import { STATUS_COLOR } from "../../../utils/constants";
 import { SegmentedBar } from "../../General/ui/SegmentedBar";
@@ -6,7 +7,7 @@ export const ProgressBar = ({
   counts = {},
   cards_count = 0,
   activeTheme,
-  isMastered = false,
+  compact = false,
 }) => {
   const { suspended = 0, waiting = 0, due = 0, new: newCards = 0 } = counts;
 
@@ -47,7 +48,7 @@ export const ProgressBar = ({
       segments={segments}
       total={cards_count}
       activeTheme={activeTheme}
-      showLegend={!isMastered}
+      compact={compact}
     />
   );
 };

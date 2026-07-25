@@ -3,6 +3,7 @@ import useDeckLogic from "../hooks/useDeckLogic";
 import FullVariant from "./variants/FullVariant";
 import CompactVariant from "./variants/CompactVariant";
 import DeckDelete from "../../DeckMenu/components/DeckDelete";
+import ListVariant from "./variants/ListVariant";
 
 function DeckCardItem({ deck, activeTheme, variant, toast, highlightedId }) {
   const logic = useDeckLogic(deck.id, deck.cards_count || 0, {
@@ -12,6 +13,10 @@ function DeckCardItem({ deck, activeTheme, variant, toast, highlightedId }) {
 
   if (!deck || !logic) return null;
 
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+  if (isMobile) {
+    variant = "list";
+  }
   // Check against both deck_id and id to cover all configurations
   const isHighlighted =
     highlightedId &&
@@ -38,6 +43,9 @@ function DeckCardItem({ deck, activeTheme, variant, toast, highlightedId }) {
       break;
     case "compact":
       Content = CompactVariant;
+      break;
+    case "list":
+      Content = ListVariant;
       break;
     default:
       Content = null;

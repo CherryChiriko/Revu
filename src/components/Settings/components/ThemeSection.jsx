@@ -11,9 +11,15 @@ export function ThemeSection({
   allThemes,
   currentThemeName,
   dispatch,
+  isMobile,
 }) {
   return (
-    <SettingCard icon={faPalette} title="Theme" activeTheme={activeTheme}>
+    <SettingCard
+      icon={faPalette}
+      title="Theme"
+      activeTheme={activeTheme}
+      isMobile={isMobile}
+    >
       <div className="grid grid-cols-2 gap-3">
         {Object.values(allThemes).map((theme) => (
           <button
