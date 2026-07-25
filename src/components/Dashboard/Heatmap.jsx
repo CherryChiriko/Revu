@@ -60,7 +60,7 @@ function generateCalendarGrid(dataMap, weeksToShow = 4, weekStart = "monday") {
   return cells;
 }
 
-export const Heatmap = ({ activeTheme }) => {
+export const Heatmap = ({ activeTheme, isMobile }) => {
   const COLORS = activeTheme.gradients.colors;
   const heatmapMetric = useSelector(selectHeatmapMetric);
   const dailyGoal = useSelector(selectDailyGoal);
@@ -127,9 +127,14 @@ export const Heatmap = ({ activeTheme }) => {
   }, [cells]);
 
   return (
-    <div className="space-y-3">
+    <div
+      className={`flex flex-col justify-between h-full w-full ${
+        isMobile ? "space-y-3" : "space-y-5"
+      }`}
+    >
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold">Activity</h3>
+        <h4 className="font-semibold">Activity</h4>
         <div className="text-xs opacity-60">
           {heatmapMetric === "consistency"
             ? "daily objectives reached"
@@ -139,51 +144,79 @@ export const Heatmap = ({ activeTheme }) => {
         </div>
       </div>
 
-      {/* Weekday header */}
-      <div className="grid grid-cols-7 gap-1 text-[10px] md:text-xs opacity-60">
-        {weekdayLabels.map((label, idx) => (
-          <div key={idx} className="w-6 md:w-7 text-center">
-            {label}
-          </div>
-        ))}
-      </div>
+      {/* Centered Calendar Area */}
+      <div
+        className={`flex flex-col items-center justify-center w-full ${
+          isMobile ? "space-y-2" : "space-y-3"
+        }`}
+      >
+        {/* Weekday header */}
+        <div
+          className={`grid grid-cols-7 gap-1 opacity-60 justify-items-center w-full max-w-xs ${
+            isMobile ? "text-[10px]" : "text-xs"
+          }`}
+        >
+          {weekdayLabels.map((label, idx) => (
+            <div
+              key={idx}
+              className={`text-center ${isMobile ? "w-6" : "w-7"}`}
+            >
+              {label}
+            </div>
+          ))}
+        </div>
 
-      {/* Calendar weeks */}
-      <div className="space-y-1">
-        {weeks.map((week, wIdx) => (
-          <div key={wIdx} className="grid grid-cols-7 gap-1">
-            {week.map((c, idx) => {
-              const isToday = c.iso === TODAY_ISO;
-              const isUncoloredOrFuture = c.value === 0 || c.isFuture;
-              return (
-                <div
-                  key={idx}
-                  title={`${c.iso}: ${c.value}%`}
-                  className={`w-6 h-6 md:w-7 md:h-7 rounded-sm flex items-center justify-center text-[10px] md:text-xs font-medium
-                    ${isToday ? `border-2 ${activeTheme.border.card}` : ""}
-                    ${c.isFuture ? `border-2 ${activeTheme.border.muted}` : ""}
-                    ${!activeTheme.isDark && isUncoloredOrFuture ? activeTheme.text.secondary : activeTheme.text.activeButton}
-                  `}
-                  style={{
-                    background: getColor(c.value, c.isFuture),
-                  }}
-                >
-                  {c.date.getDate()}
-                </div>
-              );
-            })}
-          </div>
-        ))}
+        {/* Calendar weeks */}
+        <div
+          className={`w-full max-w-xs ${isMobile ? "space-y-1" : "space-y-2"}`}
+        >
+          {weeks.map((week, wIdx) => (
+            <div
+              key={wIdx}
+              className="grid grid-cols-7 gap-1 justify-items-center"
+            >
+              {week.map((c, idx) => {
+                const isToday = c.iso === TODAY_ISO;
+                const isUncoloredOrFuture = c.value === 0 || c.isFuture;
+                return (
+                  <div
+                    key={idx}
+                    title={`${c.iso}: ${c.value}%`}
+                    className={`rounded-sm flex items-center justify-center font-medium
+                      ${isMobile ? "w-6 h-6 text-[10px]" : "w-7 h-7 text-xs"}
+                      ${isToday ? `border-2 ${activeTheme.border.card}` : ""}
+                      ${c.isFuture ? `border-2 ${activeTheme.border.muted}` : ""}
+                      ${
+                        !activeTheme.isDark && isUncoloredOrFuture
+                          ? activeTheme.text.secondary
+                          : activeTheme.text.activeButton
+                      }
+                    `}
+                    style={{
+                      background: getColor(c.value, c.isFuture),
+                    }}
+                  >
+                    {c.date.getDate()}
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Legend */}
-      <div className="flex justify-between items-center text-[10px] md:text-xs opacity-60 pt-1">
+      <div
+        className={`flex justify-between items-center opacity-60 w-full max-w-xs mx-auto ${
+          isMobile ? "text-[10px]" : "text-xs"
+        }`}
+      >
         <span>0%</span>
         <div className="flex space-x-1">
           {COLORS.map((hex, index) => (
             <div
               key={index}
-              className="w-3.5 h-3.5 md:w-4 md:h-4 rounded-sm"
+              className={`rounded-sm ${isMobile ? "w-3.5 h-3.5" : "w-4 h-4"}`}
               style={{ backgroundColor: hex }}
             />
           ))}
@@ -191,9 +224,12 @@ export const Heatmap = ({ activeTheme }) => {
         <span>100%</span>
       </div>
 
+      {/* Action Button */}
       <Link
         to="/activity"
-        className={`inline-flex items-center justify-center w-full rounded-lg py-2 text-xs md:text-sm font-semibold no-underline ${activeTheme.button.secondary} ${activeTheme.text.secondary}`}
+        className={`inline-flex items-center justify-center w-full rounded-lg font-semibold no-underline ${
+          isMobile ? "text-xs py-1.5" : "text-sm py-2"
+        } ${activeTheme.button.secondary} ${activeTheme.text.secondary}`}
       >
         View activity
       </Link>

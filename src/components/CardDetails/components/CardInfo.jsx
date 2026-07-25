@@ -1,10 +1,7 @@
+// src/components/DeckDetails/components/CardInfo.jsx
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faGaugeHigh,
-  faRepeat,
-  faSeedling,
-} from "@fortawesome/free-solid-svg-icons";
+import { faGaugeHigh, faSeedling } from "@fortawesome/free-solid-svg-icons";
 
 import { STATUS_TILE } from "../../DeckDetails/components/SharedStyles";
 import { getMasterySummary } from "../../../utils/cardMastery";
@@ -12,7 +9,6 @@ import { getMasterySummary } from "../../../utils/cardMastery";
 const getCardStrengthLabel = (easeFactor, status) => {
   if (status === "new") return "New card";
   const ef = Number(easeFactor);
-
   if (ef < 1.7) return "Challenging";
   if (ef < 2.2) return "Getting there";
   if (ef <= 2.6) return "Good";
@@ -23,13 +19,13 @@ const MetaRow = ({ icon, label, value, activeTheme }) => {
   return (
     <div className="flex items-center justify-between gap-4">
       <span
-        className={`flex items-center gap-2 text-xs ${activeTheme.text.muted}`}
+        className={`flex items-center gap-2 text-[11px] md:text-xs ${activeTheme.text.muted}`}
       >
         <FontAwesomeIcon icon={icon} className="w-3 h-3" />
         {label}
       </span>
       <span
-        className={`text-xs font-semibold ${activeTheme.text.secondary} text-right`}
+        className={`text-[11px] md:text-xs font-semibold ${activeTheme.text.secondary} text-right`}
       >
         {value}
       </span>
@@ -40,18 +36,17 @@ const MetaRow = ({ icon, label, value, activeTheme }) => {
 export function CardInfo({ card, isC, activeTheme }) {
   const tile = STATUS_TILE[card.status] ?? STATUS_TILE.new;
   const mastery = getMasterySummary(card);
-  // const timesStudied = card.study_count ?? card.repetitions ?? 0;
 
   return (
     <>
-      <section className="space-y-1.5">
+      <section className="space-y-1 md:space-y-1.5">
         <label
           className={`text-[10px] font-black uppercase tracking-widest ${activeTheme.text.accent3}`}
         >
           Front
         </label>
         <p
-          className={`text-2xl font-extrabold leading-snug ${activeTheme.text.primary}`}
+          className={`text-xl md:text-2xl font-extrabold leading-snug ${activeTheme.text.primary}`}
         >
           {card.front}
         </p>
@@ -59,14 +54,14 @@ export function CardInfo({ card, isC, activeTheme }) {
 
       <div className={`h-px ${activeTheme.background.track}`} />
 
-      <section className="space-y-1.5">
+      <section className="space-y-1 md:space-y-1.5">
         <label
           className={`text-[10px] font-black uppercase tracking-widest ${activeTheme.text.accent3}`}
         >
           Back / Meaning
         </label>
         <p
-          className={`text-base leading-relaxed ${activeTheme.text.secondary}`}
+          className={`text-sm md:text-base leading-relaxed ${activeTheme.text.secondary}`}
         >
           {card.back || (
             <span className={activeTheme.text.muted}>
@@ -79,13 +74,13 @@ export function CardInfo({ card, isC, activeTheme }) {
       {isC && card.reading && (
         <>
           <div className={`h-px ${activeTheme.background.track}`} />
-          <section className="space-y-1.5">
+          <section className="space-y-1 md:space-y-1.5">
             <label
               className={`text-[10px] font-black uppercase tracking-widest ${activeTheme.text.accent3}`}
             >
               Reading
             </label>
-            <p className={`text-base ${activeTheme.text.secondary}`}>
+            <p className={`text-sm md:text-base ${activeTheme.text.secondary}`}>
               {card.reading}
             </p>
           </section>
@@ -94,7 +89,7 @@ export function CardInfo({ card, isC, activeTheme }) {
 
       <div className={`h-px ${activeTheme.background.track}`} />
 
-      <section className="space-y-3">
+      <section className="space-y-2 md:space-y-3">
         <label
           className={`text-[10px] font-black uppercase tracking-widest ${activeTheme.text.secondary}`}
         >
@@ -109,7 +104,7 @@ export function CardInfo({ card, isC, activeTheme }) {
           </span>
         </div>
 
-        <div className="space-y-2.5">
+        <div className="space-y-2 md:space-y-2.5">
           {card.ease_factor != null && (
             <MetaRow
               icon={faGaugeHigh}
@@ -124,12 +119,6 @@ export function CardInfo({ card, isC, activeTheme }) {
             value={`${mastery.label} (${mastery.progress}%)`}
             activeTheme={activeTheme}
           />
-          {/* <MetaRow
-            icon={faRepeat}
-            label="Times studied"
-            value={timesStudied}
-            activeTheme={activeTheme}
-          /> */}
         </div>
       </section>
     </>

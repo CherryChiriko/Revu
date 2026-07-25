@@ -1,3 +1,4 @@
+// src/components/DeckDetails/components/AddCardMenu.jsx
 import React, { useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -21,15 +22,14 @@ export function AddCardMenu({
 
   const { fields, setField, isValid, isSubmitting, error, submit, reset } =
     useAddCard({ deckId, studyMode, totalCardCount, onSuccess, onClose });
-  // Reset and focus when modal opens
+
   useEffect(() => {
     if (isOpen) {
       reset();
       setTimeout(() => firstInputRef.current?.focus(), 50);
     }
-  }, [isOpen]);
+  }, [isOpen, reset]);
 
-  // Close on Escape keypress
   useEffect(() => {
     if (!isOpen) return;
     const handler = (e) => {
@@ -46,7 +46,7 @@ export function AddCardMenu({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-[2px]"
+      className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4 backdrop-blur-[2px]"
       style={{
         backgroundColor: activeTheme.isDark
           ? "rgba(0, 0, 0, 0.5)"
@@ -55,20 +55,20 @@ export function AddCardMenu({
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div
-        className={`w-full max-w-md rounded-2xl shadow-xl overflow-hidden border ${activeTheme.background.secondary} ${activeTheme.border.secondary}`}
+        className={`w-full md:max-w-md rounded-t-2xl md:rounded-2xl shadow-xl overflow-hidden border ${activeTheme.background.secondary} ${activeTheme.border.secondary}`}
       >
         {/* Header */}
         <div
-          className={`flex items-start justify-between px-6 pt-6 pb-2 border-b ${activeTheme.border.muted}`}
+          className={`flex items-start justify-between px-4 md:px-6 pt-4 md:pt-6 pb-2 border-b ${activeTheme.border.muted}`}
         >
           <div className="flex flex-col text-left">
             <h2
-              className={`text-lg font-bold tracking-tight leading-tight ${activeTheme.text.primary}`}
+              className={`text-base md:text-lg font-bold tracking-tight leading-tight ${activeTheme.text.primary}`}
             >
               Add a card
             </h2>
             <p
-              className={`text-xs mt-1 leading-snug font-medium ${activeTheme.text.muted}`}
+              className={`text-[11px] md:text-xs mt-1 leading-snug font-medium ${activeTheme.text.muted}`}
             >
               {isC
                 ? "Character, meaning and optional pinyin."
@@ -79,18 +79,17 @@ export function AddCardMenu({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className={`p-1.5 -mr-1.5 -mt-1 rounded-lg transition-colors outline-none focus:ring-2 ${activeTheme.link.hoverBg} ${activeTheme.ring.focus} ${activeTheme.text.secondary}`}
+            className={`p-1.5 -mr-1 -mt-1 rounded-lg transition-colors outline-none focus:ring-2 ${activeTheme.link.hoverBg} ${activeTheme.ring.focus} ${activeTheme.text.secondary}`}
           >
             <FontAwesomeIcon icon={faXmark} className="w-4 h-4 block" />
           </button>
         </div>
 
-        {/* Body Form */}
-        <div className="px-6 pb-6 pt-4 space-y-4">
-          {/* Front / Character input */}
+        {/* Body */}
+        <div className="px-4 md:px-6 pb-6 md:pb-6 pt-3 md:pt-4 space-y-3 md:space-y-4">
           <div className="flex flex-col gap-1">
             <p
-              className={`text-xs font-semibold uppercase tracking-wider ${activeTheme.text.muted}`}
+              className={`text-[11px] md:text-xs font-semibold uppercase tracking-wider ${activeTheme.text.muted}`}
             >
               {isC ? "Character" : "Front"}{" "}
               <span className={activeTheme.text.danger}>*</span>
@@ -101,7 +100,7 @@ export function AddCardMenu({
               value={fields.front}
               onChange={(e) => setField("front", e.target.value)}
               placeholder={isC ? "e.g. 你好" : "Word or phrase"}
-              className={inputCls(activeTheme)}
+              className={`${inputCls(activeTheme)} text-base md:text-sm`}
             />
             {isC &&
               fields.front.trim() !== "" &&
@@ -112,10 +111,9 @@ export function AddCardMenu({
               )}
           </div>
 
-          {/* Meaning input */}
           <div className="flex flex-col gap-1">
             <p
-              className={`text-xs font-semibold uppercase tracking-wider ${activeTheme.text.muted}`}
+              className={`text-[11px] md:text-xs font-semibold uppercase tracking-wider ${activeTheme.text.muted}`}
             >
               Meaning <span className={activeTheme.text.danger}>*</span>
             </p>
@@ -124,15 +122,14 @@ export function AddCardMenu({
               value={fields.back}
               onChange={(e) => setField("back", e.target.value)}
               placeholder="Meaning or translation"
-              className={inputCls(activeTheme)}
+              className={`${inputCls(activeTheme)} text-base md:text-sm`}
             />
           </div>
 
-          {/* Optional Reading input for character mode */}
           {isC && (
             <div className="flex flex-col gap-1">
               <p
-                className={`text-xs font-semibold uppercase tracking-wider ${activeTheme.text.muted}`}
+                className={`text-[11px] md:text-xs font-semibold uppercase tracking-wider ${activeTheme.text.muted}`}
               >
                 Reading (Pinyin)
               </p>
@@ -141,15 +138,14 @@ export function AddCardMenu({
                 value={fields.reading}
                 onChange={(e) => setField("reading", e.target.value)}
                 placeholder="e.g. nǐ hǎo"
-                className={inputCls(activeTheme)}
+                className={`${inputCls(activeTheme)} text-base md:text-sm`}
               />
-              <p className={`text-[10px] ${activeTheme.text.muted}`}>
+              <p className={`text-[10px] md:text-xs ${activeTheme.text.muted}`}>
                 Auto-generated if left blank.
               </p>
             </div>
           )}
 
-          {/* Error Message */}
           {error && (
             <div
               className={`flex items-center gap-1 text-xs ${activeTheme.text.danger}`}
@@ -159,15 +155,14 @@ export function AddCardMenu({
             </div>
           )}
 
-          {/* Action Button */}
           <button
             onClick={submit}
             disabled={isButtonDisabled}
-            className={`w-full py-2.5 mt-4 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all
+            className={`w-full py-3 md:py-2.5 mt-2 md:mt-4 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all
               ${
                 isButtonDisabled
                   ? activeTheme.button.disabled
-                  : `bg-gradient-to-r ${activeTheme.gradients.from} ${activeTheme.gradients.to} ${activeTheme.text.activeButton} hover:brightness-110`
+                  : `bg-gradient-to-r ${activeTheme.gradients.from} ${activeTheme.gradients.to} ${activeTheme.text.activeButton} hover:brightness-110 active:scale-[0.98]`
               }`}
           >
             {isSubmitting ? (

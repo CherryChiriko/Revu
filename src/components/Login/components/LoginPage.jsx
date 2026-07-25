@@ -1,6 +1,8 @@
+// src/components/Auth/views/LoginPage.jsx
 import React from "react";
 import { useLogin } from "../hooks/useLogin";
 import { inputCls } from "../../General/ui/FormStyles";
+import LoadingSpinner from "../../General/ui/LoadingSpinner";
 
 const LoginPage = ({ activeTheme }) => {
   const {
@@ -24,24 +26,24 @@ const LoginPage = ({ activeTheme }) => {
 
   return (
     <div
-      className={`h-screen flex flex-col items-center justify-center p-4 ${activeTheme.background.app}`}
+      className={`min-h-[100dvh] flex flex-col items-center justify-center p-4 ${activeTheme.background.app}`}
     >
-      <div className={`w-full max-w-md border shadow-xl rounded-2xl p-6`}>
-        {/* Dynamic Header */}
+      <div
+        className={`w-full max-w-md border shadow-xl rounded-2xl p-4 md:p-6 ${activeTheme.background.secondary} ${activeTheme.border.card}`}
+      >
         <h2
-          className={`text-2xl ${activeTheme.text.primary} font-bold mb-6 text-center`}
+          className={`text-xl md:text-2xl ${activeTheme.text.primary} font-bold mb-4 md:mb-6 text-center`}
         >
           {isResetting ? "Reset Password" : isSigningUp ? "Sign Up" : "Login"}
         </h2>
 
-        {/* Google OAuth Block */}
         {!isResetting && (
           <>
             <button
               type="button"
               onClick={loginWithGoogle}
               disabled={authLoading}
-              className={`w-full flex items-center justify-center gap-2 border py-2.5 rounded-xl font-semibold text-sm transition-all active:scale-[0.99] disabled:opacity-50 ${activeTheme.border.card} ${activeTheme.background.canvas} ${activeTheme.text.primary}`}
+              className={`w-full flex items-center justify-center gap-2 border py-2.5 rounded-xl font-semibold text-sm transition-all active:scale-[0.98] disabled:opacity-50 ${activeTheme.border.card} ${activeTheme.background.canvas} ${activeTheme.text.primary}`}
             >
               <svg
                 viewBox="0 0 24 24"
@@ -81,12 +83,10 @@ const LoginPage = ({ activeTheme }) => {
           </>
         )}
 
-        {/* Native Credential Entry Form */}
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className={`p-4`}>
-            {/* Username Input */}
+        <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5">
+          <div className="space-y-4">
             {!isResetting && (
-              <div className="mb-4">
+              <div>
                 <label
                   className={`${activeTheme.text.secondary} block mb-1.5 text-xs font-bold uppercase tracking-wider`}
                 >
@@ -94,7 +94,7 @@ const LoginPage = ({ activeTheme }) => {
                 </label>
                 <input
                   type="text"
-                  className={inputCls(activeTheme)}
+                  className={`${inputCls(activeTheme)} text-base md:text-sm`}
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Enter your username"
@@ -103,7 +103,6 @@ const LoginPage = ({ activeTheme }) => {
               </div>
             )}
 
-            {/* Email Input */}
             {(isSigningUp || isResetting) && (
               <div>
                 <label
@@ -113,7 +112,7 @@ const LoginPage = ({ activeTheme }) => {
                 </label>
                 <input
                   type="email"
-                  className={inputCls(activeTheme)}
+                  className={`${inputCls(activeTheme)} text-base md:text-sm`}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
@@ -122,7 +121,6 @@ const LoginPage = ({ activeTheme }) => {
               </div>
             )}
 
-            {/* Password Input */}
             {!isResetting && (
               <div>
                 <label
@@ -132,7 +130,7 @@ const LoginPage = ({ activeTheme }) => {
                 </label>
                 <input
                   type="password"
-                  className={inputCls(activeTheme)}
+                  className={`${inputCls(activeTheme)} text-base md:text-sm`}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
@@ -142,7 +140,6 @@ const LoginPage = ({ activeTheme }) => {
             )}
           </div>
 
-          {/* Feedback Blocks */}
           {error && (
             <p className="text-red-400 text-xs font-medium px-1">{error}</p>
           )}
@@ -155,63 +152,56 @@ const LoginPage = ({ activeTheme }) => {
           <button
             type="submit"
             disabled={authLoading}
-            className={`w-full py-2.5 rounded-xl font-bold text-sm shadow transition-all active:scale-[0.99] disabled:opacity-50 ${activeTheme.button.accent2}`}
+            className={`w-full py-3 md:py-2.5 rounded-xl font-bold text-sm shadow transition-all active:scale-[0.98] disabled:opacity-50 ${activeTheme.button.accent2}`}
           >
-            {authLoading
-              ? "Loading..."
-              : isResetting
-                ? "Send Reset Email"
-                : isSigningUp
-                  ? "Sign Up"
-                  : "Login"}
+            {authLoading ? (
+              <LoadingSpinner fullScreen />
+            ) : isResetting ? (
+              "Send Reset Email"
+            ) : isSigningUp ? (
+              "Sign Up"
+            ) : (
+              "Login"
+            )}
           </button>
         </form>
 
-        {/* Footer Navigation Link Segment */}
-        <div className="mt-5 space-y-2 text-center text-sm">
+        <div className="mt-5 space-y-3 text-center">
           {!isResetting && !isSigningUp && (
-            <div>
-              <button
-                className={`${activeTheme.text.accent1} underline text-xs font-medium`}
-                onClick={switchToResetMode}
-              >
-                Forgot password?
-              </button>
-            </div>
+            <button
+              className={`${activeTheme.text.accent1} underline text-xs font-medium`}
+              onClick={switchToResetMode}
+            >
+              Forgot password?
+            </button>
           )}
 
           {isResetting && (
-            <div>
-              <button
-                className={`${activeTheme.text.accent1} hover:underline font-semibold text-xs`}
-                onClick={exitResetMode}
-              >
-                Back to Login
-              </button>
-            </div>
+            <button
+              className={`${activeTheme.text.accent1} hover:underline font-semibold text-xs`}
+              onClick={exitResetMode}
+            >
+              Back to Login
+            </button>
           )}
 
           {!isResetting && (
-            <div>
-              <button
-                className={`${activeTheme.text.accent1} hover:underline font-semibold text-xs`}
-                onClick={handleToggleMode}
-              >
-                {isSigningUp
-                  ? "Already have an account? Login"
-                  : "Don't have an account? Sign Up"}
-              </button>
-            </div>
+            <button
+              className={`${activeTheme.text.accent1} hover:underline font-semibold text-xs block w-full`}
+              onClick={handleToggleMode}
+            >
+              {isSigningUp
+                ? "Already have an account? Login"
+                : "Don't have an account? Sign Up"}
+            </button>
           )}
         </div>
       </div>
 
-      {/* Development Context Badge */}
       <span
-        className={`mt-4 text-xs font-medium opacity-60 tracking-wide ${activeTheme.text.primary}`}
+        className={`mt-4 text-xs font-medium opacity-60 tracking-wide ${activeTheme.text.primary} text-center`}
       >
-        Demo only: Username - &ldquo;guest&rdquo;, Password -
-        &ldquo;guest123&rdquo;
+        Demo: Username "guest" / Password "guest123"
       </span>
     </div>
   );

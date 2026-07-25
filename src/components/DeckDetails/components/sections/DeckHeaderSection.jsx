@@ -1,3 +1,4 @@
+// src/components/DeckDetails/components/sections/DeckHeaderSection.jsx
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -14,7 +15,6 @@ export default function DeckHeaderSection({
   activeTheme,
   onDeckDeleted,
 }) {
-  // Pull from-to token combinations safely from your theme settings configuration wrapper
   const gradientFrom = activeTheme?.gradients?.from || "from-indigo-500";
   const gradientTo = activeTheme?.gradients?.to || "to-purple-500";
 
@@ -41,21 +41,21 @@ export default function DeckHeaderSection({
 
   return (
     <header
-      className={`${activeTheme.background.secondary} rounded-2xl shadow-xl border ${activeTheme.border.card} overflow-hidden relative p-6 md:p-8`}
+      className={`${activeTheme.background.secondary} rounded-2xl shadow-xl border ${activeTheme.border.card} overflow-hidden relative p-4 md:p-6 lg:p-8`}
     >
-      {/* Top decorative gradient bar */}
       <div
         className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${gradientFrom} ${gradientTo}`}
       />
 
-      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 w-full">
-        {/* Main textual wrapper - explicitly forcing wrap behavior */}
-        <div className="w-full space-y-3 min-w-0 flex-1 block">
-          <p
-            className={`${activeTheme.text.accent1} font-semibold text-xs uppercase tracking-wider block mb-1`}
-          >
-            Deck details
-          </p>
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 md:gap-6 w-full">
+        <div className="w-full space-y-2 md:space-y-3 min-w-0 flex-1">
+          {!isEditingMeta && (
+            <p
+              className={`${activeTheme.text.accent1} font-semibold text-[10px] md:text-xs uppercase tracking-wider`}
+            >
+              Deck details
+            </p>
+          )}
 
           {isEditingMeta ? (
             <DeckMetaEditor
@@ -67,26 +67,23 @@ export default function DeckHeaderSection({
               onCancel={() => setIsEditingMeta(false)}
             />
           ) : (
-            <div className="w-full space-y-3 block overflow-visible">
-              {/* Heading Container: Cleaned up line-breaks entirely */}
-              <div className="w-full block overflow-visible">
-                <h1
-                  className={`text-2xl sm:text-3xl lg:text-4xl font-extrabold text-balance leading-tight tracking-tight whitespace-normal break-words ${activeTheme.text.primary}`}
-                >
-                  {deck?.name ?? "Deck Details"}
-                </h1>
-              </div>
+            <div className="w-full space-y-2 md:space-y-3">
+              <h1
+                className={`text-xl md:text-2xl lg:text-4xl font-extrabold text-balance leading-tight tracking-tight break-words ${activeTheme.text.primary}`}
+              >
+                {deck?.name ?? "Deck Details"}
+              </h1>
 
               {deck?.description && (
                 <p
-                  className={`text-xs sm:text-sm pl-2 max-w-3xl leading-relaxed text-pretty whitespace-normal break-words ${activeTheme.text.secondary}`}
+                  className={`text-xs md:text-sm md:pl-2 max-w-3xl leading-relaxed text-pretty break-words ${activeTheme.text.secondary}`}
                 >
                   {deck.description}
                 </p>
               )}
 
               {deck?.tags?.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 pt-0.5 pl-2">
+                <div className="flex flex-wrap gap-1.5 md:pl-2">
                   {deck.tags.map((tag) => (
                     <span
                       key={tag}
@@ -102,7 +99,9 @@ export default function DeckHeaderSection({
                 </div>
               )}
 
-              <p className={`text-xs pl-2 pt-0.5 ${activeTheme.text.muted}`}>
+              <p
+                className={`text-[11px] md:text-xs md:pl-2 ${activeTheme.text.muted}`}
+              >
                 <span className="font-bold">
                   {STUDY_MODES[studyMode] || studyMode}
                 </span>{" "}
@@ -116,9 +115,8 @@ export default function DeckHeaderSection({
           )}
         </div>
 
-        {/* Menu Actions Wrapper */}
         {!isEditingMeta && (
-          <div className="shrink-0 sm:pt-7 self-end sm:self-start">
+          <div className="shrink-0 pt-0 sm:pt-6 self-start">
             <DeckMenu
               activeTheme={activeTheme}
               onEdit={() => setIsEditingMeta(true)}
@@ -128,7 +126,6 @@ export default function DeckHeaderSection({
         )}
       </div>
 
-      {/* Confirmation Modal */}
       <DeckDelete
         deckData={pendingDelete}
         activeTheme={activeTheme}

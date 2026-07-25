@@ -1,6 +1,6 @@
+// src/components/DeckDetails/components/CardEdit.jsx
 import React from "react";
 import { FormField } from "../../General/ui/FormField";
-// 1. Make sure to import your regex helper here as well!
 import { hasCJKCharacter } from "../../../utils/cjkValidation";
 
 export function CardEdit({
@@ -17,18 +17,16 @@ export function CardEdit({
   const baseInputCls = inputCls(activeTheme);
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 md:space-y-5">
       <FormField label="Front" activeTheme={activeTheme}>
         <input
           type="text"
           value={editFront}
           onChange={(e) => setEditFront(e.target.value)}
           placeholder={isC ? "Chinese character(s)" : "Word or phrase"}
-          className={`${baseInputCls} resize-none`}
+          className={`${baseInputCls} resize-none text-base md:text-sm`}
           autoFocus
         />
-
-        {/* 2. Adjusted variables to match CardEdit's local props */}
         {isC && editFront.trim() !== "" && !hasCJKCharacter(editFront) && (
           <p className={`text-xs ${activeTheme.text.danger} mt-1`}>
             Front must contain at least one Chinese character.
@@ -42,7 +40,7 @@ export function CardEdit({
           onChange={(e) => setEditBack(e.target.value)}
           placeholder="Meaning or translation"
           rows={3}
-          className={`${baseInputCls} resize-none`}
+          className={`${baseInputCls} resize-none text-base md:text-sm`}
         />
       </FormField>
 
@@ -57,7 +55,7 @@ export function CardEdit({
             value={editReading}
             onChange={(e) => setEditReading(e.target.value)}
             placeholder="e.g. nǐ hǎo  (auto-generated if blank)"
-            className={`${baseInputCls} resize-none`}
+            className={`${baseInputCls} resize-none text-base md:text-sm`}
           />
         </FormField>
       )}

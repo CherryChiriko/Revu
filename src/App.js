@@ -42,6 +42,7 @@ import DecksLoader from "./components/Loaders/DecksLoader";
 import StatsLoader from "./components/Loaders/StatsLoader";
 import ResetPasswordPage from "./components/Login/components/ResetPasswordPage";
 import Tutorial from "./components/Tutorial/components/Tutorial";
+import LoadingSpinner from "./components/General/ui/LoadingSpinner";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
@@ -254,9 +255,7 @@ function App() {
         <div
           className={`${activeTheme.background.app} min-h-screen flex items-center justify-center`}
         >
-          <p className={`${activeTheme.text.primary} text-xl animate-pulse`}>
-            Loading...
-          </p>
+          <LoadingSpinner fullScreen />
         </div>
       </>
     );

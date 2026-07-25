@@ -1,4 +1,4 @@
-// components/DeckDetails/DeckMetaEditor.jsx
+// src/components/DeckDetails/components/DeckMetaEditor.jsx
 import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
@@ -7,9 +7,8 @@ import { updateDeckLocally } from "../../../slices/deckSlice";
 
 const C_LANGUAGES = ["Chinese"];
 
-// Shared class styles for clean, uniform input boxes
 const inputCls =
-  "w-full text-xs font-medium px-3 py-2 rounded-xl border bg-transparent outline-none focus:ring-1 transition-all";
+  "w-full text-sm md:text-xs font-medium px-3 py-2.5 md:py-2 rounded-xl border bg-transparent outline-none focus:ring-1 transition-all";
 
 export default function DeckMetaEditor({
   deck,
@@ -33,10 +32,8 @@ export default function DeckMetaEditor({
   const [saveError, setSaveError] = useState(null);
   const [languageSuggestions, setLanguageSuggestions] = useState([]);
 
-  // Fetch language suggestions for non-character decks
   useEffect(() => {
     if (isCharacterMode) return;
-
     supabase.auth.getUser().then(({ data }) => {
       if (!data?.user) return;
       supabase
@@ -104,12 +101,10 @@ export default function DeckMetaEditor({
     }
   };
 
-  // Build reactive styling classes based on the theme context
   const inputThemeCls = `${activeTheme.border.secondary} ${activeTheme.text.primary} focus:${activeTheme.border.primary} focus:ring-indigo-500/30`;
 
   return (
-    <div className="space-y-3 max-w-xl text-left">
-      {/* Name Input */}
+    <div className="space-y-3 md:space-y-3 max-w-xl text-left">
       <div>
         <label
           className={`text-[10px] font-bold uppercase tracking-wider ${activeTheme.text.muted}`}
@@ -120,13 +115,12 @@ export default function DeckMetaEditor({
           type="text"
           value={editName}
           onChange={(e) => setEditName(e.target.value)}
-          className={`mt-1 ${inputCls} ${inputThemeCls}`}
+          className={`mt-1 ${inputCls} ${inputThemeCls} text-base md:text-xs`}
           placeholder="Deck name…"
           autoFocus
         />
       </div>
 
-      {/* Language Selector / Input */}
       <div>
         <label
           className={`text-[10px] font-bold uppercase tracking-wider ${activeTheme.text.muted}`}
@@ -137,7 +131,7 @@ export default function DeckMetaEditor({
           <select
             value={editLanguage}
             onChange={(e) => setEditLanguage(e.target.value)}
-            className={`mt-1 ${inputCls} ${inputThemeCls} ${activeTheme.background.canvas}`}
+            className={`mt-1 ${inputCls} ${inputThemeCls} ${activeTheme.background.canvas} text-base md:text-xs`}
           >
             <option value="" disabled>
               Select language
@@ -155,7 +149,7 @@ export default function DeckMetaEditor({
               list="language-suggestions"
               value={editLanguage}
               onChange={(e) => setEditLanguage(e.target.value)}
-              className={`mt-1 ${inputCls} ${inputThemeCls}`}
+              className={`mt-1 ${inputCls} ${inputThemeCls} text-base md:text-xs`}
               placeholder="e.g. Japanese, Spanish…"
             />
             <datalist id="language-suggestions">
@@ -167,7 +161,6 @@ export default function DeckMetaEditor({
         )}
       </div>
 
-      {/* Description Input */}
       <div>
         <label
           className={`text-[10px] font-bold uppercase tracking-wider ${activeTheme.text.muted}`}
@@ -178,12 +171,11 @@ export default function DeckMetaEditor({
           value={editDescription}
           onChange={(e) => setEditDescription(e.target.value)}
           rows={2}
-          className={`mt-1 ${inputCls} ${inputThemeCls} resize-none`}
+          className={`mt-1 ${inputCls} ${inputThemeCls} resize-none text-base md:text-xs`}
           placeholder="Brief description…"
         />
       </div>
 
-      {/* Tags Input */}
       <div>
         <label
           className={`text-[10px] font-bold uppercase tracking-wider ${activeTheme.text.muted}`}
@@ -191,7 +183,7 @@ export default function DeckMetaEditor({
           Tags (Press Enter)
         </label>
         <div
-          className={`mt-1 flex flex-wrap gap-1.5 p-2 rounded-xl border min-h-[40px] ${activeTheme.background.canvas} ${activeTheme.border.secondary}`}
+          className={`mt-1 flex flex-wrap gap-1.5 p-2 rounded-xl border min-h-[44px] md:min-h-[40px] ${activeTheme.background.canvas} ${activeTheme.border.secondary}`}
         >
           {editTags.map((tag) => (
             <span
@@ -217,20 +209,19 @@ export default function DeckMetaEditor({
             onChange={(e) => setTagInput(e.target.value)}
             onKeyDown={handleAddTag}
             placeholder={editTags.length === 0 ? "Add tags…" : ""}
-            className="flex-1 bg-transparent text-xs px-1 min-w-[60px] focus:outline-none"
+            className="flex-1 bg-transparent text-sm md:text-xs px-1 min-w-[60px] focus:outline-none"
           />
         </div>
       </div>
 
       {saveError && <p className="text-xs text-red-400">{saveError}</p>}
 
-      {/* Action Buttons */}
       <div className="flex items-center gap-2 pt-1">
         <button
           type="button"
           onClick={onCancel}
           disabled={isSaving}
-          className={`px-3 py-1.5 text-xs font-semibold rounded-xl border transition-colors ${activeTheme.border.secondary} ${activeTheme.text.secondary} disabled:opacity-50`}
+          className={`flex-1 md:flex-none px-3 py-2.5 md:py-1.5 text-sm md:text-xs font-semibold rounded-xl border transition-colors ${activeTheme.border.secondary} ${activeTheme.text.secondary} disabled:opacity-50`}
         >
           Cancel
         </button>
@@ -238,7 +229,7 @@ export default function DeckMetaEditor({
           type="button"
           onClick={handleSave}
           disabled={isSaving || !editName.trim()}
-          className={`px-3 py-1.5 text-xs font-semibold text-white rounded-xl transition-all disabled:opacity-50 bg-gradient-to-r ${activeTheme.gradients.from} ${activeTheme.gradients.to}`}
+          className={`flex-1 md:flex-none px-3 py-2.5 md:py-1.5 text-sm md:text-xs font-semibold text-white rounded-xl transition-all disabled:opacity-50 bg-gradient-to-r ${activeTheme.gradients.from} ${activeTheme.gradients.to}`}
         >
           {isSaving ? "Saving…" : "Save"}
         </button>

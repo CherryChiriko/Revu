@@ -1,3 +1,4 @@
+// src/components/DeckDetails/views/DeckDetails.jsx
 import React, { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -28,8 +29,6 @@ export default function DeckDetails({ activeTheme }) {
   const state = useDeckDetails(deckId);
   const studyMode = state.deck.study_mode || "A";
 
-  // ── Spotlight tour references ─────────────────────────────────────────────
-
   const filterRef = useRef(null);
   const helpRef = useRef(null);
   const addRef = useRef(null);
@@ -45,28 +44,21 @@ export default function DeckDetails({ activeTheme }) {
 
   useEffect(() => {
     if (!profile) return;
-
-    // 1. Guard: Ensure they've finalized the introductory global tutorial first
     const hasFinishedGeneralTour =
       profile.completed_tutorials?.general === true;
-
-    // 2. Evaluate if they have viewed this dashboard layout context yet
     const hasSeenDashboardTour = profile.completed_tutorials?.details === true;
 
     if (hasFinishedGeneralTour && !hasSeenDashboardTour) {
-      // Small architectural delay ensuring DOM ref spacing layouts settle cleanly
       const timer = setTimeout(() => setShowSpotlight(true), 800);
       return () => clearTimeout(timer);
     }
   }, [profile]);
 
-  // 🌟 Handles tour dismissal updates dynamically through Redux
   const closeSpotlight = () => {
     setShowSpotlight(false);
     dispatch(completeTutorial("details"));
   };
 
-  // 🌟 Allows user to explicitly manual replay the workflow when pressing help icon
   const handleManualReplayTour = () => {
     setShowSpotlight(true);
   };
@@ -77,14 +69,14 @@ export default function DeckDetails({ activeTheme }) {
     <div
       className={`min-h-dvh ${activeTheme.background.app} ${activeTheme.text.primary} w-full`}
     >
-      <div className="relative max-w-5xl mx-auto px-4 py-6 space-y-4">
+      <div className="relative max-w-5xl mx-auto px-3 md:px-4 py-4 md:py-6 space-y-3 md:space-y-4">
         {/* Back */}
         <button
           onClick={() => navigate(-1)}
-          className={`inline-flex items-center gap-2 text-sm font-semibold px-3 py-1.5 rounded-xl border transition-colors ${activeTheme.border.secondary} ${activeTheme.text.secondary} hover:${activeTheme.background.canvas}`}
+          className={`inline-flex items-center gap-2 text-xs md:text-sm font-semibold px-3 py-1.5 rounded-xl border transition-colors ${activeTheme.border.secondary} ${activeTheme.text.secondary} hover:${activeTheme.background.canvas}`}
         >
           <FontAwesomeIcon icon={faArrowLeft} className="text-xs" />
-          Back
+          <span className="hidden md:inline">Back</span>
         </button>
 
         {/* Hero */}
@@ -95,9 +87,8 @@ export default function DeckDetails({ activeTheme }) {
           onDeckDeleted={() => navigate(-1)}
         />
 
-        <div className="flex flex-row justify-between">
-          <div ref={filterRef}>
-            {/* Stats + filter pills */}
+        <div className="flex flex-row justify-between items-start gap-2">
+          <div ref={filterRef} className="flex-1 min-w-0">
             <DeckStatsSection
               statusCounts={state.statusCounts}
               totalCardCount={state.totalCardCount}
@@ -107,18 +98,18 @@ export default function DeckDetails({ activeTheme }) {
             />
           </div>
 
-          {/* Help / tutorial */}
+          {/* Help */}
           <button
             type="button"
-            onClick={handleManualReplayTour} // 🌟 Connected to our review callback logic
+            onClick={handleManualReplayTour}
             title="Show me around"
             aria-label="Show me around"
-            className={`flex items-center justify-center w-9 h-9 rounded-full shrink-0 transition-colors ${activeTheme.background.app} ${activeTheme.text.secondary}`}
+            className={`flex items-center justify-center w-8 h-8 md:w-9 md:h-9 rounded-full shrink-0 transition-colors ${activeTheme.background.app} ${activeTheme.text.secondary}`}
           >
             <FontAwesomeIcon
               icon={faCircleQuestion}
               ref={helpRef}
-              className="w-4 h-4"
+              className="w-3.5 h-3.5 md:w-4 md:h-4"
             />
           </button>
         </div>
@@ -138,7 +129,6 @@ export default function DeckDetails({ activeTheme }) {
         />
       </div>
 
-      {/* Card detail drawer */}
       {selectedCard && (
         <CardDetails
           card={selectedCard}
@@ -152,7 +142,6 @@ export default function DeckDetails({ activeTheme }) {
         />
       )}
 
-      {/* Add card modal */}
       <AddCardMenu
         isOpen={isAddingCard}
         onClose={() => setIsAddingCard(false)}

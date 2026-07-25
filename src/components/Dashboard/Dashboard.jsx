@@ -38,6 +38,19 @@ const Dashboard = () => {
   const profile = useSelector(selectUserProfile);
   const toast = useRef(null);
 
+  // Dynamic window resize listener to keep isMobile accurately updated
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== "undefined" && window.innerWidth < 768,
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const decks = useSelector(selectDecks);
   const [deckPage, setDeckPage] = useState(1);
   const decksPerPage = 4;
@@ -104,7 +117,7 @@ const Dashboard = () => {
       className={`min-h-screen ${activeTheme.background.app} ${activeTheme.text.primary} w-full px-4 md:px-8 py-6 md:py-8`}
     >
       <div className="max-w-screen-xl mx-auto space-y-5 md:space-y-6">
-        {/* Header: logo shrinks on mobile, XPBar stacks below */}
+        {/* Header */}
         <Header
           title=""
           activeTheme={activeTheme}
@@ -179,7 +192,11 @@ const Dashboard = () => {
         </div>
 
         {/* Main content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+        <div
+          className={`mt-5 grid grid-cols-1 lg:grid-cols-3 gap-6 ${
+            decks.length > 2 ? "items-center" : ""
+          }`}
+        >
           {/* Decks */}
           <div
             ref={continueLearningRef}
@@ -265,12 +282,12 @@ const Dashboard = () => {
             )}
           </div>
 
-          {/* Heatmap */}
+          {/* Heatmap Card Wrapper */}
           <div
             ref={heatmapRef}
-            className={`${activeTheme.background.secondary} p-4 md:p-6 rounded-xl md:rounded-2xl shadow-lg flex flex-col space-y-4 md:space-y-6`}
+            className={`${activeTheme.background.secondary} p-4 md:p-5 rounded-xl md:rounded-2xl shadow-lg flex flex-col justify-between`}
           >
-            <Heatmap activeTheme={activeTheme} />
+            <Heatmap activeTheme={activeTheme} isMobile={isMobile} />
           </div>
         </div>
       </div>

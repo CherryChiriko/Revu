@@ -1,3 +1,4 @@
+// src/components/Auth/views/ResetPasswordPage.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useResetPassword } from "../hooks/useResetPassword";
@@ -21,18 +22,17 @@ export default function ResetPasswordPage({ activeTheme }) {
 
   return (
     <div
-      className={`h-screen flex items-center justify-center p-4 ${activeTheme.background.app}`}
+      className={`min-h-[100dvh] flex items-center justify-center p-4 ${activeTheme.background.app}`}
     >
       <div
-        className={`w-full max-w-md p-6 rounded-2xl shadow-lg border ${activeTheme.background.secondary} ${activeTheme.border.card}`}
+        className={`w-full max-w-md p-4 md:p-6 rounded-xl md:rounded-2xl shadow-lg border ${activeTheme.background.secondary} ${activeTheme.border.card}`}
       >
         <h1
-          className={`text-2xl font-bold mb-6 text-center ${activeTheme.text.primary}`}
+          className={`text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center ${activeTheme.text.primary}`}
         >
           Reset Password
         </h1>
 
-        {/* ── Status View: Checking Session ── */}
         {checking && (
           <p
             className={`text-center text-sm ${activeTheme.text.secondary} animate-pulse`}
@@ -41,11 +41,10 @@ export default function ResetPasswordPage({ activeTheme }) {
           </p>
         )}
 
-        {/* ── Status View: Link Expired or Invalid ── */}
         {!checking && !ready && (
           <div className="text-center space-y-4">
             <p className="text-red-400 text-sm font-medium">
-              Invalid or expired reset link. Please request a new one.
+              Invalid or expired reset link.
             </p>
             <a
               href="/"
@@ -56,20 +55,18 @@ export default function ResetPasswordPage({ activeTheme }) {
           </div>
         )}
 
-        {/* ── Status View: Password Form ── */}
         {ready && !completed && (
-          <form onSubmit={handleReset} className="space-y-5">
-            {/* 🌟 Wrap the inputs in a contrasting frame block to give them depth */}
-            <div className={`p-2`}>
-              <div className="mb-4">
+          <form onSubmit={handleReset} className="space-y-4 md:space-y-5">
+            <div className="space-y-4">
+              <div>
                 <label
-                  className={`${activeTheme.text.secondary} block mb-2 text-xs font-bold uppercase tracking-wider`}
+                  className={`${activeTheme.text.secondary} block mb-1.5 text-xs font-bold uppercase tracking-wider`}
                 >
                   New password
                 </label>
                 <input
                   type="password"
-                  className={inputCls(activeTheme)}
+                  className={`${inputCls(activeTheme)} text-base md:text-sm`}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="At least 6 characters"
@@ -80,13 +77,13 @@ export default function ResetPasswordPage({ activeTheme }) {
 
               <div>
                 <label
-                  className={`${activeTheme.text.secondary} block mb-2 text-xs font-bold uppercase tracking-wider`}
+                  className={`${activeTheme.text.secondary} block mb-1.5 text-xs font-bold uppercase tracking-wider`}
                 >
                   Confirm new password
                 </label>
                 <input
                   type="password"
-                  className={inputCls(activeTheme)}
+                  className={`${inputCls(activeTheme)} text-base md:text-sm`}
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
                   placeholder="Repeat password"
@@ -100,29 +97,25 @@ export default function ResetPasswordPage({ activeTheme }) {
               <p className="text-red-400 text-xs font-medium px-1">{error}</p>
             )}
 
-            {/* Adjust button sizing to balance the larger input layouts */}
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-2.5 rounded-xl font-bold text-sm shadow transition-all active:scale-[0.99] ${activeTheme.button.accent2} disabled:opacity-50`}
+              className={`w-full py-3 md:py-2.5 rounded-xl font-bold text-sm shadow transition-all active:scale-[0.98] ${activeTheme.button.accent2} disabled:opacity-50`}
             >
               {loading ? "Updating…" : "Set new password"}
             </button>
           </form>
         )}
 
-        {/* ── Status View: Form Submission Success ── */}
         {completed && (
           <div className="text-center space-y-4">
             <p className="text-emerald-400 text-sm font-semibold">
-              ✓ Password updated successfully.
+              Password updated successfully.
             </p>
             <button
               type="button"
               onClick={() => navigate("/")}
-              className={`px-3 py-2 rounded-lg text-sm font-semibold whitespace-nowrap ${
-                activeTheme.button.accent2
-              } disabled:opacity-50`}
+              className={`px-4 py-2.5 rounded-lg text-sm font-semibold ${activeTheme.button.accent2}`}
             >
               Continue
             </button>

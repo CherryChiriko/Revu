@@ -1,3 +1,4 @@
+// src/components/DeckDetails/views/CardDetails.jsx
 import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -18,10 +19,8 @@ import ConfirmationDialog from "../../General/ui/ConfirmationDialog";
 export default function CardDetails(props) {
   const { studyMode, activeTheme, onClose, userId } = props;
 
-  // Track the card state locally inside the modal so modifications reflect instantly
   const [currentCard, setCurrentCard] = useState(props.card);
 
-  // Keep local state in sync if the parent passes down a new card prop
   useEffect(() => {
     setCurrentCard(props.card);
   }, [props.card]);
@@ -52,8 +51,6 @@ export default function CardDetails(props) {
       if (updatedCard) {
         setCurrentCard(updatedCard);
       }
-
-      // Bubble changes back up to the parent pagination structures safely
       if (props.handleCardUpdate) props.handleCardUpdate(updatedCard);
       if (props.onUpdate) props.onUpdate(updatedCard);
     },
@@ -71,7 +68,7 @@ export default function CardDetails(props) {
       activeTheme={activeTheme}
       maxWidth="max-w-md"
     >
-      <div className="relative space-y-6">
+      <div className="relative space-y-5 md:space-y-6">
         {isEditing ? (
           <CardEdit
             editFront={editFront}
@@ -88,8 +85,8 @@ export default function CardDetails(props) {
           <>
             <CardInfo card={currentCard} isC={isC} activeTheme={activeTheme} />
 
-            {/* ── Edit + Suspend row ── */}
-            <div className="flex gap-2">
+            {/* Edit + Suspend — stack on mobile */}
+            <div className="flex flex-col md:flex-row gap-2">
               <button
                 type="button"
                 onClick={startEditing}
@@ -121,20 +118,18 @@ export default function CardDetails(props) {
               </button>
             </div>
 
-            {/* ── Danger Zone ── */}
+            {/* Danger Zone */}
             <div className="pt-4 border-t">
               <p
-                className={`text-xs uppercase text-pretty ${activeTheme.text.danger}`}
+                className={`text-[10px] md:text-xs uppercase tracking-wider mb-3 ${activeTheme.text.danger}`}
               >
                 Danger Zone
               </p>
-              <div
-                className={`flex justify-center gap-3 text-xs ${activeTheme.text.danger}`}
-              >
+              <div className="flex flex-col md:flex-row justify-center gap-2 md:gap-3 text-xs">
                 <button
                   type="button"
                   onClick={() => setConfirmTarget("reset")}
-                  className={`py-2 px-3 rounded-xl ${activeTheme.button.danger} font-bold flex items-center justify-center gap-1.5`}
+                  className={`py-2.5 px-3 rounded-xl ${activeTheme.button.danger} font-bold flex items-center justify-center gap-1.5`}
                 >
                   <FontAwesomeIcon
                     icon={faArrowRotateLeft}
@@ -145,7 +140,7 @@ export default function CardDetails(props) {
                 <button
                   type="button"
                   onClick={() => setConfirmTarget("delete")}
-                  className={`py-2 px-3 rounded-xl ${activeTheme.button.danger} font-bold flex items-center justify-center gap-1.5`}
+                  className={`py-2.5 px-3 rounded-xl ${activeTheme.button.danger} font-bold flex items-center justify-center gap-1.5`}
                 >
                   <FontAwesomeIcon icon={faTrashCan} />
                   Delete Card
@@ -155,7 +150,7 @@ export default function CardDetails(props) {
           </>
         )}
 
-        {/* ── Action tray ── */}
+        {/* Action tray */}
         <div className="pt-2 space-y-2">
           {(toggleError || saveError) && (
             <p className={`text-xs ${activeTheme.text.danger} text-center`}>
@@ -167,7 +162,7 @@ export default function CardDetails(props) {
               type="button"
               onClick={handleSave}
               disabled={isSaving}
-              className={`w-full py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all bg-gradient-to-r ${activeTheme.gradients.from} ${activeTheme.gradients.to} text-white`}
+              className={`w-full py-3 md:py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all bg-gradient-to-r ${activeTheme.gradients.from} ${activeTheme.gradients.to} text-white active:scale-[0.98]`}
             >
               <FontAwesomeIcon icon={faCheck} />
               {isSaving ? "Saving Changes…" : "Save Changes"}
@@ -175,7 +170,7 @@ export default function CardDetails(props) {
           )}
         </div>
 
-        {/* ── Confirmation overlay ── */}
+        {/* Confirmation overlay */}
         {confirmTarget && (
           <ConfirmationDialog
             activeTheme={activeTheme}

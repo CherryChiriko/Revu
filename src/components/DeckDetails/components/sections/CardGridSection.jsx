@@ -1,3 +1,4 @@
+// src/components/DeckDetails/components/sections/CardGridSection.jsx
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
@@ -17,7 +18,6 @@ export default function CardGridSection({
   activeTheme,
   refs,
 }) {
-  // Empty deck: show only the add tile with a hint
   if (totalCount === 0 && !isLoading) {
     return (
       <div className="space-y-3">
@@ -34,9 +34,8 @@ export default function CardGridSection({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 md:space-y-4">
       {isLoading && cards.length === 0 ? (
-        // Initial load: show skeletons (add tile not shown during first load)
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
           {Array.from({ length: 10 }).map((_, i) => (
             <EmptyTile key={i} activeTheme={activeTheme} />
@@ -44,26 +43,24 @@ export default function CardGridSection({
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-          {/* Add tile always first */}
           <div ref={refs?.addRef} className="flex flex-col w-full h-full">
             <AddCardTile onClick={onAddCard} activeTheme={activeTheme} />
           </div>
 
           {cards.length === 0 ? (
-            // Filter active but no matches
             <p
-              className={`col-span-full text-sm ${activeTheme.text.muted} py-8 text-center`}
+              className={`col-span-full text-xs md:text-sm ${activeTheme.text.muted} py-6 md:py-8 text-center`}
             >
-              No matching cards found or loaded yet.
+              No matching cards found.
             </p>
           ) : (
             cards.map((card, index) => (
               <div
                 ref={index === 0 ? refs?.cardRef : null}
+                key={card.card_id}
                 className="flex flex-col w-full h-full"
               >
                 <CardTile
-                  key={card.card_id}
                   card={card}
                   onClick={onCardClick}
                   activeTheme={activeTheme}
@@ -72,7 +69,6 @@ export default function CardGridSection({
             ))
           )}
 
-          {/* Trailing skeletons while loading more pages */}
           {isLoading &&
             Array.from({ length: 5 }).map((_, i) => (
               <EmptyTile key={`skel-${i}`} activeTheme={activeTheme} />
@@ -82,12 +78,14 @@ export default function CardGridSection({
 
       {hasMore && !isLoading && (
         <div className="flex flex-col items-center gap-1 pt-2">
-          <p className={`text-xs tabular-nums ${activeTheme.text.muted}`}>
+          <p
+            className={`text-[11px] md:text-xs tabular-nums ${activeTheme.text.muted}`}
+          >
             Showing {loadedCount} of {totalCount} cards
           </p>
           <button
             onClick={onLoadMore}
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border transition-colors ${activeTheme.border.secondary} ${activeTheme.text.secondary} ${activeTheme.background.secondary} hover:${activeTheme.background.canvas}`}
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs md:text-sm font-semibold border transition-colors ${activeTheme.border.secondary} ${activeTheme.text.secondary} ${activeTheme.background.secondary} hover:${activeTheme.background.canvas}`}
           >
             <FontAwesomeIcon icon={faChevronDown} className="text-xs" />
             Load more
