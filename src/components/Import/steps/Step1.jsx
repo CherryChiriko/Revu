@@ -28,7 +28,6 @@ const Step1 = ({ activeTheme, logic, onNext }) => {
       case 1:
         return (
           <div className="grid grid-cols-3 gap-3">
-            {/* Column 1: Front Card + Label */}
             <div className="flex flex-col items-center gap-2">
               <div
                 className={`w-full rounded-lg p-3 border flex items-center justify-center ${activeTheme.border.default} ${activeTheme.background.accent1}`}
@@ -44,16 +43,13 @@ const Step1 = ({ activeTheme, logic, onNext }) => {
               </span>
             </div>
 
-            {/* Column 2: Arrow */}
             <div className="flex items-start justify-center pt-4">
-              {/* pt-4 aligns the arrow vertically with the text inside the cards */}
               <FontAwesomeIcon
                 icon={faArrowRight}
                 className={`text-sm ${activeTheme.text.muted}`}
               />
             </div>
 
-            {/* Column 3: Back Card + Label */}
             <div className="flex flex-col items-center gap-2">
               <div
                 className={`w-full rounded-lg p-3 border flex items-center justify-center ${activeTheme.border.default} ${activeTheme.background.primary}`}
@@ -86,10 +82,10 @@ const Step1 = ({ activeTheme, logic, onNext }) => {
   };
 
   return (
-    <>
-      <div className="mb-4">
+    <div className="space-y-5 sm:space-y-4">
+      <div className="mb-2">
         <h2
-          className={`text-2xl font-bold flex items-center gap-2 ${activeTheme.text.primary}`}
+          className={`text-xl sm:text-2xl font-bold flex items-center gap-2 ${activeTheme.text.primary}`}
         >
           <FontAwesomeIcon icon={faSquarePlus} className="w-5 h-5" />
           Step 1: Choose your flashcard type
@@ -99,8 +95,7 @@ const Step1 = ({ activeTheme, logic, onNext }) => {
         </p>
       </div>
 
-      {/* Flashcard Type Selection */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         {CARD_TYPES.map((type) => {
           const isSelected = logic.selectedStudyType === type.id;
           return (
@@ -108,7 +103,7 @@ const Step1 = ({ activeTheme, logic, onNext }) => {
               key={type.id}
               type="button"
               onClick={() => logic.setSelectedStudyType(type.id)}
-              className={`text-left flex justify-start flex-col rounded-xl border p-4 transition-all duration-200
+              className={`text-left flex justify-start flex-col rounded-xl border p-4 sm:p-5 transition-all duration-200 min-h-[140px] active:scale-[0.98]
               ${
                 isSelected
                   ? `${activeTheme.border.primary} ring-2 ring-offset-2 ${activeTheme.ring}`
@@ -146,27 +141,23 @@ const Step1 = ({ activeTheme, logic, onNext }) => {
                 {type.description}
               </p>
 
-              {/* Sample Card Preview */}
-              {/* <div className="flex justify-center items-center"> */}
               {sample(type.id)}
-              {/* </div> */}
             </button>
           );
         })}
       </div>
 
-      {/* Footer */}
-      <div className="flex justify-end mt-8">
+      <div className="flex justify-end mt-6 sm:mt-8">
         <button
           onClick={onNext}
           disabled={!logic.selectedStudyType}
-          className={`px-4 py-2 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed`}
+          className={`px-4 py-3.5 sm:py-2 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed min-h-12 sm:min-h-0 text-base sm:text-sm flex items-center justify-center gap-2 active:scale-95 transition-transform`}
         >
           Next: Upload File
-          <FontAwesomeIcon icon={faArrowRight} className="ml-2" />
+          <FontAwesomeIcon icon={faArrowRight} />
         </button>
       </div>
-    </>
+    </div>
   );
 };
 

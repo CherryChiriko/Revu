@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { ModalTemplate } from "../../General/ui/ModalTemplate"; // Import template
+import { ModalTemplate } from "../../General/ui/ModalTemplate";
 import { NewDeck } from "../components/NewDeck";
 import { CopyDeck } from "../components/CopyDeck";
 
@@ -18,7 +18,7 @@ export default function QuickCreateView({ activeTheme, mode, onClose }) {
 
   return (
     <ModalTemplate
-      isOpen={true} // Controlled directly by mount state here
+      isOpen={true}
       onClose={onClose}
       title={isNew ? "New Deck" : "Create from deck"}
       subtitle={

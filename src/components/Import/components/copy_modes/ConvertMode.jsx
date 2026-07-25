@@ -8,35 +8,34 @@ import { C_FIELDS } from "../../hooks/useQuickCreate";
 import { selectCls } from "../../../General/ui/FormStyles";
 
 export function ConvertMode({ logic, activeTheme }) {
-  // Check if they are currently violating the unique constraint to show a helpful validation hint
   const hasConflict = logic.frontField === logic.backField;
 
   return (
-    <div className="flex flex-col gap-1 w-full">
+    <div className="flex flex-col gap-1.5 w-full">
       <p
-        className={`text-xs font-semibold uppercase tracking-wider ${activeTheme.text.muted}`}
+        className={`text-sm sm:text-xs font-semibold uppercase tracking-wider ${activeTheme.text.muted}`}
       >
         Assign fields
       </p>
-      <span className={`text-xs ${activeTheme.text.muted} mb-2`}>
+      <span className={`text-sm sm:text-xs ${activeTheme.text.muted} mb-2`}>
         Choose what should be the front and back of the new cards.
       </span>
 
-      <div className="grid grid-cols-2 gap-3">
-        {/* Front Field Select */}
-        <div className="flex flex-col">
-          <p
-            className={`text-[10px] font-bold uppercase tracking-wider ${activeTheme.text.muted}`}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="flex flex-col gap-1.5">
+          <label
+            htmlFor="convert-front"
+            className={`text-xs sm:text-[10px] font-bold uppercase tracking-wider ${activeTheme.text.muted}`}
           >
             Front
-          </p>
+          </label>
           <div className="relative w-full">
             <select
+              id="convert-front"
               value={logic.frontField}
               onChange={(e) => logic.setFrontField(e.target.value)}
-              className={`${selectCls(activeTheme)} ${hasConflict ? `${activeTheme.ring.error}` : ""}`}
+              className={`${selectCls(activeTheme)} ${hasConflict ? activeTheme.ring.error : ""} text-base`}
             >
-              {/* REMOVED FILTER: All options are always visible */}
               {C_FIELDS.map((f) => (
                 <option key={f.value} value={f.value}>
                   {f.label}
@@ -51,20 +50,20 @@ export function ConvertMode({ logic, activeTheme }) {
           </div>
         </div>
 
-        {/* Back Field Select */}
-        <div className="flex flex-col">
-          <p
-            className={`text-[10px] font-bold uppercase tracking-wider ${activeTheme.text.muted}`}
+        <div className="flex flex-col gap-1.5">
+          <label
+            htmlFor="convert-back"
+            className={`text-xs sm:text-[10px] font-bold uppercase tracking-wider ${activeTheme.text.muted}`}
           >
             Back
-          </p>
+          </label>
           <div className="relative w-full">
             <select
+              id="convert-back"
               value={logic.backField}
               onChange={(e) => logic.setBackField(e.target.value)}
-              className={`${selectCls(activeTheme)} ${hasConflict ? `${activeTheme.ring.error}` : ""}`}
+              className={`${selectCls(activeTheme)} ${hasConflict ? activeTheme.ring.error : ""} text-base`}
             >
-              {/* REMOVED FILTER: All options are always visible */}
               {C_FIELDS.map((f) => (
                 <option key={f.value} value={f.value}>
                   {f.label}
@@ -80,14 +79,13 @@ export function ConvertMode({ logic, activeTheme }) {
         </div>
       </div>
 
-      {/* Optional: Add a subtle text danger so the user knows why the submit button went dead */}
       {hasConflict && (
         <div className={`${activeTheme.text.danger} flex flex-row gap-2 mt-2`}>
           <FontAwesomeIcon
             icon={faTriangleExclamation}
             className="mt-0.5 shrink-0"
           />
-          <span className="text-[11px]  mt-1 font-medium">
+          <span className="text-sm sm:text-[11px] mt-1 font-medium">
             "Front" and "Back" fields must be different.
           </span>
         </div>

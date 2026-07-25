@@ -92,21 +92,24 @@ const ImportView = () => {
       >
         {/* Page header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/5 pb-6">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => {
                 if (logic.currentStep === 0) navigate(-1);
                 else logic.setCurrentStep(logic.currentStep - 1);
               }}
-              className={`p-2 rounded-full hover:${activeTheme.background.canvas} transition-colors ${activeTheme.text.muted}`}
+              className={`shrink-0 p-3 sm:p-2 rounded-full hover:${activeTheme.background.canvas} transition-colors ${activeTheme.text.muted} min-h-12 min-w-12 sm:min-h-0 sm:min-w-0 flex items-center justify-center active:scale-95`}
+              aria-label="Go back"
             >
               <FontAwesomeIcon icon={faArrowLeft} className="text-lg" />
             </button>
-            <div>
-              <h1 className={`text-2xl font-bold ${activeTheme.text.primary}`}>
+            <div className="min-w-0">
+              <h1
+                className={`text-xl sm:text-2xl font-bold ${activeTheme.text.primary} truncate`}
+              >
                 Import Deck
               </h1>
-              <p className={`${activeTheme.text.secondary} text-sm`}>
+              <p className={`${activeTheme.text.secondary} text-sm truncate`}>
                 {logic.importMode === "existing"
                   ? `Adding cards to "${logic.targetDeck?.name ?? "…"}"`
                   : "Import flashcards from CSV/Excel files"}
@@ -117,53 +120,55 @@ const ImportView = () => {
 
         {/* Progress bar */}
         {logic.currentStep > 0 && (
-          <div className="flex items-center justify-center space-x-8 mb-8">
-            {progressSteps.map((step, idx) => (
-              <div key={step} className="flex items-center">
-                {step !== 5 && (
-                  <div
-                    className={`rounded-full w-10 h-10 flex items-center justify-center border-2 transition-all duration-300
+          <div className="flex items-center justify-center mb-6 sm:mb-8 overflow-x-auto pb-2">
+            <div className="flex items-center space-x-3 sm:space-x-8">
+              {progressSteps.map((step, idx) => (
+                <div key={step} className="flex items-center shrink-0">
+                  {step !== 5 && (
+                    <div
+                      className={`rounded-full w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center border-2 transition-all duration-300
                       ${
                         logic.currentStep >= step
                           ? `${activeTheme.button.primary} `
                           : `${activeTheme.button.disabled} ${activeTheme.border.secondary} ${activeTheme.text.secondary}`
                       }`}
-                  >
-                    {logic.currentStep > step ? (
-                      <FontAwesomeIcon
-                        icon={faCheckCircle}
-                        className={`w-5 h-5 ${activeTheme.text.activeButton}`}
-                      />
-                    ) : (
-                      <div
-                        className={`${
-                          logic.currentStep >= step
-                            ? `${activeTheme.text.activeButton} font-semibold`
-                            : `${activeTheme.text.secondary} `
-                        } `}
-                      >
-                        {idx + 1}
-                      </div>
-                    )}
-                  </div>
-                )}
-                {idx < progressSteps.length - 2 && (
-                  <FontAwesomeIcon
-                    icon={faArrowRight}
-                    className={`w-6 h-6 mx-4 transition-colors duration-300 ${
-                      logic.currentStep > step
-                        ? activeTheme.text.primary
-                        : activeTheme.text.muted
-                    }`}
-                  />
-                )}
-              </div>
-            ))}
+                    >
+                      {logic.currentStep > step ? (
+                        <FontAwesomeIcon
+                          icon={faCheckCircle}
+                          className={`w-4 h-4 sm:w-5 sm:h-5 ${activeTheme.text.activeButton}`}
+                        />
+                      ) : (
+                        <div
+                          className={`text-xs sm:text-sm ${
+                            logic.currentStep >= step
+                              ? `${activeTheme.text.activeButton} font-semibold`
+                              : `${activeTheme.text.secondary} `
+                          } `}
+                        >
+                          {idx + 1}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {idx < progressSteps.length - 2 && (
+                    <FontAwesomeIcon
+                      icon={faArrowRight}
+                      className={`w-4 h-4 sm:w-6 sm:h-6 mx-2 sm:mx-4 transition-colors duration-300 ${
+                        logic.currentStep > step
+                          ? activeTheme.text.primary
+                          : activeTheme.text.muted
+                      }`}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
         <div
-          className={`${activeTheme.background.secondary} max-w-4xl mx-auto space-y-8 rounded-lg shadow-xl p-12`}
+          className={`${activeTheme.background.secondary} max-w-4xl mx-auto space-y-6 sm:space-y-8 rounded-lg shadow-xl p-6 sm:p-8 md:p-12`}
         >
           {renderStep()}
         </div>

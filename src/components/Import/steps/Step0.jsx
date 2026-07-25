@@ -28,10 +28,10 @@ const Step0 = ({ activeTheme, logic, onSelectNew, onSelectExisting }) => {
     (logic.importMode === "existing" && !logic.targetDeckId);
 
   return (
-    <>
-      <div className="mb-6">
+    <div className="space-y-5 sm:space-y-4">
+      <div className="mb-2">
         <h2
-          className={`text-2xl font-bold flex items-center gap-2 ${activeTheme.text.primary}`}
+          className={`text-xl sm:text-2xl font-bold flex items-center gap-2 ${activeTheme.text.primary}`}
         >
           <FontAwesomeIcon icon={faLayerGroup} className="w-5 h-5" />
           Import mode
@@ -49,7 +49,7 @@ const Step0 = ({ activeTheme, logic, onSelectNew, onSelectExisting }) => {
               key={mode.id}
               type="button"
               onClick={() => logic.setImportMode(mode.id)}
-              className={`text-left flex flex-col gap-3 rounded-xl border p-5 transition-all duration-200 outline-none
+              className={`text-left flex flex-col gap-3 rounded-xl border p-5 transition-all duration-200 outline-none min-h-[120px] active:scale-[0.98]
                 ${
                   isSelected
                     ? `${activeTheme.border.primary} ring-2 ring-offset-2 ${activeTheme.ring}`
@@ -57,7 +57,7 @@ const Step0 = ({ activeTheme, logic, onSelectNew, onSelectExisting }) => {
                 }`}
             >
               <div
-                className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors
+                className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors shrink-0
                 ${
                   isSelected
                     ? `${activeTheme.background.accent1} ${activeTheme.text.activeButton}`
@@ -66,7 +66,7 @@ const Step0 = ({ activeTheme, logic, onSelectNew, onSelectExisting }) => {
               >
                 <FontAwesomeIcon icon={mode.icon} className="w-4 h-4" />
               </div>
-              <div>
+              <div className="min-w-0">
                 <p className={`font-semibold ${activeTheme.text.primary}`}>
                   {mode.title}
                 </p>
@@ -82,6 +82,7 @@ const Step0 = ({ activeTheme, logic, onSelectNew, onSelectExisting }) => {
       {logic.importMode === "existing" && (
         <div className="mt-6 space-y-2">
           <label
+            htmlFor="target-deck"
             className={`block text-sm font-semibold ${activeTheme.text.primary}`}
           >
             Target deck <span className={activeTheme.text.danger}>*</span>
@@ -92,10 +93,10 @@ const Step0 = ({ activeTheme, logic, onSelectNew, onSelectExisting }) => {
               className={`absolute left-3 top-1/2 -translate-y-1/2 text-xs pointer-events-none ${activeTheme.text.muted}`}
             />
             <select
+              id="target-deck"
               value={logic.targetDeckId}
               onChange={(e) => logic.setTargetDeckId(e.target.value)}
-              className={`w-full rounded-xl py-2.5 px-3.5 pl-8 text-sm border outline-none
-    focus:ring-2 appearance-none transition-all
+              className={`w-full rounded-xl py-3 sm:py-2.5 px-3.5 pl-8 text-base border outline-none appearance-none transition-all
     ${activeTheme.background.canvas} ${activeTheme.text.primary}
     ${activeTheme.border.secondary} ${activeTheme.ring}`}
             >
@@ -123,7 +124,7 @@ const Step0 = ({ activeTheme, logic, onSelectNew, onSelectExisting }) => {
         </div>
       )}
 
-      <div className="flex justify-end mt-8">
+      <div className="flex justify-end mt-6 sm:mt-8">
         <button
           onClick={() => {
             if (logic.importMode === "new") onSelectNew();
@@ -131,13 +132,13 @@ const Step0 = ({ activeTheme, logic, onSelectNew, onSelectExisting }) => {
               onSelectExisting();
           }}
           disabled={isNextDisabled}
-          className={`px-4 py-2 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed`}
+          className={`px-4 py-3.5 sm:py-2 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed min-h-12 sm:min-h-0 text-base sm:text-sm flex items-center justify-center gap-2 active:scale-95 transition-transform`}
         >
           Next: Upload File
-          <FontAwesomeIcon icon={faArrowRight} className="ml-2" />
+          <FontAwesomeIcon icon={faArrowRight} />
         </button>
       </div>
-    </>
+    </div>
   );
 };
 

@@ -2,19 +2,18 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 
-/**
- * A → C conversion panel. No field picker needed
- * Front is always used as the character, back becomes the meaning. Pinyin is auto-generated.
- * Cards whose front isn't a valid CJK character are skipped and a warning is shown.
- */
 export function ConvertModeToC({ activeTheme }) {
   return (
-    <div className={`flex items-start gap-2.5 text-xs px-3 py-2.5`}>
+    <div
+      className={`flex items-start gap-2.5 text-sm sm:text-xs px-3 py-3 sm:py-2.5`}
+    >
       <FontAwesomeIcon
         icon={faTriangleExclamation}
         className={`mt-0.5 shrink-0 ${activeTheme.text.muted}`}
       />
-      <div className={`${activeTheme.text.muted} text-pretty flex flex-col`}>
+      <div
+        className={`${activeTheme.text.muted} text-pretty flex flex-col gap-1`}
+      >
         <p>
           The{" "}
           <span className={`font-semibold ${activeTheme.text.primary}`}>
@@ -26,11 +25,10 @@ export function ConvertModeToC({ activeTheme }) {
           </span>{" "}
           will become the meaning.
         </p>
-        <span>Pinyin will be generated automatically.</span>
-        <span>
-          Cards whose front doesn't contain a valid CJK character will be
-          skipped.
-        </span>
+        <p>Pinyin will be generated automatically.</p>
+        <p>
+          Cards whose front doesn't contain a valid character will be skipped.
+        </p>
       </div>
     </div>
   );
