@@ -1,0 +1,19 @@
+To generate an APK:
+npm run build
+npx cap sync android
+cd android
+.\gradlew.bat assembleDebug
+cd ..
+
+
+How to install it on your phone
+
+    Transfer the app-debug.apk file to your phone (via USB, Google Drive, WhatsApp, or email).
+
+    Tap the file on your phone to open it.
+
+    If prompted, toggle on "Allow installation from unknown sources" in your phone settings.
+
+    Tap Install, and Revu will show up on your app drawer like any standard app from the Google Play Store!
+
+    Note: Debug APKs are meant for personal testing. When you're ready to publish to the Google Play Store later, you'll generate a signed release file (.aab / Signed APK) instead, which requires a developer keystore.

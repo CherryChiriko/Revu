@@ -129,7 +129,7 @@ export const Heatmap = ({ activeTheme, isMobile }) => {
   return (
     <div
       className={`flex flex-col justify-between h-full w-full ${
-        isMobile ? "space-y-3" : "space-y-5"
+        isMobile ? "space-y-3" : "space-y-4"
       }`}
     >
       {/* Header */}
@@ -228,7 +228,7 @@ export const Heatmap = ({ activeTheme, isMobile }) => {
       <Link
         to="/activity"
         className={`inline-flex items-center justify-center w-full rounded-lg font-semibold no-underline ${
-          isMobile ? "text-xs py-1.5" : "text-sm py-2"
+          isMobile ? "text-xs py-1.5" : "text-sm py-2 "
         } ${activeTheme.button.secondary} ${activeTheme.text.secondary}`}
       >
         View activity

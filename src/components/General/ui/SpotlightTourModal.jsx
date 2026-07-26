@@ -6,25 +6,25 @@ import {
   faCheck,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
+import { App as CapacitorApp } from "@capacitor/app"; // 👈 Added import
+import { Capacitor } from "@capacitor/core"; // 👈 Added import
 
 const PAD = 10;
 const POPOVER_WIDTH = 340;
 const GAP = 16;
-const ESTIMATED_POPOVER_HEIGHT = 200; // Defensive threshold layout calculation value
+const ESTIMATED_POPOVER_HEIGHT = 200;
 
 export default function SpotlightTourModal({ activeTheme, steps, refs, tour }) {
   const { step, isLastStep, handleNext, handleBack, handleFinish } = tour;
   const [rect, setRect] = useState(null);
   const current = steps[step];
 
-  // Measures the size and positioning coords of the targeted live element
   const updateRect = useCallback(() => {
     if (!refs) return;
     const el = refs[current?.target]?.current;
     if (el) setRect(el.getBoundingClientRect());
   }, [current, refs]);
 
-  // Smooth scrolls targeted interface element directly into view frames
   useEffect(() => {
     if (!refs) return;
     const el = refs[current?.target]?.current;
@@ -34,7 +34,6 @@ export default function SpotlightTourModal({ activeTheme, steps, refs, tour }) {
     return () => clearTimeout(timeoutId);
   }, [step, updateRect, refs]);
 
-  // Handle dimensional screen adjustments seamlessly
   useEffect(() => {
     window.addEventListener("resize", updateRect);
     window.addEventListener("scroll", updateRect, true);
@@ -44,20 +43,29 @@ export default function SpotlightTourModal({ activeTheme, steps, refs, tour }) {
     };
   }, [updateRect]);
 
+  // Handle mobile hardware back button
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+
+    const listener = CapacitorApp.addListener("backButton", () => {
+      handleFinish(); // 👈 Closes/dismisses the tour on phone back tap
+    });
+
+    return () => {
+      listener.then((handler) => handler.remove());
+    };
+  }, [handleFinish]);
+
   if (!rect) return null;
 
-  // Viewport structural grid definitions
   const viewportH = window.innerHeight;
   const viewportW = window.innerWidth;
 
-  // Calculate open real estate in all 4 directions relative to the padded target area
   const spaceBelow = viewportH - (rect.bottom + PAD);
   const spaceAbove = rect.top - PAD;
   const spaceRight = viewportW - (rect.right + PAD);
   const spaceLeft = rect.left - PAD;
 
-  // Priority Ranking Engine: Default to "Below" if it fits comfortably.
-  // Otherwise, calculate the absolute largest available clearing vector block.
   let placement = "bottom";
 
   if (spaceBelow < ESTIMATED_POPOVER_HEIGHT + GAP) {
@@ -67,30 +75,25 @@ export default function SpotlightTourModal({ activeTheme, steps, refs, tour }) {
       { side: "right", val: spaceRight },
       { side: "left", val: spaceLeft },
     ];
-    // Sort directions to locate the absolute largest open pocket
     spaces.sort((a, b) => b.val - a.val);
     placement = spaces[0].side;
   }
 
-  // Calculate absolute coordinates based on the designated space sector winner
   let popoverTop = 0;
   let popoverLeft = 0;
 
   switch (placement) {
     case "top":
       popoverTop = rect.top - PAD - ESTIMATED_POPOVER_HEIGHT - GAP;
-      // Center horizontally relative to the target item anchor point
       popoverLeft = rect.left + rect.width / 2 - POPOVER_WIDTH / 2;
       break;
 
     case "right":
-      // Center vertically relative to target center axis
       popoverTop = rect.top + rect.height / 2 - ESTIMATED_POPOVER_HEIGHT / 2;
       popoverLeft = rect.right + PAD + GAP;
       break;
 
     case "left":
-      // Center vertically relative to target center axis
       popoverTop = rect.top + rect.height / 2 - ESTIMATED_POPOVER_HEIGHT / 2;
       popoverLeft = rect.left - PAD - POPOVER_WIDTH - GAP;
       break;
@@ -98,12 +101,10 @@ export default function SpotlightTourModal({ activeTheme, steps, refs, tour }) {
     case "bottom":
     default:
       popoverTop = rect.bottom + PAD + GAP;
-      // Center horizontally relative to the target item anchor point
       popoverLeft = rect.left + rect.width / 2 - POPOVER_WIDTH / 2;
       break;
   }
 
-  // Safety Boundary Guardrails: Protect component layout from bleeding offscreen edges
   popoverTop = Math.max(
     GAP,
     Math.min(popoverTop, viewportH - ESTIMATED_POPOVER_HEIGHT - GAP),
@@ -112,9 +113,9 @@ export default function SpotlightTourModal({ activeTheme, steps, refs, tour }) {
     GAP,
     Math.min(popoverLeft, viewportW - POPOVER_WIDTH - GAP),
   );
+
   return (
     <div className="fixed inset-0 z-[60]" role="dialog" aria-modal="true">
-      {/* Dark overlay with a spotlight cutout around the target */}
       <div
         className="fixed pointer-events-none transition-all duration-300 ease-out"
         style={{
@@ -127,7 +128,6 @@ export default function SpotlightTourModal({ activeTheme, steps, refs, tour }) {
         }}
       />
 
-      {/* Accent ring around the highlighted element */}
       <div
         className={`fixed pointer-events-none transition-all duration-300 ease-out rounded-2xl ring-4 ${activeTheme.ring?.focus || "ring-indigo-500"}`}
         style={{
@@ -138,10 +138,8 @@ export default function SpotlightTourModal({ activeTheme, steps, refs, tour }) {
         }}
       />
 
-      {/* Click-blocker backdrop layout element */}
       <div className="fixed inset-0" onClick={handleFinish} />
 
-      {/* Popover Dialogue Card */}
       <div
         className={`fixed rounded-2xl shadow-xl overflow-hidden border flex flex-col
           ${activeTheme.background.secondary} ${activeTheme.border.secondary} relative z-10 transition-all duration-300 ease-out`}
@@ -149,11 +147,10 @@ export default function SpotlightTourModal({ activeTheme, steps, refs, tour }) {
           top: popoverTop,
           left: popoverLeft,
           width: POPOVER_WIDTH,
-          maxHeight: `${Math.min(400, viewportH - GAP * 2)}px`, // Safeguard viewport caps dynamically
+          maxHeight: `${Math.min(400, viewportH - GAP * 2)}px`,
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header Structure matching Modal template styling */}
         <div
           className={`flex items-start justify-between px-4 pt-3 pb-2 border-b ${activeTheme.border.muted}`}
         >
@@ -181,7 +178,6 @@ export default function SpotlightTourModal({ activeTheme, steps, refs, tour }) {
           </button>
         </div>
 
-        {/* Dynamic Scrollable Content Body Area */}
         <div className="px-4 pt-4 pb-2 overflow-y-auto custom-scrollbar flex-1 text-left">
           <p
             className={`text-xs leading-relaxed whitespace-pre-line ${activeTheme.text.secondary}`}
@@ -190,7 +186,6 @@ export default function SpotlightTourModal({ activeTheme, steps, refs, tour }) {
           </p>
         </div>
 
-        {/* Action Controls Footer Drawer */}
         <div
           className={`flex items-center justify-between px-4 py-2 border-t bg-black/5 dark:bg-white/5 ${activeTheme.border.muted}`}
         >
@@ -208,7 +203,6 @@ export default function SpotlightTourModal({ activeTheme, steps, refs, tour }) {
             <FontAwesomeIcon icon={faArrowLeft} className="w-3.5 h-3.5" />
           </button>
 
-          {/* Dots Indicator Tracking Area */}
           <div className="flex gap-1.5">
             {steps.map((_, i) => (
               <div

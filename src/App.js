@@ -47,6 +47,8 @@ import LoadingSpinner from "./components/General/ui/LoadingSpinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
+import { useBackButton } from "./hooks/useBackButton";
+
 // ─── Stable route tree ────────────────────────────────────────────────────────
 const AppRoutes = ({
   profile,
@@ -96,6 +98,8 @@ function App() {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  useBackButton();
 
   const activeTheme = useSelector(selectActiveTheme);
   const profile = useSelector(selectUserProfile);

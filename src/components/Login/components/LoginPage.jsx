@@ -149,21 +149,20 @@ const LoginPage = ({ activeTheme }) => {
             </p>
           )}
 
-          <button
-            type="submit"
-            disabled={authLoading}
-            className={`w-full py-3 md:py-2.5 rounded-xl font-bold text-sm shadow transition-all active:scale-[0.98] disabled:opacity-50 ${activeTheme.button.accent2}`}
-          >
-            {authLoading ? (
-              <LoadingSpinner fullScreen />
-            ) : isResetting ? (
-              "Send Reset Email"
-            ) : isSigningUp ? (
-              "Sign Up"
-            ) : (
-              "Login"
-            )}
-          </button>
+          {!authLoading ? (
+            <LoadingSpinner fullScreen label="" />
+          ) : (
+            <button
+              type="submit"
+              className={`w-full py-3 md:py-2.5 rounded-xl font-bold text-sm shadow transition-all active:scale-[0.98] disabled:opacity-50 ${activeTheme.button.accent2}`}
+            >
+              {isResetting
+                ? "Send Reset Email"
+                : isSigningUp
+                  ? "Sign Up"
+                  : "Login"}
+            </button>
+          )}
         </form>
 
         <div className="mt-5 space-y-3 text-center">

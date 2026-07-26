@@ -7,6 +7,8 @@ import {
   faEye,
   faFileText,
 } from "@fortawesome/free-solid-svg-icons";
+import { App as CapacitorApp } from "@capacitor/app"; // 👈 Added import
+import { Capacitor } from "@capacitor/core"; // 👈 Added import
 
 export default function TourModal({
   activeTheme,
@@ -29,6 +31,20 @@ export default function TourModal({
   React.useEffect(() => {
     setShowDemo(false);
   }, [step]);
+
+  React.useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+
+    // Intercept phone hardware back button while modal is active
+    const listener = CapacitorApp.addListener("backButton", () => {
+      if (onClose) onClose();
+      else handleFinish();
+    });
+
+    return () => {
+      listener.then((handler) => handler.remove());
+    };
+  }, [onClose, handleFinish]);
 
   return (
     <div
