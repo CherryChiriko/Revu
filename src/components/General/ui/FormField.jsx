@@ -19,7 +19,6 @@ export function FormField({
         </p>
       )}
 
-      {/* Renders the wrapped <input>, <textarea>, or <select> container natively */}
       {children}
 
       {error && (

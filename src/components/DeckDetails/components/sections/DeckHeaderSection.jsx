@@ -47,8 +47,9 @@ export default function DeckHeaderSection({
         className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${gradientFrom} ${gradientTo}`}
       />
 
-      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 md:gap-6 w-full">
-        <div className="w-full space-y-2 md:space-y-3 min-w-0 flex-1">
+      {/* Layout is now flex-row on all sizes so the menu stays top-right on mobile */}
+      <div className="flex flex-row items-start justify-between gap-2 md:gap-6 w-full">
+        <div className="w-full space-y-1 md:space-y-3 min-w-0 flex-1">
           {!isEditingMeta && (
             <p
               className={`${activeTheme.text.accent1} font-semibold text-[10px] md:text-xs uppercase tracking-wider`}
@@ -116,7 +117,8 @@ export default function DeckHeaderSection({
         </div>
 
         {!isEditingMeta && (
-          <div className="shrink-0 pt-0 sm:pt-6 self-start">
+          /* pt-1 on mobile aligns the menu trigger with the text-xl title baseline */
+          <div className="shrink-0 pt-1 sm:pt-6">
             <DeckMenu
               activeTheme={activeTheme}
               onEdit={() => setIsEditingMeta(true)}

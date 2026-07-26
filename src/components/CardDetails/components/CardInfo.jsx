@@ -1,4 +1,3 @@
-// src/components/DeckDetails/components/CardInfo.jsx
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGaugeHigh, faSeedling } from "@fortawesome/free-solid-svg-icons";
@@ -90,17 +89,10 @@ export function CardInfo({ card, isC, activeTheme }) {
       <div className={`h-px ${activeTheme.background.track}`} />
 
       <section className="space-y-2 md:space-y-3">
-        <label
-          className={`text-[10px] font-black uppercase tracking-widest ${activeTheme.text.secondary}`}
-        >
-          Card info
-        </label>
-        <div>
-          <span className="flex items-center gap-1">
-            <span className={`size-1.5 rounded-full ${tile.dot}`} />
-            <span className={`text-xs font-bold uppercase ${tile.text}`}>
-              {tile.label}
-            </span>
+        <div className="flex items-center gap-1.5">
+          <span className={`size-1.5 rounded-full ${tile.dot}`} />
+          <span className={`text-xs font-bold uppercase ${tile.text}`}>
+            {tile.label}
           </span>
         </div>
 

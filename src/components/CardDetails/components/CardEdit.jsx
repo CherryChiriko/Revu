@@ -1,4 +1,3 @@
-// src/components/DeckDetails/components/CardEdit.jsx
 import React from "react";
 import { FormField } from "../../General/ui/FormField";
 import { hasCJKCharacter } from "../../../utils/cjkValidation";
@@ -26,6 +25,8 @@ export function CardEdit({
           placeholder={isC ? "Chinese character(s)" : "Word or phrase"}
           className={`${baseInputCls} resize-none text-base md:text-sm`}
           autoFocus
+          autoComplete="off"
+          enterKeyHint="next"
         />
         {isC && editFront.trim() !== "" && !hasCJKCharacter(editFront) && (
           <p className={`text-xs ${activeTheme.text.danger} mt-1`}>
@@ -56,6 +57,8 @@ export function CardEdit({
             onChange={(e) => setEditReading(e.target.value)}
             placeholder="e.g. nǐ hǎo  (auto-generated if blank)"
             className={`${baseInputCls} resize-none text-base md:text-sm`}
+            autoComplete="off"
+            enterKeyHint="done"
           />
         </FormField>
       )}

@@ -20,7 +20,7 @@ export default function DeckCard({
     >
       {decks.map((deck) => (
         <div
-          key={deck.deck_id}
+          key={deck.id || deck.deck_id}
           /* Adding p-1 gives room for shadows without clipping inside overflow-x-auto */
           className="max-md:snap-align-start max-md:shrink-0 max-md:w-[85vw] max-md:max-w-[320px] p-1"
         >

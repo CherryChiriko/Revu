@@ -18,6 +18,7 @@ export default function useDeckLogic(id, cards_count, { toast, activeTheme }) {
   const dispatch = useDispatch();
 
   const [pendingDeleteDeck, setPendingDeleteDeck] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   const counts = useSelector(
     (state) => state.decks.deckCounts[id] ?? DEFAULT_COUNTS,
@@ -38,8 +39,8 @@ export default function useDeckLogic(id, cards_count, { toast, activeTheme }) {
     activeCardsCount > 0 && activeCardsCount === counts.mastered;
 
   const handleCardClick = useCallback(() => {
-    if (!isMastered) navigate(`/decks/${id}`);
-  }, [isMastered, id, navigate]);
+    if (!isMastered && !isEditing) navigate(`/decks/${id}`);
+  }, [isMastered, isEditing, id, navigate]);
 
   const deleteDeck = useCallback(
     async (deckData) => {
@@ -91,8 +92,7 @@ export default function useDeckLogic(id, cards_count, { toast, activeTheme }) {
       }
 
       if (type === "edit") {
-        // Navigate to detail page and signal it to open the editor
-        navigate(`/decks/${id}`, { state: { openEdit: true } });
+        setIsEditing(true);
         return;
       }
 
@@ -120,6 +120,9 @@ export default function useDeckLogic(id, cards_count, { toast, activeTheme }) {
       pendingDeleteDeck,
       onConfirmDelete: () => deleteDeck(pendingDeleteDeck),
       onCancelDelete: () => setPendingDeleteDeck(null),
+      isEditing,
+      setIsEditing,
+      dispatch,
     }),
     [
       showLearn,
@@ -135,6 +138,8 @@ export default function useDeckLogic(id, cards_count, { toast, activeTheme }) {
       streakState,
       pendingDeleteDeck,
       deleteDeck,
+      isEditing,
+      dispatch,
     ],
   );
 }

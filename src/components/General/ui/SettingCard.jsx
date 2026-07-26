@@ -28,8 +28,8 @@ export function SettingCard({
     <section
       className={`flex flex-col ${activeTheme.background.secondary} border ${
         activeTheme.border.card
-      } relative z-10 ${
-        isMobile ? "rounded-xl shadow-md" : "rounded-2xl shadow-lg"
+      } relative z-10  shadow-md ${
+        isMobile ? "rounded-xl" : "rounded-2xl "
       } overflow-hidden`}
     >
       {/* Header */}
