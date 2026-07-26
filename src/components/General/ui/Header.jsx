@@ -29,12 +29,12 @@ export default function Header({
           {leftElement && <div className="flex-shrink-0">{leftElement}</div>}
 
           <div className="min-w-0">
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tight">
+            <p className="text-xl md:text-2xl lg:text-3xl font-extrabold tracking-tight">
               {title}
-            </h1>
+            </p>
             {description && (
               <p
-                className={`${activeTheme.text.secondary} text-sm md:text-base mt-1 leading-relaxed`}
+                className={`${activeTheme.text.secondary} text-xs md:text-sm mt-1 leading-relaxed`}
               >
                 {description}
               </p>

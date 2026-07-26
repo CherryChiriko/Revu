@@ -63,7 +63,7 @@ Menu.Items = function MenuItems({ children, activeTheme, width = "w-40" }) {
   return (
     <div
       className={`absolute right-0 mt-2 ${width}
-        rounded-xl shadow-xl border overflow-hidden
+        rounded-xl shadow-md border overflow-hidden
         
         origin-top-right z-[100] p-1.5 flex flex-col gap-0.5
         ${activeTheme.background.secondary}

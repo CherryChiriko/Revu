@@ -13,24 +13,55 @@ export function DeckMenu({ activeTheme, onEdit, onDelete, compact = false }) {
     <Menu>
       <Menu.Trigger>
         <button
-          className={`flex items-center justify-center rounded-xl transition-all active:scale-90 ${activeTheme.text.secondary} ${compact ? "w-8 h-8" : "w-9 h-9 md:w-8 md:h-8"} hover:bg-black/5 dark:hover:bg-white/10`}
+          className={`flex items-center justify-center rounded transition-all active:scale-90 ${activeTheme.text.secondary} ${
+            compact ? "w-5 h-5" : "w-7 h-7"
+          } hover:bg-black/5 dark:hover:bg-white/10`}
+          aria-label="Deck menu"
         >
-          <FontAwesomeIcon icon={faEllipsisVertical} className="w-4 h-4" />
+          <FontAwesomeIcon
+            icon={faEllipsisVertical}
+            className={compact ? "w-2.5 h-2.5" : "w-3 h-3"}
+          />
         </button>
       </Menu.Trigger>
 
-      <Menu.Items activeTheme={activeTheme} width="w-36">
-        <Menu.Item action={onEdit} activeTheme={activeTheme} divider>
+      <Menu.Items
+        activeTheme={activeTheme}
+        width={compact ? "w-28" : "w-32"}
+        className="py-0.5"
+      >
+        <Menu.Item
+          action={onEdit}
+          activeTheme={activeTheme}
+          divider
+          className="py-1 px-2 min-h-0"
+        >
           <FontAwesomeIcon
             icon={faPen}
-            className={`w-3.5 h-3.5 ${activeTheme.text.secondary}`}
+            className={`${compact ? "w-2.5 h-2.5" : "w-3 h-3"} ${activeTheme.text.secondary}`}
           />
-          <span className="text-sm">Edit</span>
+          <span
+            className={`leading-none ${compact ? "text-[11px]" : "text-xs"}`}
+          >
+            Edit
+          </span>
         </Menu.Item>
 
-        <Menu.Item action={onDelete} danger activeTheme={activeTheme}>
-          <FontAwesomeIcon icon={faTrash} className="w-3.5 h-3.5" />
-          <span className="text-sm">Delete</span>
+        <Menu.Item
+          action={onDelete}
+          danger
+          activeTheme={activeTheme}
+          className="py-1 px-2 min-h-0"
+        >
+          <FontAwesomeIcon
+            icon={faTrash}
+            className={compact ? "w-2.5 h-2.5" : "w-3 h-3"}
+          />
+          <span
+            className={`leading-none ${compact ? "text-[11px]" : "text-xs"}`}
+          >
+            Delete
+          </span>
         </Menu.Item>
       </Menu.Items>
     </Menu>
