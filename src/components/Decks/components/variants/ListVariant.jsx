@@ -9,7 +9,6 @@ export default function ListVariant({ deck, activeTheme, logic }) {
     handleAction,
     streak,
     streakState,
-    isMastered,
     isStreakActive,
     counts,
     cards_count,
@@ -62,7 +61,6 @@ export default function ListVariant({ deck, activeTheme, logic }) {
             streak={streak}
             streakState={streakState}
             activeTheme={activeTheme}
-            isMastered={isMastered}
             isStreakActive={isStreakActive}
             compact
           />
@@ -81,7 +79,6 @@ export default function ListVariant({ deck, activeTheme, logic }) {
           <ProgressBar
             counts={counts}
             activeTheme={activeTheme}
-            isMastered={isMastered}
             cards_count={cards_count}
             compact
           />

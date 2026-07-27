@@ -8,8 +8,7 @@ const FullVariant = ({ deck, activeTheme, logic }) => {
   const {
     handleAction,
     streak,
-    isMastered,
-    isStreakActive,
+    streakState,
     counts,
     cards_count,
     showLearn,
@@ -17,7 +16,6 @@ const FullVariant = ({ deck, activeTheme, logic }) => {
   } = logic;
 
   return (
-    // min-h-[320px] (or similar) ensures the card itself has a standard minimum size
     <div className="relative flex flex-col h-full min-h-[200px]">
       {/* Header Section: Title & Menu */}
       <div className="flex justify-between items-start">
@@ -47,8 +45,7 @@ const FullVariant = ({ deck, activeTheme, logic }) => {
             <DeckBadges
               streak={streak}
               activeTheme={activeTheme}
-              isMastered={isMastered}
-              isStreakActive={isStreakActive}
+              streakState={streakState}
             />
             <DeckMenu
               activeTheme={activeTheme}
@@ -62,7 +59,6 @@ const FullVariant = ({ deck, activeTheme, logic }) => {
       <ProgressBar
         counts={counts}
         activeTheme={activeTheme}
-        isMastered={isMastered}
         cards_count={cards_count}
       />
 

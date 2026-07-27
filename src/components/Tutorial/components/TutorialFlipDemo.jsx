@@ -9,8 +9,10 @@ export function TutorialFlipCardDemo({ activeTheme }) {
   };
 
   return (
-    <div className="w-full h-auto min-h-[140px] flex flex-col items-center justify-center overflow-hidden py-2">
-      <div className="w-full h-32 sm:h-40 relative">
+    <div
+      className={`w-full max-w-[300px] flex flex-col items-center justify-center`}
+    >
+      <div className="w-full h-44 sm:h-48 relative">
         <FlipCard
           card={mockCard}
           activeTheme={activeTheme}

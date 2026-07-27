@@ -7,8 +7,8 @@ import {
   faEye,
   faFileText,
 } from "@fortawesome/free-solid-svg-icons";
-import { App as CapacitorApp } from "@capacitor/app"; // 👈 Added import
-import { Capacitor } from "@capacitor/core"; // 👈 Added import
+import { App as CapacitorApp } from "@capacitor/app";
+import { Capacitor } from "@capacitor/core";
 
 export default function TourModal({
   activeTheme,
@@ -54,7 +54,8 @@ export default function TourModal({
       aria-labelledby="tour-title"
     >
       <div
-        className={`w-full max-w-md rounded-2xl ${activeTheme.background.card} shadow-xl overflow-hidden flex flex-col max-h-[80vh] sm:max-h-[600px]`}
+        /* Changed max-h to fixed h-[420px] sm:h-[460px] to keep all tabs uniform in height */
+        className={`w-full max-w-md rounded-2xl ${activeTheme.background.card} shadow-xl overflow-hidden flex flex-col h-[500px]`}
       >
         {/* Header */}
         <div className="px-4 sm:px-6 pt-4 sm:pt-5 shrink-0">
@@ -91,7 +92,7 @@ export default function TourModal({
           {!finished ? (
             <div className="flex flex-col h-full">
               {/* Icon + Title */}
-              <div className="flex items-center justify-between min-h-[56px] mb-2">
+              <div className="flex items-center justify-between min-h-[56px] mb-2 shrink-0">
                 <div className="flex items-center gap-3 min-w-0">
                   {stepIcon && (
                     <div
@@ -135,14 +136,14 @@ export default function TourModal({
               </div>
 
               {/* Body */}
-              <div className="flex-1 flex items-center justify-center overflow-hidden">
+              <div className="flex-1 flex items-start justify-center overflow-y-auto pt-2">
                 {showDemo && hasDemo ? (
                   <div className="w-full h-full flex items-center justify-center min-h-[140px]">
                     {renderDemo(step)}
                   </div>
                 ) : (
                   <p
-                    className={`text-sm leading-relaxed whitespace-pre-line w-full self-start pt-2 ${activeTheme.text.secondary}`}
+                    className={`text-sm leading-relaxed whitespace-pre-line w-full ${activeTheme.text.secondary}`}
                   >
                     {current.body}
                   </p>

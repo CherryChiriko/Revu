@@ -8,8 +8,6 @@ export default function CompactVariant({ deck, activeTheme, logic }) {
     handleAction,
     streak,
     streakState,
-    isMastered,
-    isStreakActive,
     counts,
     cards_count,
     showLearn,
@@ -33,8 +31,6 @@ export default function CompactVariant({ deck, activeTheme, logic }) {
             streak={streak}
             streakState={streakState}
             activeTheme={activeTheme}
-            isMastered={isMastered}
-            isStreakActive={isStreakActive}
           />
           <DeckMenu
             activeTheme={activeTheme}
@@ -47,7 +43,6 @@ export default function CompactVariant({ deck, activeTheme, logic }) {
       <ProgressBar
         counts={counts}
         activeTheme={activeTheme}
-        isMastered={isMastered}
         cards_count={cards_count}
       />
 

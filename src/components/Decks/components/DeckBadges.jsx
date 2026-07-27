@@ -8,7 +8,7 @@ export function DeckBadges({ streak, streakState, activeTheme }) {
     frozen: "text-sky-400 bg-sky-400/10",
   };
   const badgeColor = colorMap[streakState] || colorMap.inactive;
-
+  console.log(streakState);
   return (
     <>
       {streak > 0 && (

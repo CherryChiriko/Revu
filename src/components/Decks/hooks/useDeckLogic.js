@@ -34,13 +34,10 @@ export default function useDeckLogic(id, cards_count, { toast, activeTheme }) {
 
   const showLearn = counts.new > 0;
   const showReview = counts.due > 0;
-  const activeCardsCount = Math.max(cards_count - (counts.suspended || 0), 0);
-  const isMastered =
-    activeCardsCount > 0 && activeCardsCount === counts.mastered;
 
   const handleCardClick = useCallback(() => {
-    if (!isMastered && !isEditing) navigate(`/decks/${id}`);
-  }, [isMastered, isEditing, id, navigate]);
+    if (!isEditing) navigate(`/decks/${id}`);
+  }, [isEditing, id, navigate]);
 
   const deleteDeck = useCallback(
     async (deckData) => {
@@ -108,7 +105,6 @@ export default function useDeckLogic(id, cards_count, { toast, activeTheme }) {
     () => ({
       showLearn,
       showReview,
-      isMastered,
       counts,
       cards_count,
       handleCardClick,
@@ -127,7 +123,6 @@ export default function useDeckLogic(id, cards_count, { toast, activeTheme }) {
     [
       showLearn,
       showReview,
-      isMastered,
       counts,
       cards_count,
       handleCardClick,

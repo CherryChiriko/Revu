@@ -59,7 +59,11 @@ const FlipCard = ({
 
   // Shared footer slot — inner container is w-full so children can choose their own width
   const FooterSlot = ({ children }) => (
-    <div className="absolute bottom-3 md:bottom-6 left-0 right-0 px-4 pointer-events-none">
+    <div
+      className={`absolute left-0 right-0 px-3 pointer-events-none ${
+        isDemo ? "bottom-3" : "bottom-6"
+      }`}
+    >
       <div className="pointer-events-auto w-full max-w-lg mx-auto flex justify-center">
         {children}
       </div>
@@ -79,7 +83,9 @@ const FlipCard = ({
         <div
           className={`absolute inset-0 rounded-2xl ${activeTheme.background.secondary} ${
             activeTheme.border?.secondary || "border-gray-200"
-          } flex flex-col items-center p-3 md:p-6 pb-20 md:pb-24 shadow-md`}
+          } flex flex-col items-center p-3 shadow-md ${
+            isDemo ? "pb-16" : "md:p-6 pb-20 md:pb-24"
+          }`}
           style={{ backfaceVisibility: "hidden" }}
         >
           <div className="shrink-0">
@@ -90,14 +96,14 @@ const FlipCard = ({
             </span>
           </div>
 
-          <div className="flex-1 flex items-center justify-center w-full min-h-0 px-1">
-            <span
-              className={`font-extrabold ${activeTheme.text.primary} text-center break-words leading-tight ${
-                isDemo ? "text-3xl" : "text-4xl sm:text-5xl md:text-6xl"
+          <div className="flex-1 flex items-center justify-center w-full min-h-0 px-1 overflow-hidden">
+            <p
+              className={`font-bold ${activeTheme.text.primary} text-center break-words leading-snug ${
+                isDemo ? "text-xl" : "text-2xl sm:text-3xl md:text-4xl"
               }`}
             >
               {card?.front}
-            </span>
+            </p>
           </div>
 
           {!showAnswer && displayState === "animation" && (
@@ -126,7 +132,9 @@ const FlipCard = ({
         <div
           className={`absolute inset-0 rounded-2xl ${activeTheme.background.secondary} ${
             activeTheme.border?.secondary || "border-gray-200"
-          } flex flex-col items-center p-3 md:p-6 pb-20 md:pb-24 shadow-md`}
+          } flex flex-col items-center p-3 shadow-md ${
+            isDemo ? "pb-16" : "md:p-6 pb-20 md:pb-24"
+          }`}
           style={{
             backfaceVisibility: "hidden",
             transform: "rotateY(180deg)",
@@ -144,7 +152,9 @@ const FlipCard = ({
             {showAnswer && (
               <p
                 className={`font-semibold ${activeTheme.text.primary} text-center break-words leading-snug ${
-                  isDemo ? "text-xl" : "text-2xl sm:text-3xl md:text-4xl"
+                  isDemo
+                    ? "text-lg sm:text-xl"
+                    : "text-2xl sm:text-3xl md:text-4xl"
                 }`}
               >
                 {card?.back}

@@ -55,7 +55,6 @@ function DeckCardItem({ deck, activeTheme, variant, toast, highlightedId }) {
     ${activeTheme.border.card}
     ${activeTheme.background.secondary}
     ${activeTheme.text.primary}
-    ${logic.isMastered && !logic.isEditing ? "opacity-60" : ""}
     ${isList ? "p-3.5 w-[82vw] max-w-[320px] shrink-0 snap-center select-none" : "p-4 hover:shadow-xl"}
     ${!logic.isEditing ? "cursor-pointer hover:-translate-y-1" : ""}
     ${
