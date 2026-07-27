@@ -5,7 +5,6 @@ import AccountEditView from "../views/AccountEditView";
 
 export function AccountSection({ profile, activeTheme, dispatch, isMobile }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  console.log(isMobile);
   return (
     <>
       <SettingCard

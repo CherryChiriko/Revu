@@ -121,11 +121,12 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
         className={`min-h-[100dvh] flex flex-col items-center justify-center ${activeTheme.background.app} text-center px-4`}
       >
         <SessionComplete
-          learnedCount={limit}
-          isOpen={!!sessionSummary}
-          onGoBack={exitSession}
-          onLearnMore={handleResetSession}
+          isOpen={session.sessionFinished}
+          learnedCount={session.sessionSummary?.learned || 0}
+          onGoBack={session.exitStudy}
+          onLearnMore={session.restartSession}
           activeTheme={activeTheme}
+          isLoading={session.status === "loading"}
         />
       </div>
     );

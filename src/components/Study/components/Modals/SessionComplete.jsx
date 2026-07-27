@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 export default function SessionComplete({
   isOpen,
@@ -8,69 +8,77 @@ export default function SessionComplete({
   onGoBack,
   onLearnMore,
   activeTheme,
+  isLoading = false,
 }) {
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 bg-black/60 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
         >
           <motion.div
-            className={`${activeTheme.background.secondary} rounded-3xl p-8 px-10 shadow-2xl text-center max-w-sm`}
-            initial={{ scale: 0.6, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.6, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 140, damping: 14 }}
+            className={`${activeTheme.background.secondary} rounded-3xl p-6 sm:p-8 shadow-2xl text-center w-full max-w-sm border ${activeTheme.border.card}`}
+            initial={{ opacity: 0, y: 16, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 16, scale: 0.96 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
           >
             <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
-              className="text-5xl mb-4"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.2, delay: 0.05 }}
+              className="text-5xl mb-4 select-none"
             >
               🎉
             </motion.div>
 
             <h1
-              className={`${activeTheme.text.primary} text-2xl font-semibold mb-2`}
+              className={`${activeTheme.text.primary} text-xl sm:text-2xl font-bold mb-2`}
             >
               Session Complete!
             </h1>
 
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.25 }}
-              className={`${activeTheme.text.secondary} text-lg`}
+            <p
+              className={`${activeTheme.text.secondary} text-base sm:text-lg mb-6`}
             >
               You learned <span className="font-bold">{learnedCount}</span> word
               {learnedCount > 1 ? "s" : ""} today.
-            </motion.p>
+            </p>
 
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3">
               <motion.button
-                onClick={onLearnMore}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.35 }}
-                className={`py-2 rounded-lg ${activeTheme.button.accent} ${activeTheme.text.activeButton} transition`}
+                onClick={!isLoading ? onLearnMore : undefined}
+                disabled={isLoading}
+                whileTap={!isLoading ? { scale: 0.98 } : undefined}
+                className={`py-3 px-4 rounded-xl font-semibold text-sm transition-all
+                  ${isLoading ? "opacity-70 cursor-wait" : "hover:brightness-110"}
+                  ${activeTheme.button.accent} ${activeTheme.text.activeButton}`}
               >
-                Learn More
+                {isLoading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <FontAwesomeIcon
+                      icon={faSpinner}
+                      className="animate-spin w-4 h-4"
+                    />
+                    Loading cards...
+                  </span>
+                ) : (
+                  "Learn More"
+                )}
               </motion.button>
 
-              <motion.button
+              <button
                 onClick={onGoBack}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.45 }}
-                className={`flex items-center ${activeTheme.text.muted} hover:${activeTheme.text.primary} transition-colors duration-200`}
+                className={`flex items-center justify-center py-3 px-4 rounded-xl text-sm font-medium transition-colors
+                  ${activeTheme.text.muted} hover:${activeTheme.text.primary}`}
               >
-                <FontAwesomeIcon icon={faArrowLeft} className="w-5 h-5 mr-2" />
+                <FontAwesomeIcon icon={faArrowLeft} className="w-4 h-4 mr-2" />
                 Go back
-              </motion.button>
+              </button>
             </div>
           </motion.div>
         </motion.div>

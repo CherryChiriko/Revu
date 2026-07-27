@@ -8,6 +8,7 @@ import { selectActiveDeck, selectDecks } from "../../../slices/deckSlice";
 import { selectUserProfile } from "../../../slices/userSlice";
 import useStudySession from "../hooks/useStudySession";
 import SessionMode from "./SessionMode";
+import LoadingSpinner from "../../General/ui/LoadingSpinner";
 
 const StudySession = () => {
   const renderCount = React.useRef(0);
@@ -88,16 +89,12 @@ const StudySession = () => {
     );
   }
 
-  if (status === "loading" || status === "idle") {
+  if ((status === "loading" || status === "idle") && !session.sessionFinished) {
     return (
       <div
         className={`h-screen flex items-center justify-center px-4 ${activeTheme.background.app}`}
       >
-        <p
-          className={`${activeTheme.text.primary} text-lg md:text-xl animate-pulse text-center`}
-        >
-          Loading cards for "{activeDeck.name}"...
-        </p>
+        <LoadingSpinner label={`Loading cards for "${activeDeck.name}"...`} />
       </div>
     );
   }
@@ -116,7 +113,10 @@ const StudySession = () => {
     );
   }
 
-  if (status === "succeeded" && cards.length > 0 && navMode) {
+  if (
+    (status === "succeeded" && cards.length > 0 && navMode) ||
+    session.sessionFinished
+  ) {
     return (
       <div
         className={`h-screen flex flex-col items-center justify-center px-4 text-center ${activeTheme.background.app}`}

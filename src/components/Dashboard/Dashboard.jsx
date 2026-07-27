@@ -285,7 +285,7 @@ const Dashboard = () => {
           {/* Heatmap Card Wrapper */}
           <div
             ref={heatmapRef}
-            className={`${activeTheme.background.secondary} p-4 md:p-5 rounded-xl md:rounded-2xl shadow-lg flex flex-col justify-between`}
+            className={`${activeTheme.background.secondary} p-4 md:p-5 rounded-xl md:rounded-2xl shadow-md flex flex-col justify-between`}
           >
             <Heatmap activeTheme={activeTheme} isMobile={isMobile} />
           </div>
