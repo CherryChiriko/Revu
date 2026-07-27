@@ -13,7 +13,7 @@ import { useCardDetails } from "../hooks/useCardDetails";
 import { CardEdit } from "../components/CardEdit";
 import { CardInfo } from "../components/CardInfo";
 import { ModalTemplate } from "../../General/ui/ModalTemplate";
-import { inputCls } from "../../General/ui/FormStyles";
+import { inputCls } from "../../General/ui/FormField";
 import ConfirmationDialog from "../../General/ui/ConfirmationDialog";
 
 export default function CardDetails(props) {

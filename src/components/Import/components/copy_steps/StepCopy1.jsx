@@ -1,7 +1,7 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLayerGroup, faChevronDown } from "@fortawesome/free-solid-svg-icons";
-import { selectCls } from "../../../General/ui/FormStyles";
+import { selectCls } from "../../../General/ui/FormField";
 import { TYPE_ICONS, STUDY_MODES } from "../../../../utils/constants";
 
 export function StepCopy1({ logic, activeTheme }) {

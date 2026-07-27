@@ -1,10 +1,8 @@
 import React from "react";
 import { SettingCard } from "../../General/ui/SettingCard";
 import { setTheme } from "../../../slices/themeSlice";
+import { persistUserTheme } from "../hooks/useSettings";
 import { faPalette } from "@fortawesome/free-solid-svg-icons";
-// ─────────────────────────────────────────────────────────────────────────────
-// Section: Theme
-// ─────────────────────────────────────────────────────────────────────────────
 
 export function ThemeSection({
   activeTheme,
@@ -12,7 +10,20 @@ export function ThemeSection({
   currentThemeName,
   dispatch,
   isMobile,
+  userId, // Pass user ID (e.g. profile?.id) here
 }) {
+  const handleThemeSelect = (themeId) => {
+    if (themeId === currentThemeName) return;
+
+    // 1. Instant optimistic update in Redux + localStorage
+    dispatch(setTheme(themeId));
+
+    // 2. Persist to Supabase DB in the background
+    if (userId) {
+      persistUserTheme(userId, themeId);
+    }
+  };
+
   return (
     <SettingCard
       icon={faPalette}
@@ -25,10 +36,10 @@ export function ThemeSection({
           <button
             key={theme.id}
             type="button"
-            onClick={() => dispatch(setTheme(theme.id))}
-            className={`text-left rounded-xl p-3 border ${
+            onClick={() => handleThemeSelect(theme.id)}
+            className={`text-left rounded-xl p-3 border transition-all ${
               currentThemeName === theme.id
-                ? "border-sky-400"
+                ? "border-sky-400 ring-2 ring-sky-400/20"
                 : activeTheme.border.card
             } ${activeTheme.background.canvas}`}
           >

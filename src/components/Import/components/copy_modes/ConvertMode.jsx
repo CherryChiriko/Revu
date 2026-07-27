@@ -5,7 +5,7 @@ import {
   faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
 import { C_FIELDS } from "../../hooks/useQuickCreate";
-import { selectCls } from "../../../General/ui/FormStyles";
+import { selectCls } from "../../../General/ui/FormField";
 
 export function ConvertMode({ logic, activeTheme }) {
   const hasConflict = logic.frontField === logic.backField;

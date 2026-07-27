@@ -5,7 +5,7 @@ import {
   faChevronDown,
 } from "@fortawesome/free-solid-svg-icons";
 import { useCreateNew } from "../hooks/useCreateNew";
-import { inputCls, selectCls } from "../../General/ui/FormStyles";
+import { inputCls, selectCls } from "../../General/ui/FormField";
 import { FormField } from "../../General/ui/FormField";
 
 const STUDY_MODES = [

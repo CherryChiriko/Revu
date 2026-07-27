@@ -24,3 +24,22 @@ export async function persistAvatarState(
     p_avatar_color: color ?? "#6366f1",
   });
 }
+
+/**
+ * Persists the user's selected theme ID to Supabase.
+ *
+ * @param {string} userId - User's UUID from profile
+ * @param {string} themeId - Theme key ('dark', 'light', etc.)
+ */
+export async function persistUserTheme(userId, themeId) {
+  if (!userId) return;
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ theme: themeId })
+    .eq("id", userId);
+
+  if (error) {
+    console.error("Failed to persist theme to Supabase:", error.message);
+  }
+}

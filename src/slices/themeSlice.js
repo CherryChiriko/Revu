@@ -1,7 +1,7 @@
+// src/slices/themeSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 import themesArray from "../assets/themes";
 
-// Convert the array of themes into an object map for easy lookup by ID ('dark', 'light')
 const themesMap = themesArray.reduce((acc, theme) => {
   acc[theme.id] = theme;
   return acc;
@@ -14,12 +14,20 @@ const themeSlice = createSlice({
   name: "theme",
   initialState: {
     currentThemeName: defaultThemeId,
-    allThemes: themesMap, // Store the themes as a map
+    allThemes: themesMap,
   },
   reducers: {
     setTheme: (state, action) => {
-      const themeId = action.payload; // Renamed for clarity, using ID
+      const themeId = action.payload;
       if (state.allThemes[themeId]) {
+        state.currentThemeName = themeId;
+        localStorage.setItem("currentThemeName", themeId);
+      }
+    },
+    // Hydrate theme directly from Supabase profile on user session load
+    syncThemeFromProfile: (state, action) => {
+      const themeId = action.payload;
+      if (themeId && state.allThemes[themeId]) {
         state.currentThemeName = themeId;
         localStorage.setItem("currentThemeName", themeId);
       }
@@ -27,10 +35,9 @@ const themeSlice = createSlice({
   },
 });
 
-export const { setTheme } = themeSlice.actions;
+export const { setTheme, syncThemeFromProfile } = themeSlice.actions;
 
 export const selectCurrentThemeName = (state) => state.theme.currentThemeName;
-// Lookup now works correctly on the themesMap
 export const selectActiveTheme = (state) =>
   state.theme.allThemes[state.theme.currentThemeName];
 export const selectAllThemes = (state) => state.theme.allThemes;

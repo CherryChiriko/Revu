@@ -1,7 +1,7 @@
 // src/components/Auth/views/LoginPage.jsx
 import React from "react";
 import { useLogin } from "../hooks/useLogin";
-import { inputCls } from "../../General/ui/FormStyles";
+import { inputCls } from "../../General/ui/FormField";
 import LoadingSpinner from "../../General/ui/LoadingSpinner";
 
 const LoginPage = ({ activeTheme }) => {

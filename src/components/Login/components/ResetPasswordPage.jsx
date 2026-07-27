@@ -2,7 +2,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useResetPassword } from "../hooks/useResetPassword";
-import { inputCls } from "../../General/ui/FormStyles";
+import { inputCls } from "../../General/ui/FormField";
 
 export default function ResetPasswordPage({ activeTheme }) {
   const navigate = useNavigate();
