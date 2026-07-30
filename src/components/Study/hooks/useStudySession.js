@@ -45,7 +45,7 @@ export default function useStudySession({ deck, navMode, userId }) {
 
   const reviewLimit = useSelector(selectReviewLimit);
   const learnLimit = useSelector(selectLearnLimit);
-  const modeLimit = isReviewMode ? reviewLimit : learnLimit;
+  const modeLimit = isReviewMode ? 10 : 5;
   const BATCH_SIZE = Math.max(20, modeLimit * 2);
   const PREFETCH_THRESHOLD = modeLimit;
 

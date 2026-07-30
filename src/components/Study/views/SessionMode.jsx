@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { Bar } from "../../General/ui/Bar";
 import { selectSettings } from "../../../slices/settingsSlice";
+import LoadingSpinner from "../../General/ui/LoadingSpinner";
 
 const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
   const navigate = useNavigate();
@@ -22,18 +23,14 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
     progress,
     cards,
     sessionFinished,
-    sessionSummary,
-    limit,
     onReveal,
     handleRate,
     handlePassComplete,
-    resetSession,
     exitSession,
   } = session;
 
   const [previousCardId, setPreviousCardId] = React.useState(currentCard?.id);
   const [isTransitioning, setIsTransitioning] = React.useState(false);
-  const [sessionResetCount, setSessionResetCount] = React.useState(0);
   const transitionTimeoutRef = React.useRef(null);
 
   React.useEffect(() => {
@@ -59,32 +56,23 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
     };
   }, [isTransitioning, currentCard?.id, previousCardId]);
 
-  const handleResetSession = React.useCallback(() => {
-    setPreviousCardId(currentCard?.id);
-    setIsTransitioning(true);
-    setSessionResetCount((count) => count + 1);
-    resetSession(true);
-  }, [currentCard?.id, resetSession]);
-
-  function SessionHeader({ title }) {
+  function SessionHeader({ title, progress }) {
     const gradientFrom = activeTheme?.gradients?.from || "from-indigo-500";
     const gradientTo = activeTheme?.gradients?.to || "to-purple-500";
 
     return (
       <header
-        className={`mt-4 md:mt-8 ${activeTheme.background.secondary} rounded-2xl shadow-md border ${activeTheme.border.card} overflow-hidden relative`}
+        className={`mt-1 md:mt-8 ${activeTheme.background.secondary} rounded-2xl shadow-md border ${activeTheme.border.card} overflow-hidden relative`}
       >
-        {/* Top gradient accent */}
         <div
           className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${gradientFrom} ${gradientTo}`}
         />
 
-        <div className="relative flex items-center justify-center p-3 md:p-4 min-w-0">
-          {/* Back Button: absolute left so it doesn't push the title off-center */}
+        <div className="relative p-2 md:p-3 min-w-0">
           <button
             onClick={exitSession}
             aria-label="Exit session"
-            className={`absolute left-3 md:left-4 group inline-flex items-center justify-center shrink-0 w-10 h-10 md:w-auto md:h-9 md:px-3 rounded-xl border transition-all ${activeTheme.border.secondary} ${activeTheme.text.secondary} hover:${activeTheme.background.canvas} active:scale-95`}
+            className={`absolute left-3 md:left-4 top-1/2 -translate-y-1/2 group inline-flex items-center justify-center shrink-0 w-10 h-10 md:w-auto md:h-9 md:px-3 rounded-xl border transition-all ${activeTheme.border.secondary} ${activeTheme.text.secondary} hover:${activeTheme.background.canvas} active:scale-95`}
           >
             <FontAwesomeIcon
               icon={faArrowLeft}
@@ -95,8 +83,7 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
             </span>
           </button>
 
-          {/* Title block: dead center */}
-          <div className="text-center min-w-0 px-12 md:px-20">
+          <div className="flex flex-col items-center text-center min-w-0 px-12 md:px-20">
             <h1
               className={`text-base sm:text-lg md:text-xl font-extrabold tracking-tight truncate ${activeTheme.text.primary}`}
             >
@@ -104,10 +91,20 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
             </h1>
             {mode && (
               <p
-                className={`hidden sm:block text-xs ${activeTheme.text.muted} truncate capitalize`}
+                className={`text-xs ${activeTheme.text.muted} truncate capitalize`}
               >
                 {mode} Session
               </p>
+            )}
+            {progress && (
+              <div className="w-full max-w-[180px] md:max-w-[220px] ">
+                <Bar
+                  activeTheme={activeTheme}
+                  current={progress.current}
+                  total={progress.total}
+                  compact
+                />
+              </div>
             )}
           </div>
         </div>
@@ -135,15 +132,11 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
   if (isTransitioning) {
     return (
       <div
-        className={`min-h-[100dvh] ${activeTheme.background.app} ${activeTheme.text.primary} w-full px-4 md:px-0`}
+        className={`min-h-[100dvh] ${activeTheme.background.app} ${activeTheme.text.primary} w-full px-0 md:px-4`}
       >
         <div className="max-w-screen-xl mx-auto space-y-4 md:space-y-6">
           <SessionHeader title={activeDeck.name} />
-          <div className="h-72 md:h-96 flex items-center justify-center">
-            <p className="text-lg md:text-xl animate-pulse">
-              Loading next card…
-            </p>
-          </div>
+          <LoadingSpinner label="Loading next card…" />
         </div>
       </div>
     );
@@ -154,7 +147,7 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
   if (!cards.length) {
     return (
       <div
-        className={`min-h-[100dvh] flex flex-col items-center justify-center px-4 ${activeTheme.background.app} text-center`}
+        className={`min-h-[100dvh] flex flex-col items-center justify-center px-0 md:px-4 ${activeTheme.background.app} text-center`}
       >
         <h3
           className={`text-xl md:text-2xl font-semibold mb-3 ${activeTheme.text.primary}`}
@@ -172,38 +165,27 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
   }
 
   return (
-    <div className={`min-h-[100dvh] w-full px-4 md:px-0 select-none`}>
+    <div className={`min-h-[100dvh] w-full px-0 md:px-4 select-none`}>
       <div className="max-w-screen-xl mx-auto space-y-4 md:space-y-6">
-        <SessionHeader title={activeDeck.name} />
+        <SessionHeader title={activeDeck.name} progress={progress} />
 
-        <div className="w-full max-w-2xl mx-auto space-y-3 mb-6 md:mb-8">
-          {/* Progress Bar */}
-          <div className="w-full">
-            <Bar
-              activeTheme={activeTheme}
-              current={progress.current}
-              total={progress.total}
-            />
-          </div>
-        </div>
-
-        <div className="relative perspective-1000 w-full max-w-2xl mx-auto h-[52vh] min-h-[340px] md:h-96 mb-6 md:mb-8">
-          <CardRenderer
-            key={`${currentCard.id}-${sessionResetCount}`}
-            card={currentCard}
-            study_mode={activeDeck.study_mode}
-            phase={currentPhase}
-            activeTheme={activeTheme}
-            displayState={currentPhase.displayState}
-            allowRating={currentPhase.allowRating}
-            onReveal={onReveal}
-            onRate={handleRate}
-            onPassComplete={handlePassComplete}
-            autoFlipEnabled={autoFlipEnabled}
-            autoFlipDelay={autoFlipDelay}
-            strokeAnimationSpeed={strokeAnimationSpeed}
-          />
-        </div>
+        {/* <div className="relative perspective-1000 w-full md:max-w-2xl mx-auto h-[62vh] min-h-[400px] mb-4 md:mb-8 px-2 md:px-0"> */}
+        <CardRenderer
+          key={currentCard.id}
+          card={currentCard}
+          study_mode={activeDeck.study_mode}
+          phase={currentPhase}
+          activeTheme={activeTheme}
+          displayState={currentPhase.displayState}
+          allowRating={currentPhase.allowRating}
+          onReveal={onReveal}
+          onRate={handleRate}
+          onPassComplete={handlePassComplete}
+          autoFlipEnabled={autoFlipEnabled}
+          autoFlipDelay={autoFlipDelay}
+          strokeAnimationSpeed={strokeAnimationSpeed}
+        />
+        {/* </div> */}
       </div>
     </div>
   );
