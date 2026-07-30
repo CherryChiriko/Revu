@@ -73,6 +73,7 @@ export function TutorialCharDemo({ activeTheme }) {
             revealed={false}
             strokeAnimationSpeed={1.2}
             onQuizComplete={handleQuizComplete}
+            variant="demo"
           />
         </div>
       </div>

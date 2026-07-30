@@ -25,7 +25,8 @@ export default function TourModal({
 
   const current = steps[step];
   const stepIcon = current?.icon;
-  const isImageIcon = typeof stepIcon === "string";
+  const isImageIcon =
+    typeof stepIcon === "string" && stepIcon.startsWith("http");
   const hasDemo = typeof renderDemo === "function" && renderDemo(step) != null;
 
   React.useEffect(() => {
@@ -143,7 +144,7 @@ export default function TourModal({
                   </div>
                 ) : (
                   <p
-                    className={`text-sm leading-relaxed whitespace-pre-line w-full ${activeTheme.text.secondary}`}
+                    className={`text-sm text-left leading-relaxed whitespace-pre-line w-full ${activeTheme.text.secondary}`}
                   >
                     {current.body}
                   </p>

@@ -9,10 +9,12 @@ const HanziCanvas = ({
   strokeColor,
   revealed,
   strokeAnimationSpeed = 1,
+  variant = "standard",
 }) => {
+  const isDemo = variant === "demo";
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
   const wrapperRef = useRef(null);
-  const canvasSize = isMobile ? 300 : 250;
+  const canvasSize = isDemo ? 150 : isMobile ? 300 : 250;
 
   const { containerRef } = useHanziWriter({
     character,

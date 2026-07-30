@@ -178,10 +178,8 @@ export function useCharacterFlow({
       onPassComplete?.();
     }
   }, [
-    currentIndex,
     isLastCharacter,
     displayState,
-    characters,
     handleReveal,
     allowRating,
     calculateAverage,
@@ -196,6 +194,7 @@ export function useCharacterFlow({
     return (
       <div className="flex space-x-2 text-2xl justify-center items-center">
         {characters.map((ch, idx) => {
+          const isCurrent = idx === currentIndex;
           if (displayState === "quiz") {
             const isRevealed = idx < completedChars.length;
             return (
@@ -204,13 +203,15 @@ export function useCharacterFlow({
                 className={`transition-all duration-300 ${
                   isRevealed ? "opacity-100" : "opacity-20"
                 }`}
+                style={{
+                  color: isRevealed && isCurrent ? strokeColor : "inherit",
+                }}
               >
                 {isRevealed ? ch : "•"}
               </span>
             );
           }
 
-          const isCurrent = idx === currentIndex;
           return (
             <span
               key={idx}

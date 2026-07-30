@@ -1,21 +1,50 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import CardRenderer from "../../Study/components/Card/CardRenderer";
 import SessionComplete from "../components/Modals/SessionComplete";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowLeft,
+  faCircleQuestion,
+} from "@fortawesome/free-solid-svg-icons";
 import { Bar } from "../../General/ui/Bar";
 import { selectSettings } from "../../../slices/settingsSlice";
+import { selectUserProfile, completeTutorial } from "../../../slices/userSlice";
 import LoadingSpinner from "../../General/ui/LoadingSpinner";
+import StudyTutorial from "../../Tutorial/components/StudyTutorial";
 
 const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
+  const profile = useSelector(selectUserProfile);
   const settings = useSelector(selectSettings);
   const autoFlipEnabled = settings.autoflipModeA ?? false;
   const autoFlipDelay = (settings.autoflipSpeed ?? 3) * 1000;
   const strokeAnimationSpeed = settings.characterAnimationSpeed ?? 1;
+
+  const [showTutorial, setShowTutorial] = useState(false);
+
+  useEffect(() => {
+    if (!profile) return;
+    const hasFinishedGeneralTour =
+      profile.completed_tutorials?.general === true;
+    const hasSeenDashboardTour = profile.completed_tutorials?.decks === true;
+    if (hasFinishedGeneralTour && !hasSeenDashboardTour) {
+      const timer = setTimeout(() => setShowTutorial(true), 800);
+      return () => clearTimeout(timer);
+    }
+  }, [profile]);
+
+  const closeTutorial = () => {
+    setShowTutorial(false);
+    dispatch(completeTutorial("decks"));
+  };
+
+  const handleManualReplayTour = () => {
+    setShowTutorial(true);
+  };
 
   const {
     currentCard,
@@ -108,6 +137,16 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
             )}
           </div>
         </div>
+        {/* Help */}
+        <button
+          type="button"
+          onClick={handleManualReplayTour}
+          title="Show me around"
+          aria-label="Show me around"
+          className={`absolute right-3 md:right-4 top-1/2 -translate-y-1/2 group inline-flex items-center justify-center w-10 h-10 ${activeTheme.text.secondary}`}
+        >
+          <FontAwesomeIcon icon={faCircleQuestion} className="w-4 h-4" />
+        </button>
       </header>
     );
   }
@@ -169,7 +208,6 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
       <div className="max-w-screen-xl mx-auto space-y-4 md:space-y-6">
         <SessionHeader title={activeDeck.name} progress={progress} />
 
-        {/* <div className="relative perspective-1000 w-full md:max-w-2xl mx-auto h-[62vh] min-h-[400px] mb-4 md:mb-8 px-2 md:px-0"> */}
         <CardRenderer
           key={currentCard.id}
           card={currentCard}
@@ -185,8 +223,10 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
           autoFlipDelay={autoFlipDelay}
           strokeAnimationSpeed={strokeAnimationSpeed}
         />
-        {/* </div> */}
       </div>
+      {showTutorial && (
+        <StudyTutorial activeTheme={activeTheme} onClose={closeTutorial} />
+      )}
     </div>
   );
 };

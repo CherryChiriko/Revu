@@ -23,7 +23,6 @@ Instead of cramming, you will review cards at the exact moment you're about to f
     body: `Standard cards display the word you want to learn on the front and a translation or answer on the back.
 
 After flipping, you'll rate how well you remembered it. Your self-assessment will allow the algorithm to calculate the optimal review schedule.`,
-    // demo: FlipCardDemo,
   },
   {
     icon: null,
@@ -35,7 +34,6 @@ After flipping, you'll rate how well you remembered it. Your self-assessment wil
 3. Draw: Write it entirely from memory.
 
 If you struggle, a hint will appear. Your rating is automatically calculated based on your precision!`,
-    // demo: StrokeOrderDemo,
   },
   {
     icon: faLayerGroup,
