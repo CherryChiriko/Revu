@@ -147,7 +147,7 @@ function DeckCardItem({ deck, activeTheme, variant, toast, highlightedId }) {
 
   let Content;
   switch (variant) {
-    case "full":
+    case "large":
       Content = FullVariant;
       break;
     case "compact":

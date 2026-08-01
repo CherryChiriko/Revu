@@ -49,40 +49,42 @@ export default function DeckListView() {
     totalPages,
   } = controller;
 
-  // ── Responsive page size ────────────────────────────────────────────────
-  // If useListController supports setPageSize, this keeps mobile snappy.
-  // If not, add `setPageSize` to your controller hook (see note below).
+  // ── Responsive window check ──
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== "undefined" && window.innerWidth < 768,
+  );
+
   const [responsivePageSize, setResponsivePageSize] = useState(() =>
-    typeof window !== "undefined" && window.innerWidth < 768 ? 6 : 12,
+    isMobile ? 6 : 12,
   );
 
   useEffect(() => {
     const onResize = () => {
-      const next = window.innerWidth < 768 ? 6 : 12;
-      setResponsivePageSize((prev) => {
-        if (prev !== next) {
-          // Notify controller if it supports dynamic page size
-          // setPageSize?.(next);
-          return next;
-        }
-        return prev;
-      });
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      const next = mobile ? 6 : 12;
+      setResponsivePageSize((prev) => (prev !== next ? next : prev));
     };
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  // Reset to page 1 whenever page size changes so we don't land out-of-bounds
   useEffect(() => {
     setPage(1);
   }, [responsivePageSize, setPage]);
 
-  const gridClasses =
-    viewMode === "large"
-      ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"
-      : "grid grid-cols-1 md:grid-cols-4 gap-3";
-
-  const variant = viewMode === "large" ? "full" : "compact";
+  const gridClasses = () => {
+    switch (viewMode) {
+      case "large":
+        return "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6";
+      case "compact":
+        return "grid grid-cols-1 md:grid-cols-4 gap-3";
+      case "list":
+        return "grid grid-cols-1 md:grid-cols-3 gap-4";
+      default:
+        return "grid grid-cols-1 md:grid-cols-4 gap-3";
+    }
+  };
 
   const [mode, setMode] = useState(null);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
@@ -98,17 +100,23 @@ export default function DeckListView() {
     }
   }, [highlightedId, navigate, location.pathname]);
 
+  // ── Tutorial Refs ──
   const searchRef = useRef(null);
   const sortRef = useRef(null);
   const viewRef = useRef(null);
   const importRef = useRef(null);
+  const createRef = useRef(null);
   const helpRef = useRef(null);
+  const decksRef = useRef(null);
+
   const spotlightRefs = {
     search: searchRef,
     sort: sortRef,
-    view: viewRef,
+    view: isMobile ? { current: null } : viewRef,
     import: importRef,
+    create: createRef,
     help: helpRef,
+    decks: decksRef,
   };
 
   const [showSpotlight, setShowSpotlight] = useState(false);
@@ -152,19 +160,20 @@ export default function DeckListView() {
             <div className="relative flex-1 min-w-0" ref={searchRef}>
               <FontAwesomeIcon
                 icon={faSearch}
-                className={`h-4 w-4 absolute left-3.5 top-1/2 -translate-y-1/2 ${activeTheme.text.muted}`}
+                className={`h-3 w-3 md:h-4 md:w-4 absolute left-3.5 top-1/2 -translate-y-1/2 ${activeTheme.text.muted}`}
               />
               <input
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className={`w-full h-[46px] border-1 ${activeTheme.border.secondary} ${activeTheme.isDark ? activeTheme.background.canvas : activeTheme.background.secondary} ${activeTheme.text.primary} placeholder:${activeTheme.text.muted} rounded-xl pl-10 pr-10 md:pr-4 text-sm focus:outline-none focus:ring-2 ${activeTheme.ring.focus} transition-all`}
+                className={`w-full h-[32px] md:h-[46px] border-1 ${activeTheme.border.secondary} ${activeTheme.isDark ? activeTheme.background.canvas : activeTheme.background.secondary} ${activeTheme.text.primary} placeholder:${activeTheme.text.muted} rounded-xl pl-10 pr-10 md:pr-4 text-sm focus:outline-none focus:ring-2 ${activeTheme.ring.focus} transition-all`}
                 placeholder="Search decks..."
               />
-              {/* Mobile filter toggle — sits inside the search bar */}
+              {/* Mobile filter toggle — attach sortRef here on mobile */}
               <button
                 type="button"
+                ref={isMobile ? sortRef : null}
                 onClick={() => setShowMobileFilters((s) => !s)}
-                className={`md:hidden absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-colors ${
+                className={`md:hidden absolute right-4 top-1/2 -translate-y-1/2 transition-colors ${
                   showMobileFilters
                     ? `${activeTheme.background.secondary} ${activeTheme.text.primary}`
                     : `${activeTheme.text.muted} hover:${activeTheme.background.secondary}`
@@ -172,13 +181,16 @@ export default function DeckListView() {
                 aria-label="Toggle filters"
                 aria-expanded={showMobileFilters}
               >
-                <FontAwesomeIcon icon={faSliders} className="w-4 h-4" />
+                <FontAwesomeIcon
+                  icon={faSliders}
+                  className="h-3 w-3 md:h-4 md:w-4"
+                />
               </button>
             </div>
 
             {/* Actions */}
             <div className="flex items-center gap-2 md:gap-3 shrink-0">
-              {/* View toggle — desktop only (grid/list are identical on mobile) */}
+              {/* View toggle — desktop only */}
               <div
                 className={`hidden md:inline-flex h-[46px] rounded-xl border-1 ${activeTheme.border.secondary} p-1 ${activeTheme.isDark ? activeTheme.background.canvas : activeTheme.background.secondary}`}
                 ref={viewRef}
@@ -190,26 +202,25 @@ export default function DeckListView() {
                       ? `${activeTheme.button.secondary} ${activeTheme.text.primary} shadow-sm`
                       : `${activeTheme.text.secondary} hover:${activeTheme.background.secondary}`
                   }`}
-                  title="Grid view"
+                  title="Large view"
                 >
                   <FontAwesomeIcon icon={faThLarge} className="w-4 h-4" />
                 </button>
                 <button
-                  onClick={() => toggleViewMode("list")}
+                  onClick={() => toggleViewMode("compact")}
                   className={`px-3 rounded-lg transition-all text-sm font-medium flex items-center justify-center ${
-                    viewMode === "list"
+                    viewMode === "compact"
                       ? `${activeTheme.button.secondary} ${activeTheme.text.primary} shadow-sm`
                       : `${activeTheme.text.secondary} hover:${activeTheme.background.secondary}`
                   }`}
-                  title="List view"
+                  title="Compact view"
                 >
                   <FontAwesomeIcon icon={faList} className="w-4 h-4" />
                 </button>
               </div>
 
               <button
-                className={`flex items-center gap-2 font-semibold py-2 px-3 rounded-xl  text-sm md:text-base
-                          transition-all active:scale-98 ${activeTheme.button.accent2}`}
+                className={`flex items-center gap-2 font-semibold py-2 px-3 rounded-xl text-sm md:text-base transition-all active:scale-98 ${activeTheme.button.accent2}`}
                 title="Import deck"
                 ref={importRef}
                 onClick={() => navigate("import")}
@@ -219,7 +230,7 @@ export default function DeckListView() {
               </button>
 
               {/* Quick Create */}
-              <div className="flex items-stretch text-sm md:text-base">
+              <div ref={createRef}>
                 <QuickCreateMenu
                   activeTheme={activeTheme}
                   onNewDeck={() => setMode("new")}
@@ -235,7 +246,7 @@ export default function DeckListView() {
                 onClick={handleManualReplayTour}
                 title="Show me around"
                 aria-label="Show me around"
-                className={`inline-flex items-center justify-center w-[46px] h-[46px] rounded-xl `}
+                className="inline-flex items-center justify-center w-[46px] h-[46px] rounded-xl"
               >
                 <FontAwesomeIcon
                   icon={faCircleQuestion}
@@ -246,7 +257,7 @@ export default function DeckListView() {
             </div>
           </div>
 
-          {/* Row 2: Filters — collapsible on mobile, always visible on desktop */}
+          {/* Row 2: Filters */}
           <div
             className={`flex flex-wrap items-center gap-2 md:flex ${showMobileFilters ? "flex" : "hidden"}`}
           >
@@ -254,7 +265,7 @@ export default function DeckListView() {
               <select
                 value={selectedLanguage}
                 onChange={(e) => setSelectedLanguage(e.target.value)}
-                className={`appearance-none border ${activeTheme.border.secondary} ${activeTheme.background.canvas} ${activeTheme.text.primary} rounded-lg py-2 pl-3 pr-9 text-sm focus:outline-none focus:ring-2 ${activeTheme.ring.focus} cursor-pointer`}
+                className={`appearance-none border ${activeTheme.border.secondary} ${activeTheme.background.canvas} ${activeTheme.text.primary} rounded-lg py-1 pl-2 pr-8 md:py-2 md:pl-3 md:pr-9 text-sm focus:outline-none focus:ring-2 ${activeTheme.ring.focus} cursor-pointer`}
               >
                 {uniqueLanguages.map((lang) => (
                   <option key={lang} value={lang}>
@@ -268,11 +279,12 @@ export default function DeckListView() {
               />
             </div>
 
-            <div className="relative" ref={sortRef}>
+            {/* Desktop sortRef placement */}
+            <div className="relative" ref={!isMobile ? sortRef : null}>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className={`appearance-none border ${activeTheme.border.secondary} ${activeTheme.background.canvas} ${activeTheme.text.primary} rounded-lg py-2 pl-3 pr-9 text-sm focus:outline-none focus:ring-2 ${activeTheme.ring.focus} cursor-pointer`}
+                className={`appearance-none border ${activeTheme.border.secondary} ${activeTheme.background.canvas} ${activeTheme.text.primary} rounded-lg py-1 pl-2 pr-8 md:py-2 md:pl-3 md:pr-9 text-sm focus:outline-none focus:ring-2 ${activeTheme.ring.focus} cursor-pointer`}
               >
                 <option value="lastStudied-desc">Last Studied</option>
                 <option value="name-asc">Name A-Z</option>
@@ -293,10 +305,11 @@ export default function DeckListView() {
           <DeckCard
             decks={currentDecks}
             activeTheme={activeTheme}
-            variant={variant}
-            gridClasses={gridClasses}
+            variant={viewMode}
+            gridClasses={gridClasses()}
             toast={toast}
             highlightedId={highlightedId}
+            firstCardRef={decksRef}
           />
         ) : (
           <div

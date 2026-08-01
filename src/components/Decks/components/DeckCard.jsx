@@ -8,6 +8,7 @@ export default function DeckCard({
   gridClasses,
   toast,
   highlightedId,
+  firstCardRef,
 }) {
   return (
     <div
@@ -18,10 +19,10 @@ export default function DeckCard({
         max-md:gap-3 max-md:px-4 max-md:pt-2 max-md:pb-6 max-md:-mx-4 max-md:scrollbar-hide
       `}
     >
-      {decks.map((deck) => (
+      {decks.map((deck, index) => (
         <div
           key={deck.id || deck.deck_id}
-          /* Adding p-1 gives room for shadows without clipping inside overflow-x-auto */
+          ref={index === 0 ? firstCardRef : null}
           className="max-md:snap-align-start max-md:shrink-0 max-md:w-[85vw] max-md:max-w-[320px] p-1"
         >
           <DeckCardItem

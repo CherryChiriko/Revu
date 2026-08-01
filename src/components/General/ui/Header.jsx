@@ -16,7 +16,7 @@ export default function Header({
 
   return (
     <header
-      className={`${activeTheme.background.secondary} ${activeTheme.text.primary} rounded-2xl p-4 md:p-6 shadow-md overflow-hidden relative w-full`}
+      className={`${activeTheme.background.secondary} ${activeTheme.text.primary} rounded-2xl px-4 pt-3 pb-1 md:p-6 shadow-md overflow-hidden relative w-full`}
     >
       {/* Top accent strip */}
       <div
