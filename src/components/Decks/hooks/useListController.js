@@ -53,11 +53,17 @@ export default function useListController({
 
   // decks per page: fewer on mobile, more on desktop
   const decksPerPage = useMemo(() => {
-    if (viewMode === "large") {
-      return 3; //  3 decks
+    switch (viewMode) {
+      case "compact":
+        return 8;
+      case "list":
+        return 6;
+      case "large":
+        return 3;
+      default:
+        return 8;
     }
-    return isMobile ? 4 : 8; //  4 cols × 2 rows
-  }, [viewMode, isMobile]);
+  }, [viewMode]);
 
   // unique languages (depend on decks)
   const uniqueLanguages = useMemo(() => {

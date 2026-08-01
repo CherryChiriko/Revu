@@ -5,25 +5,35 @@ export default function DeckCard({
   decks,
   activeTheme,
   variant,
-  gridClasses,
   toast,
   highlightedId,
   firstCardRef,
 }) {
+  // Desktop grid maps directly from the view mode
+  const desktopGrid =
+    {
+      large: "md:grid-cols-2 lg:grid-cols-3 md:gap-6",
+      compact: "md:grid-cols-4 md:gap-3",
+      list: "md:grid-cols-3 md:gap-4",
+    }[variant] || "md:grid-cols-4 md:gap-3";
+
   return (
     <div
       className={`
-        ${gridClasses}
-        /* Mobile Only: Horizontal Snap Carousel with extra padding for shadows */
-        max-md:flex max-md:overflow-x-auto max-md:snap-x max-md:snap-mandatory 
-        max-md:gap-3 max-md:px-4 max-md:pt-2 max-md:pb-6 max-md:-mx-4 max-md:scrollbar-hide
+        grid grid-rows-2 grid-flow-col auto-cols-[85vw] gap-3
+        px-4 pt-2 pb-6 -mx-4
+        overflow-x-auto snap-x snap-mandatory scrollbar-hide
+        
+        md:grid-flow-row md:auto-cols-auto md:overflow-visible md:snap-none
+        md:px-0 md:mx-0
+        ${desktopGrid}
       `}
     >
       {decks.map((deck, index) => (
         <div
           key={deck.id || deck.deck_id}
           ref={index === 0 ? firstCardRef : null}
-          className="max-md:snap-align-start max-md:shrink-0 max-md:w-[85vw] max-md:max-w-[320px] p-1"
+          className="snap-start shrink-0"
         >
           <DeckCardItem
             deck={deck}

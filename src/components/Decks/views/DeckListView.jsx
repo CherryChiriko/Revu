@@ -73,19 +73,6 @@ export default function DeckListView() {
     setPage(1);
   }, [responsivePageSize, setPage]);
 
-  const gridClasses = () => {
-    switch (viewMode) {
-      case "large":
-        return "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6";
-      case "compact":
-        return "grid grid-cols-1 md:grid-cols-4 gap-3";
-      case "list":
-        return "grid grid-cols-1 md:grid-cols-3 gap-4";
-      default:
-        return "grid grid-cols-1 md:grid-cols-4 gap-3";
-    }
-  };
-
   const [mode, setMode] = useState(null);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
@@ -306,7 +293,6 @@ export default function DeckListView() {
             decks={currentDecks}
             activeTheme={activeTheme}
             variant={viewMode}
-            gridClasses={gridClasses()}
             toast={toast}
             highlightedId={highlightedId}
             firstCardRef={decksRef}
