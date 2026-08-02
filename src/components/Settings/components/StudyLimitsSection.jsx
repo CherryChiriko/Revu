@@ -47,18 +47,18 @@ export function StudyLimitsSection({
     >
       <LabelledSlider
         icon={faRotate}
-        label="Reviews per session"
+        label="Reviews for daily goal"
         value={settings.reviewLimit}
-        min={5}
+        min={10}
         max={100}
-        step={5}
+        step={10}
         format={(v) => `${v} cards`}
         onChange={(v) => set("reviewLimit", v)}
         activeTheme={activeTheme}
       />
       <LabelledSlider
         icon={faLayerGroup}
-        label="New cards per session"
+        label="New cards for daily goal"
         value={settings.learnLimit}
         min={5}
         max={50}
@@ -68,8 +68,8 @@ export function StudyLimitsSection({
         activeTheme={activeTheme}
       />
       <p className={`${activeTheme.text.muted} text-xs mt-2`}>
-        Complete at least your review <em>or</em> learning session to keep your
-        daily streak going.
+        Complete either your review <em>or</em> learning goal to keep your daily
+        streak going.
       </p>
     </SettingCard>
   );

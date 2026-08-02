@@ -36,6 +36,7 @@ const CardRenderer = ({
           onPassComplete={onPassComplete}
           autoFlipEnabled={autoFlipEnabled}
           autoFlipDelay={autoFlipDelay}
+          variant="standard"
         />
       );
     case "C":

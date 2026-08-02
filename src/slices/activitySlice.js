@@ -229,7 +229,7 @@ export const selectHeatmapData = createSelector(
   [selectActivityDays, selectSettingsState],
   (days, settings) => {
     // Graceful fallback defaults if settings are still hydrating
-    const reviewLimit = settings?.reviewLimit || 20;
+    const reviewLimit = settings?.reviewLimit || 10;
     const learnLimit = settings?.learnLimit || 5;
 
     return Object.values(days)

@@ -20,6 +20,8 @@ export default function CardDetails(props) {
   const { studyMode, activeTheme, onClose, userId } = props;
 
   const [currentCard, setCurrentCard] = useState(props.card);
+  const [confirmTarget, setConfirmTarget] = useState(null);
+  const [isProcessingConfirm, setIsProcessingConfirm] = useState(false);
 
   useEffect(() => {
     setCurrentCard(props.card);
@@ -56,8 +58,31 @@ export default function CardDetails(props) {
     },
   });
 
-  const [confirmTarget, setConfirmTarget] = useState(null);
   const isC = studyMode === "C";
+
+  const handleConfirmAction = async () => {
+    setIsProcessingConfirm(true);
+    try {
+      if (confirmTarget === "delete") {
+        await handleDeleteCard();
+      } else if (confirmTarget === "reset") {
+        await handleResetProgress();
+      }
+      setConfirmTarget(null);
+      if (onClose) onClose();
+    } catch (error) {
+      console.error("Action failed:", error);
+    } finally {
+      setIsProcessingConfirm(false);
+    }
+  };
+
+  const getConfirmButtonText = () => {
+    if (isProcessingConfirm) {
+      return confirmTarget === "delete" ? "Deleting..." : "Resetting...";
+    }
+    return "Confirm";
+  };
 
   return (
     <ModalTemplate
@@ -186,17 +211,11 @@ export default function CardDetails(props) {
                 ? "This completely removes the card and its historical memory weight scores from this deck. This action cannot be reversed."
                 : "This will wipe out current scheduler patterns, intervals, and history, reverting the card back into a fresh 'New' deck status state."
             }
-            confirmText="Confirm"
+            confirmText={getConfirmButtonText()}
             cancelText="Cancel"
-            onCancel={() => setConfirmTarget(null)}
-            onConfirm={async () => {
-              if (confirmTarget === "delete") {
-                await handleDeleteCard();
-              } else {
-                await handleResetProgress();
-              }
-              setConfirmTarget(null);
-            }}
+            isConfirmDisabled={isProcessingConfirm}
+            onCancel={() => !isProcessingConfirm && setConfirmTarget(null)}
+            onConfirm={handleConfirmAction}
           />
         )}
       </div>

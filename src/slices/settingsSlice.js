@@ -4,7 +4,9 @@ export const SETTINGS_STORAGE_KEY = "revuSettings";
 
 const defaultSettings = {
   // ── Study limits ──────────────────────────────────────────
-  reviewLimit: 25,
+  // reviewLimit / learnLimit = cards needed to complete the daily goal
+  // (sessions are fixed-size: 10 cards/review session, 5 cards/learn session)
+  reviewLimit: 10,
   learnLimit: 5,
   // ── Heatmap ───────────────────────────────────────────────
   heatmapMetric: "consistency",

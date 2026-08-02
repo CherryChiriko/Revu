@@ -5,9 +5,7 @@ import {
   selectCards,
   selectCardsStatus,
   fetchCards,
-  fetchMoreCards,
 } from "../../../slices/cardSlice";
-// 🌟 Added updateDeckLocally to the imports here
 import { fetchDeckCounts, updateDeckLocally } from "../../../slices/deckSlice";
 import {
   logStudySession,
@@ -28,12 +26,32 @@ import { PHASES } from "../../../utils/constants";
 import { createSelector } from "@reduxjs/toolkit";
 import { fetchUserProfile } from "../../../slices/userSlice";
 
+// Helper: Standard Fisher-Yates shuffle
+const shuffleArray = (array) => {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};
+
 // ----------------------
-// Memoized selector
+// Memoized selector: Gets ALL cards matching mode criteria once
 // ----------------------
-const selectCardsForDeck = createSelector(
-  [selectCards, (_, deckId) => deckId],
-  (allCards, deckId) => allCards.filter((c) => c.deck_id === deckId),
+const selectFilteredCardsForDeck = createSelector(
+  [selectCards, (_, deckId) => deckId, (_, __, sessionMode) => sessionMode],
+  (allCards, deckId, sessionMode) => {
+    const deckCards = allCards.filter((c) => c.deck_id === deckId);
+    if (sessionMode === "learn") {
+      return deckCards.filter(
+        (c) => c.repetitions === 0 || c.status === "new" || !c.last_reviewed,
+      );
+    }
+    return deckCards.filter(
+      (c) => c.status === "waiting" || (c.repetitions && c.repetitions > 0),
+    );
+  },
 );
 
 export default function useStudySession({ deck, navMode, userId }) {
@@ -45,36 +63,34 @@ export default function useStudySession({ deck, navMode, userId }) {
 
   const reviewLimit = useSelector(selectReviewLimit);
   const learnLimit = useSelector(selectLearnLimit);
-  const modeLimit = isReviewMode ? 10 : 5;
-  const BATCH_SIZE = Math.max(20, modeLimit * 2);
-  const PREFETCH_THRESHOLD = modeLimit;
+  const chunkSize = isReviewMode ? reviewLimit : learnLimit;
 
+  // Track state
+  const [startIndex, setStartIndex] = useState(0);
   const [phaseIndex, setPhaseIndex] = useState(0);
   const [cardIndex, setCardIndex] = useState(0);
-  const [sessionOffset, setSessionOffset] = useState(0);
   const [sessionFinished, setSessionFinished] = useState(false);
   const [sessionUpdates, setSessionUpdates] = useState([]);
   const [sessionSummary, setSessionSummary] = useState(null);
 
+  // Store shuffled order for the current active phase
+  const [shuffledPhaseCards, setShuffledPhaseCards] = useState([]);
+
   const sessionStartedAtRef = useRef(Date.now());
   const userIdRef = useRef(userId || null);
-  const batchPageRef = useRef(1);
-  const isFetchingMoreRef = useRef(false);
   const fetchedKeyRef = useRef(null);
 
   useEffect(() => {
     if (userId) userIdRef.current = userId;
   }, [userId]);
 
+  // Initial Fetch
   useEffect(() => {
     if (!deck?.id || !userId) return;
 
     const fetchKey = `${deck.id}:${sessionMode}`;
     if (fetchedKeyRef.current === fetchKey) return;
     fetchedKeyRef.current = fetchKey;
-
-    batchPageRef.current = 1;
-    isFetchingMoreRef.current = false;
 
     dispatch(
       fetchCards({
@@ -83,56 +99,37 @@ export default function useStudySession({ deck, navMode, userId }) {
         user_id: userId,
         sessionMode,
         page: 0,
-        pageSize: BATCH_SIZE,
       }),
     );
-  }, [deck?.id, sessionMode, userId, dispatch, BATCH_SIZE]);
+  }, [deck?.id, sessionMode, userId, dispatch, deck?.study_mode]);
 
-  const allCards = useSelector((state) =>
-    selectCardsForDeck(state, deck?.id || -1),
+  const allFilteredCards = useSelector((state) =>
+    selectFilteredCardsForDeck(state, deck?.id || -1, sessionMode),
   );
   const cardsStatus = useSelector(selectCardsStatus);
 
   useEffect(() => {
-    if (allCards[0]?.user_id) {
-      userIdRef.current = allCards[0].user_id;
+    if (allFilteredCards[0]?.user_id) {
+      userIdRef.current = allFilteredCards[0].user_id;
     }
-  }, [allCards]);
+  }, [allFilteredCards]);
 
-  const { cards, limit } = useMemo(() => {
-    if (!deck?.id || allCards.length === 0) return { cards: [], limit: 0 };
+  // Base 5-card linear window
+  const rawCards = useMemo(() => {
+    return allFilteredCards.slice(startIndex, startIndex + chunkSize);
+  }, [allFilteredCards, startIndex, chunkSize]);
 
-    const start = Math.max(0, sessionOffset);
-    const sessionSlice = allCards.slice(start, start + modeLimit);
-    const sessionLimit = Math.min(modeLimit, sessionSlice.length);
-
-    return { cards: sessionSlice.slice(0, sessionLimit), limit: sessionLimit };
-  }, [deck?.id, allCards, modeLimit, sessionOffset]);
-
-  const status = cardsStatus === "idle" ? "loading" : cardsStatus;
-
+  // Shuffle card order every time phaseIndex or rawCards batch changes
   useEffect(() => {
-    if (cards.length === 0 || !deck?.id || !userIdRef.current) return;
+    if (rawCards.length > 0) {
+      setShuffledPhaseCards(shuffleArray(rawCards));
+    } else {
+      setShuffledPhaseCards([]);
+    }
+  }, [phaseIndex, rawCards]);
 
-    const cardsRemaining = cards.length - cardIndex;
-    if (cardsRemaining > PREFETCH_THRESHOLD || isFetchingMoreRef.current)
-      return;
-
-    isFetchingMoreRef.current = true;
-    dispatch(
-      fetchMoreCards({
-        deck_id: deck.id,
-        study_mode: deck.study_mode,
-        user_id: userIdRef.current,
-        sessionMode,
-        page: batchPageRef.current,
-        pageSize: BATCH_SIZE,
-      }),
-    ).then(() => {
-      batchPageRef.current += 1;
-      isFetchingMoreRef.current = false;
-    });
-  }, [cardIndex, cards.length]);
+  const limit = shuffledPhaseCards.length;
+  const status = cardsStatus === "idle" ? "loading" : cardsStatus;
 
   const phases = useMemo(
     () =>
@@ -143,30 +140,34 @@ export default function useStudySession({ deck, navMode, userId }) {
   );
   const totalPhases = phases.length;
   const currentPhase = useMemo(() => phases[phaseIndex], [phases, phaseIndex]);
-  const currentCard = cards[cardIndex];
+  const currentCard = shuffledPhaseCards[cardIndex];
 
   const totalSteps = totalPhases * limit || 1;
   const currentStep = phaseIndex * limit + cardIndex;
   const progressPercentage = (currentStep / totalSteps) * 100;
 
-  const restartSession = useCallback((advance = false) => {
+  // "Learn More" / Restart with Next Batch
+  const restartSession = useCallback(() => {
     setSessionFinished(false);
     setPhaseIndex(0);
     setCardIndex(0);
     setSessionUpdates([]);
     setSessionSummary(null);
+    setStartIndex((prev) => prev + chunkSize);
     sessionStartedAtRef.current = Date.now();
-    batchPageRef.current = 1;
-    isFetchingMoreRef.current = false;
-    setSessionOffset(0);
-  }, []);
+  }, [chunkSize]);
 
   const prevDeckIdRef = useRef(null);
   useEffect(() => {
     if (!deck?.id || deck.id === prevDeckIdRef.current) return;
     prevDeckIdRef.current = deck.id;
-    restartSession(false);
-  }, [deck?.id, restartSession]);
+    setStartIndex(0);
+    setSessionFinished(false);
+    setPhaseIndex(0);
+    setCardIndex(0);
+    setSessionUpdates([]);
+    setSessionSummary(null);
+  }, [deck?.id]);
 
   const exitStudy = useCallback(() => {
     navigate("/decks");
@@ -178,7 +179,7 @@ export default function useStudySession({ deck, navMode, userId }) {
       return;
     }
     if (phaseIndex + 1 < totalPhases) {
-      setPhaseIndex((p) => p + 1);
+      setPhaseIndex((p) => p + 1); // Phase change triggers useEffect -> reshuffles rawCards for next phase
       setCardIndex(0);
       return;
     }
@@ -208,9 +209,7 @@ export default function useStudySession({ deck, navMode, userId }) {
     [currentCard, currentPhase?.allowRating, advanceCard],
   );
 
-  // ----------------------
-  // Batch update on session finish
-  // ----------------------
+  // Batch update database on session finish
   useEffect(() => {
     if (!sessionFinished || sessionUpdates.length === 0) return;
 
@@ -222,8 +221,6 @@ export default function useStudySession({ deck, navMode, userId }) {
 
     const updatesSnapshot = [...sessionUpdates];
     const deckSnapshot = deck;
-    const sessionModeSnapshot = sessionMode;
-    const batchSizeSnapshot = BATCH_SIZE;
 
     const runUpdates = async () => {
       try {
@@ -280,37 +277,18 @@ export default function useStudySession({ deck, navMode, userId }) {
           .eq("user_id", resolvedUserId)
           .eq("date", today);
 
-        fetchedKeyRef.current = null;
-
         await Promise.all([
-          dispatch(
-            fetchCards({
-              deck_id: deckSnapshot.id,
-              user_id: resolvedUserId,
-              study_mode: deckSnapshot.study_mode,
-              sessionMode: sessionModeSnapshot,
-              page: 0,
-              pageSize: batchSizeSnapshot,
-            }),
-          ).unwrap(),
           dispatch(fetchDeckCounts({ user_id: resolvedUserId })).unwrap(),
-
-          // 🌟 CHANGES HERE: Mutates the permanent database date locally inside state.
-          // This forces our priority sorter selector to evaluate it instantly on return!
           dispatch(
             updateDeckLocally({
               id: deckSnapshot.id,
-              last_reviewed: new Date().toISOString().split("T")[0], // YYYY-MM-DD format
+              last_reviewed: new Date().toISOString().split("T")[0],
             }),
           ),
-
           dispatch(fetchDailyStreakStats({ user_id: resolvedUserId })).unwrap(),
           dispatch(fetchDailyActivity({ user_id: resolvedUserId })),
           dispatch(fetchUserProfile(resolvedUserId)),
         ]);
-
-        batchPageRef.current = 1;
-        isFetchingMoreRef.current = false;
 
         dispatch(logStudySession({ cardsReviewed, cardsLearned }));
         setSessionUpdates([]);
@@ -320,10 +298,18 @@ export default function useStudySession({ deck, navMode, userId }) {
     };
 
     runUpdates();
-  }, [sessionFinished]);
+  }, [
+    deck,
+    dispatch,
+    isReviewMode,
+    learnLimit,
+    reviewLimit,
+    sessionFinished,
+    sessionUpdates,
+  ]);
 
   return {
-    cards,
+    cards: shuffledPhaseCards,
     currentCard,
     currentPhase,
     sessionFinished,

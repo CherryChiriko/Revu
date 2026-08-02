@@ -57,129 +57,137 @@ const FlipCard = ({
     onRate?.(rating);
   };
 
-  // Shared footer slot — inner container is w-full so children can choose their own width
-  const FooterSlot = ({ children }) => (
-    <div
-      className={`absolute left-0 right-0 px-3 pointer-events-none ${
-        isDemo ? "bottom-3" : "bottom-6"
-      }`}
-    >
-      <div className="pointer-events-auto w-full max-w-lg mx-auto flex justify-center">
-        {children}
-      </div>
-    </div>
-  );
-
   return (
-    <div className="relative w-full h-full" style={{ perspective: "1000px" }}>
+    <div className="flex items-center justify-center w-full h-full p-2 md:p-4">
       <div
-        className="relative w-full h-full transition-transform duration-700"
-        style={{
-          transformStyle: "preserve-3d",
-          transform: showAnswer ? "rotateY(180deg)" : "rotateY(0deg)",
-        }}
+        className={`relative w-full ${
+          isDemo ? "h-full" : "max-w-2xl aspect-[16/9]"
+        }`}
+        style={{ perspective: "1000px" }}
       >
-        {/* ─── FRONT ─── */}
         <div
-          className={`absolute inset-0 rounded-2xl ${activeTheme.background.secondary} ${
-            activeTheme.border?.secondary || "border-gray-200"
-          } flex flex-col items-center p-3 shadow-md ${
-            isDemo ? "pb-16" : "md:p-6 pb-20 md:pb-24"
-          }`}
-          style={{ backfaceVisibility: "hidden" }}
-        >
-          <div className="shrink-0">
-            <span
-              className={`text-[10px] md:text-xs uppercase tracking-[0.2em] font-bold ${activeTheme.text.muted}`}
-            >
-              Question
-            </span>
-          </div>
-
-          <div className="flex-1 flex items-center justify-center w-full min-h-0 px-1 overflow-hidden">
-            <p
-              className={`font-bold ${activeTheme.text.primary} text-center break-words leading-snug ${
-                isDemo ? "text-xl" : "text-2xl sm:text-3xl md:text-4xl"
-              }`}
-            >
-              {card?.front}
-            </p>
-          </div>
-
-          {!showAnswer && displayState === "animation" && (
-            <FooterSlot>
-              <button
-                onClick={handleReveal}
-                className={`rounded-full font-semibold ${activeTheme.button.primary} ${activeTheme.text.activeButton} transition-all duration-300 shadow-md hover:shadow-lg active:scale-95 px-4 py-2 text-sm md:px-6 md:py-3 md:text-base`}
-              >
-                Show
-              </button>
-            </FooterSlot>
-          )}
-
-          {!showAnswer && displayState === "quiz" && (
-            <FooterSlot>
-              <RevealButton
-                onReveal={handleReveal}
-                activeTheme={activeTheme}
-                variant={variant}
-              />
-            </FooterSlot>
-          )}
-        </div>
-
-        {/* ─── BACK ─── */}
-        <div
-          className={`absolute inset-0 rounded-2xl ${activeTheme.background.secondary} ${
-            activeTheme.border?.secondary || "border-gray-200"
-          } flex flex-col items-center p-3 shadow-md ${
-            isDemo ? "pb-16" : "md:p-6 pb-20 md:pb-24"
-          }`}
+          className="relative w-full h-full transition-transform duration-700"
           style={{
-            backfaceVisibility: "hidden",
-            transform: "rotateY(180deg)",
+            transformStyle: "preserve-3d",
+            transformOrigin: "center center",
+            transform: showAnswer ? "rotateY(180deg)" : "rotateY(0deg)",
           }}
         >
-          <div className="shrink-0">
-            <span
-              className={`text-[10px] md:text-xs uppercase tracking-[0.2em] font-bold ${activeTheme.text.muted}`}
-            >
-              Answer
-            </span>
-          </div>
+          {/* ─── FRONT ─── */}
+          <div
+            className={`absolute inset-0 flex flex-col justify-between overflow-hidden rounded-2xl ${
+              activeTheme.background.secondary
+            } ${
+              activeTheme.border?.secondary || "border border-gray-200"
+            } p-3 md:p-7 shadow-md`}
+            style={{
+              backfaceVisibility: "hidden",
+              WebkitBackfaceVisibility: "hidden",
+            }}
+          >
+            {/* Header Tag */}
+            <div className="flex justify-center shrink-0">
+              <span
+                className={`${
+                  isDemo ? "text-[10px]" : "text-sm md:text-md"
+                } uppercase tracking-[0.2em] font-bold ${activeTheme.text.muted}`}
+              >
+                Question
+              </span>
+            </div>
 
-          <div className="flex-1 flex items-center justify-center w-full min-h-0 px-1 overflow-y-auto">
-            {showAnswer && (
+            {/* Main Content Area */}
+            <div className="flex-1 flex items-center justify-center w-full px-2 pt-4 overflow-y-auto">
               <p
-                className={`font-semibold ${activeTheme.text.primary} text-center break-words leading-snug ${
+                className={`font-bold ${activeTheme.text.primary} text-center break-words leading-snug ${
                   isDemo
-                    ? "text-lg sm:text-xl"
-                    : "text-2xl sm:text-3xl md:text-4xl"
+                    ? "text-lg md:text-xl"
+                    : "text-2xl sm:text-2xl md:text-5xl"
                 }`}
               >
-                {card?.back}
+                {card?.front}
               </p>
-            )}
-          </div>
+            </div>
 
-          {showAnswer && (
-            <FooterSlot>
-              {allowRating ? (
-                <RatingButtons onRate={handleRate} variant={variant} />
-              ) : (
+            {/* Controls (Locked height prevents vertical layout reflow) */}
+            <div className="shrink-0 flex items-center justify-center h-14 pt-2">
+              {!showAnswer && displayState === "animation" && (
                 <button
-                  onClick={handleNext}
-                  className={`rounded-full font-semibold ${activeTheme.button.secondary} ${activeTheme.text.secondary} transition-all duration-300 shadow-md hover:shadow-lg active:scale-95 px-4 py-2 text-sm md:px-6 md:py-3 md:text-base`}
+                  onClick={handleReveal}
+                  className={`rounded-full font-semibold ${activeTheme.button.primary} ${activeTheme.text.activeButton} transition-all duration-300 shadow-md hover:shadow-md active:scale-95 px-6 py-2.5 text-sm md:text-base`}
                 >
-                  Next
-                  <FontAwesomeIcon
-                    icon={faFastForward}
-                    className="w-4 h-4 ml-2"
-                  />
+                  Show Answer
                 </button>
               )}
-            </FooterSlot>
-          )}
+
+              {!showAnswer && displayState === "quiz" && (
+                <RevealButton
+                  onReveal={handleReveal}
+                  activeTheme={activeTheme}
+                  variant={variant}
+                />
+              )}
+            </div>
+          </div>
+
+          {/* ─── BACK ─── */}
+          <div
+            className={`absolute inset-0 flex flex-col justify-between overflow-hidden rounded-2xl ${
+              activeTheme.background.secondary
+            } ${
+              activeTheme.border?.secondary || "border border-gray-200"
+            } p-3 md:p-7 shadow-md`}
+            style={{
+              backfaceVisibility: "hidden",
+              WebkitBackfaceVisibility: "hidden",
+              transform: "rotateY(180deg)",
+            }}
+          >
+            {/* Header Tag */}
+            <div className="flex justify-center shrink-0">
+              <span
+                className={`${
+                  isDemo ? "text-[10px]" : "text-sm md:text-md"
+                } uppercase tracking-[0.2em] font-bold ${activeTheme.text.muted}`}
+              >
+                Answer
+              </span>
+            </div>
+
+            {/* Main Content Area */}
+            <div className="flex-1 flex items-center justify-center w-full px-2 pt-4 overflow-y-auto">
+              {showAnswer && (
+                <p
+                  className={`font-semibold ${activeTheme.text.primary} text-center break-words leading-snug ${
+                    isDemo
+                      ? "text-lg md:text-xl"
+                      : "text-2xl sm:text-2xl md:text-5xl"
+                  }`}
+                >
+                  {card?.back}
+                </p>
+              )}
+            </div>
+
+            {/* Controls (Locked height matches front face) */}
+            <div className="shrink-0 flex items-center justify-center h-14 pt-2">
+              {showAnswer &&
+                (allowRating ? (
+                  <RatingButtons onRate={handleRate} variant={variant} />
+                ) : (
+                  <button
+                    onClick={handleNext}
+                    className={`inline-flex items-center rounded-full font-semibold ${activeTheme.button.secondary} ${activeTheme.text.secondary} transition-all duration-300 shadow-md hover:shadow-md active:scale-95 px-6 py-2.5 text-sm md:text-base`}
+                  >
+                    Next
+                    <FontAwesomeIcon
+                      icon={faFastForward}
+                      className="w-4 h-4 ml-2"
+                    />
+                  </button>
+                ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
