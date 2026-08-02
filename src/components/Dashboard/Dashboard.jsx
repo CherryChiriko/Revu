@@ -238,8 +238,7 @@ const Dashboard = () => {
                 <DeckCard
                   decks={pageDecks}
                   activeTheme={activeTheme}
-                  variant="compact"
-                  gridClasses="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4"
+                  variant="dashboard"
                   toast={toast}
                 />
 

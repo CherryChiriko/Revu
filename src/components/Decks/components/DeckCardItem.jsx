@@ -151,6 +151,7 @@ function DeckCardItem({ deck, activeTheme, variant, toast, highlightedId }) {
       Content = FullVariant;
       break;
     case "compact":
+    case "dashboard":
       Content = CompactVariant;
       break;
     case "list":

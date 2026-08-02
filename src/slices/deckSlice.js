@@ -269,42 +269,10 @@ const deckSlice = createSlice({
         const persistedHasStudyCards =
           persistedMatch && (persistedMatch.due > 0 || persistedMatch.new > 0);
 
-        try {
-          console.debug(
-            "[deckSlice] fetchDecks.fulfilled - persistedId:",
-            persistedId,
-            "(type:",
-            typeof persistedId,
-            ")",
-          );
-          console.debug(
-            "[deckSlice] fetchDecks.fulfilled - sorted decks (deck_id:due,new):",
-            sorted.map((d) => ({ id: d.deck_id, due: d.due, new: d.new })),
-          );
-          console.debug(
-            "[deckSlice] fetchDecks.fulfilled - persisted deck info:",
-            persistedMatch
-              ? {
-                  id: persistedMatch.deck_id,
-                  due: persistedMatch.due,
-                  new: persistedMatch.new,
-                }
-              : null,
-          );
-        } catch (e) {
-          /* ignore debug failures */
-        }
-
         if (persistedHasStudyCards) {
           state.activeDeckId = String(persistedMatch.deck_id);
           localStorage.setItem("activeDeckId", state.activeDeckId);
           localStorage.setItem("activeDeckIdDate", getTodayISO());
-          try {
-            console.debug(
-              "[deckSlice] Keeping persisted activeDeckId with study cards:",
-              state.activeDeckId,
-            );
-          } catch (e) {}
         } else {
           state.activeDeckId = bestDeck?.deck_id || null;
           if (state.activeDeckId) {
@@ -314,12 +282,6 @@ const deckSlice = createSlice({
             localStorage.removeItem("activeDeckId");
             localStorage.removeItem("activeDeckIdDate");
           }
-          try {
-            console.debug(
-              "[deckSlice] Selected prioritized deck:",
-              state.activeDeckId,
-            );
-          } catch (e) {}
         }
 
         state.status = "succeeded";

@@ -48,6 +48,7 @@ export default function DeckListView() {
     currentDecks,
     totalPages,
   } = controller;
+  console.log(viewMode);
 
   // ── Responsive window check ──
   const [isMobile, setIsMobile] = useState(

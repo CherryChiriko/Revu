@@ -14,6 +14,7 @@ export default function DeckCard({
     {
       large: "md:grid-cols-2 lg:grid-cols-3 md:gap-6",
       compact: "md:grid-cols-4 md:gap-3",
+      dashboard: "md:grid-cols-2 md:gap-3",
       list: "md:grid-cols-3 md:gap-4",
     }[variant] || "md:grid-cols-4 md:gap-3";
 

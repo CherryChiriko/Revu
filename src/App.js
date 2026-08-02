@@ -178,9 +178,7 @@ function App() {
       <div
         className={`${activeTheme.background.app} min-h-screen flex items-center justify-center`}
       >
-        <p className={`${activeTheme.text.primary} text-xl animate-pulse`}>
-          Checking session...
-        </p>
+        <LoadingSpinner label="Checking session..." />
       </div>
     );
   }

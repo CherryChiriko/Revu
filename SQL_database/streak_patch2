@@ -1,0 +1,85 @@
+create or replace function public.ensure_today_stats_for_user(
+  p_user_id uuid,
+  p_user_timezone text
+)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_today date := public.local_study_date(p_user_timezone);
+  v_last_stat record;
+  r record; -- Fixed: Declared loop variable 'r'
+begin
+  -- 1. Grab the most recent existing stats row for this user (regardless of how old)
+  select date, global_streak, max_global_streak
+  into v_last_stat
+  from public.daily_user_stats
+  where user_id = p_user_id
+  order by date desc
+  limit 1;
+
+  -- 2. If no row exists for today, insert it with calculated carryover
+  insert into public.daily_user_stats (
+    user_id,
+    date,
+    global_streak,
+    max_global_streak,
+    streak_state,
+    cards_reviewed,
+    cards_learned,
+    updated_at
+  )
+  values (
+    p_user_id,
+    v_today,
+    case
+      -- Same day
+      when v_last_stat.date = v_today then v_last_stat.global_streak
+      -- Exactly yesterday: keep streak pending completion today
+      when v_last_stat.date = v_today - 1 then coalesce(v_last_stat.global_streak, 0)
+      -- Skipped 1+ days: RESET TO 0
+      else 0
+    end,
+    coalesce(v_last_stat.max_global_streak, 0),
+    'inactive',
+    0,
+    0,
+    now()
+  )
+  on conflict (user_id, date) do nothing;
+
+  -- 3. Sync deck stats similarly for today
+  insert into public.daily_deck_stats (
+    user_id, deck_id, date, deck_streak, max_streak, streak_state,
+    cards_reviewed, cards_learned, review_available_count, learn_available_count, updated_at
+  )
+  select
+    d.user_id,
+    d.id,
+    v_today,
+    case
+      when y.date = v_today - 1 then coalesce(y.deck_streak, 0)
+      else 0  -- Skipped days reset deck streak to 0
+    end,
+    coalesce(y.max_streak, 0),
+    'inactive',
+    0, 0, 0, 0, now()
+  from public.decks d
+  left join lateral (
+    select date, deck_streak, max_streak
+    from public.daily_deck_stats
+    where user_id = d.user_id and deck_id = d.id
+    order by date desc
+    limit 1
+  ) y on true
+  where d.user_id = p_user_id
+  on conflict (user_id, deck_id, date) do nothing;
+
+  -- 4. Refresh counts for today
+  for r in select id from public.decks where user_id = p_user_id loop
+    perform public.refresh_deck_counts(r.id, p_user_timezone);
+  end loop;
+end;
+$$;
