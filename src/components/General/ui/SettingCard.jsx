@@ -11,6 +11,7 @@ export function SettingCard({
   saveState,
   saveLabel,
   isMobile,
+  isSettings = false,
 }) {
   const hasSave = Boolean(onSave);
 
@@ -60,7 +61,11 @@ export function SettingCard({
       {/* Body */}
       <div
         className={`flex-1 ${
-          isMobile ? "px-3 pb-3 space-y-3" : "px-5 pb-4 space-y-6"
+          isMobile
+            ? isSettings
+              ? "px-4 py-3 space-y-3"
+              : "px-3 pb-3 space-y-3"
+            : "px-5 pb-4 space-y-6"
         }`}
       >
         {children}

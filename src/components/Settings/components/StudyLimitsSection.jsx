@@ -44,6 +44,7 @@ export function StudyLimitsSection({
       onSave={handleSave}
       saveState={saveState}
       isMobile={isMobile}
+      isSettings={true}
     >
       <LabelledSlider
         icon={faRotate}

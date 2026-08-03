@@ -56,6 +56,7 @@ export function StudyFlowSection({
       onSave={handleSave} // Added the explicit save trigger action
       saveState={saveState} // Syncs loading/error styles on the button
       isMobile={isMobile}
+      isSettings={true}
     >
       <div className="space-y-6">
         {/* Autoflip toggle */}

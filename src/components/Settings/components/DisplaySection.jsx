@@ -54,10 +54,11 @@ export function DisplaySection({
       onSave={handleSave}
       saveState={saveState}
       isMobile={isMobile}
+      isSettings={true}
     >
       {/* Week start */}
       <div>
-        <div className="font-semibold mb-2">
+        <div className="font-semibold mb-2 text-sm md:text-base ">
           <FontAwesomeIcon icon={faCalendarDays} className="mr-2" />
           Week starts on
         </div>
@@ -83,7 +84,7 @@ export function DisplaySection({
 
       {/* Default deck view */}
       <div>
-        <div className="font-semibold mb-2">
+        <div className="font-semibold mb-2 text-sm md:text-base">
           <FontAwesomeIcon icon={faRotate} className="mr-2" />
           Default deck view
         </div>

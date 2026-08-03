@@ -39,7 +39,7 @@ export function ThemeSection({
             onClick={() => handleThemeSelect(theme.id)}
             className={`text-left rounded-xl p-3 border transition-all ${
               currentThemeName === theme.id
-                ? "border-sky-400 ring-2 ring-sky-400/20"
+                ? `focus:outline-none focus:ring-2 ${activeTheme.ring.focus}`
                 : activeTheme.border.card
             } ${activeTheme.background.canvas}`}
           >

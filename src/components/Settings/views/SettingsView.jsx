@@ -45,12 +45,13 @@ export default function SettingsView() {
             <button
               type="button"
               onClick={handleLogout}
-              className={`inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg ${activeTheme.button.danger} font-semibold transition-colors`}
+              className={`inline-flex items-center justify-center gap-2 text-sm px-2 py-1 md:text-base md:px-4 md:py-2 rounded-lg ${activeTheme.button.danger} font-semibold transition-colors`}
             >
               <FontAwesomeIcon icon={faArrowRightFromBracket} />
               Logout
             </button>
           }
+          layout="row"
         />
 
         <Outlet />

@@ -10,6 +10,7 @@ export default function Header({
   leftElement,
   rightElement,
   children,
+  layout = "col",
 }) {
   const gradientFrom = activeTheme?.gradients?.from || "from-indigo-500";
   const gradientTo = activeTheme?.gradients?.to || "to-purple-500";
@@ -23,7 +24,9 @@ export default function Header({
         className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${gradientFrom} ${gradientTo}`}
       />
 
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6 relative z-10 w-full">
+      <div
+        className={`flex ${layout === "col" ? "flex-col" : "flex-row md:items-center"} justify-between gap-2 md:gap-6 relative z-10 w-full`}
+      >
         {/* Left side */}
         <div className="flex items-center gap-3 md:gap-4 flex-1 min-w-0">
           {leftElement && <div className="flex-shrink-0">{leftElement}</div>}
@@ -44,7 +47,9 @@ export default function Header({
 
         {/* Right side */}
         {(rightElement || children) && (
-          <div className="flex flex-wrap items-center gap-2 md:gap-4 flex-shrink-0 w-full md:w-auto justify-start md:justify-end">
+          <div
+            className={`flex flex-wrap items-center gap-2 md:gap-4 flex-shrink-0 w-full md:w-auto ${layout === "col" ? "justify-start" : "justify-end"}`}
+          >
             {rightElement}
             {children}
           </div>

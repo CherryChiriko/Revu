@@ -15,6 +15,7 @@ export function AccountSection({ profile, activeTheme, dispatch, isMobile }) {
         saveState="idle" // Keeps button steady in its default style state
         saveLabel="Manage account" // Customizes the action button text cleanly
         isMobile={isMobile}
+        isSettings={true}
       >
         <div className="space-y-4 text-left">
           {/* Username Snapshot Display */}

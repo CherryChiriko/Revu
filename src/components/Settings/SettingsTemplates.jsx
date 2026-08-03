@@ -6,8 +6,12 @@ export function Toggle({ checked, onChange, label, description, activeTheme }) {
   return (
     <label className="flex items-center justify-between gap-4 cursor-pointer">
       <span>
-        <span className="block font-semibold">{label}</span>
-        <span className={`${activeTheme.text.muted} text-xs mt-3`}>
+        <span className="block text-sm md:text-base font-semibold">
+          {label}
+        </span>
+        <span
+          className={`${activeTheme.text.muted} text-[11px] md:text-xs mt-1 md:mt-3 block`}
+        >
           {description}
         </span>
       </span>
@@ -39,7 +43,7 @@ export function SegmentButton({ active, children, onClick, activeTheme }) {
     <button
       type="button"
       onClick={onClick}
-      className={`px-3 py-2 rounded-lg text-sm font-semibold transition ${
+      className={`px-2.5 py-1.5 md:px-3 md:py-2 rounded-lg text-xs md:text-sm font-semibold transition ${
         active
           ? `bg-gradient-to-r ${activeTheme.gradients.from} ${activeTheme.gradients.to} ${activeTheme.text.activeButton} shadow`
           : `${activeTheme.text.secondary} ${activeTheme.link.hoverBg}`
@@ -60,15 +64,18 @@ export function LabelledSlider({
   format,
   onChange,
   activeTheme,
+  isMobile,
 }) {
   return (
     <label className="block">
       <span className="flex items-center justify-between gap-4">
-        <span className="font-semibold">
+        <span className="text-sm md:text-base font-semibold">
           {icon && <FontAwesomeIcon icon={icon} className="mr-2" />}
           {label}
         </span>
-        <span className={`${activeTheme.text.secondary} text-sm tabular-nums`}>
+        <span
+          className={`${activeTheme.text.secondary} text-xs md:text-sm tabular-nums`}
+        >
           {format(value)}
         </span>
       </span>
@@ -102,22 +109,22 @@ export function FieldRow({
   }[status];
 
   return (
-    <div className={`rounded-xl p-4 ${activeTheme.background.canvas}`}>
+    <div className={`rounded-xl p-3 md:p-4 ${activeTheme.background.canvas}`}>
       <label
-        className={`block text-xs font-semibold uppercase tracking-wider ${activeTheme.text.secondary} mb-2`}
+        className={`block text-[10px] md:text-xs font-semibold uppercase tracking-wider ${activeTheme.text.secondary} mb-2`}
       >
         {label}
       </label>
       <div className="flex gap-2">
         <input
           {...inputProps}
-          className={`flex-1 rounded-lg px-3 py-2 text-sm border ${activeTheme.border.card} ${activeTheme.background.secondary} ${activeTheme.text.primary} focus:outline-none focus:ring-2 focus:ring-sky-500`}
+          className={`flex-1 rounded-lg px-3 py-1.5 md:py-2 text-xs md:text-sm border ${activeTheme.border.card} ${activeTheme.background.secondary} ${activeTheme.text.primary} focus:outline-none focus:ring-2 focus:ring-sky-500`}
         />
         <button
           type="button"
           onClick={onSave}
           disabled={status === "saving"}
-          className={`px-3 py-2 rounded-lg text-sm font-semibold whitespace-nowrap ${
+          className={`px-3 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-semibold whitespace-nowrap ${
             status === "saved"
               ? "bg-emerald-600/20 text-emerald-400"
               : status === "error"
@@ -131,8 +138,14 @@ export function FieldRow({
           {btnText}
         </button>
       </div>
-      {error && <p className="text-red-400    text-xs mt-1.5">{error}</p>}
-      {success && <p className="text-emerald-400 text-xs mt-1.5">{success}</p>}
+      {error && (
+        <p className="text-red-400 text-[11px] md:text-xs mt-1.5">{error}</p>
+      )}
+      {success && (
+        <p className="text-emerald-400 text-[11px] md:text-xs mt-1.5">
+          {success}
+        </p>
+      )}
     </div>
   );
 }
@@ -140,7 +153,7 @@ export function FieldRow({
 export function RowLabel({ children, activeTheme }) {
   return (
     <p
-      className={`${activeTheme.text.secondary} text-xs font-semibold uppercase tracking-wider mb-2`}
+      className={`${activeTheme.text.secondary} text-[10px] md:text-xs font-semibold uppercase tracking-wider mb-2`}
     >
       {children}
     </p>
@@ -162,16 +175,16 @@ export function AvatarThumb({
       <button
         type="button"
         onClick={onClick}
-        className={`w-full aspect-square rounded-xl overflow-hidden flex items-center justify-center text-xl font-black text-white transition-all
+        className={`w-full aspect-square rounded-xl overflow-hidden flex items-center justify-center font-black text-white transition-all
           ${active ? "ring-2 ring-sky-400 scale-105 shadow-lg" : "opacity-70 hover:opacity-100 hover:scale-105"}`}
         style={{ backgroundColor: url ? "transparent" : (color ?? "#6366f1") }}
       >
         {url ? (
           <img src={url} alt="" className="w-full h-full object-cover" />
         ) : emoji ? (
-          <span className="text-2xl leading-none">{emoji}</span>
+          <span className="text-xl md:text-2xl leading-none">{emoji}</span>
         ) : (
-          <span className="text-lg font-black">{initial}</span>
+          <span className="text-base md:text-lg font-black">{initial}</span>
         )}
       </button>
       {onRemove && (
@@ -182,7 +195,7 @@ export function AvatarThumb({
             onRemove();
           }}
           aria-label="Remove"
-          className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow"
+          className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white text-[10px] md:text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow"
         >
           ✕
         </button>

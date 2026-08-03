@@ -17,6 +17,10 @@ export default function CardGridSection({
   onAddCard,
   activeTheme,
   refs,
+  selectionMode = false,
+  selectedCardIds,
+  onToggleSelect,
+  onLongPressCard,
 }) {
   if (totalCount === 0 && !isLoading) {
     return (
@@ -43,9 +47,12 @@ export default function CardGridSection({
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-          <div ref={refs?.addRef} className="flex flex-col w-full h-full">
-            <AddCardTile onClick={onAddCard} activeTheme={activeTheme} />
-          </div>
+          {/* Hide the add-card tile while selecting so it can't be mistaken for a card */}
+          {!selectionMode && (
+            <div ref={refs?.addRef} className="flex flex-col w-full h-full">
+              <AddCardTile onClick={onAddCard} activeTheme={activeTheme} />
+            </div>
+          )}
 
           {cards.length === 0 ? (
             <p
@@ -64,6 +71,10 @@ export default function CardGridSection({
                   card={card}
                   onClick={onCardClick}
                   activeTheme={activeTheme}
+                  selectionMode={selectionMode}
+                  isSelected={selectedCardIds?.has(card.card_id || card.id)}
+                  onToggleSelect={onToggleSelect}
+                  onLongPress={onLongPressCard}
                 />
               </div>
             ))
