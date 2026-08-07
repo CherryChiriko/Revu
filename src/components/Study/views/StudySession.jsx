@@ -34,7 +34,7 @@ const StudySession = () => {
   if (!allDecks || allDecks.length === 0) {
     return (
       <div
-        className={`h-screen flex flex-col items-center justify-center p-4 md:p-6 text-center ${activeTheme.background.app}`}
+        className={`h-[100dvh] flex flex-col items-center justify-center p-4 md:p-6 text-center ${activeTheme.background.app}`}
       >
         <div className="max-w-md space-y-6">
           <div className="flex justify-center">
@@ -72,7 +72,7 @@ const StudySession = () => {
   if (!activeDeck) {
     return (
       <div
-        className={`h-screen flex flex-col items-center justify-center px-4 ${activeTheme.background.app}`}
+        className={`h-[100dvh] flex flex-col items-center justify-center px-4 ${activeTheme.background.app}`}
       >
         <p
           className={`${activeTheme.text.primary} text-lg md:text-xl mb-4 text-center`}
@@ -92,7 +92,7 @@ const StudySession = () => {
   if ((status === "loading" || status === "idle") && !session.sessionFinished) {
     return (
       <div
-        className={`h-screen flex items-center justify-center px-4 ${activeTheme.background.app}`}
+        className={`h-[100dvh] flex items-center justify-center px-4 ${activeTheme.background.app}`}
       >
         <LoadingSpinner label={`Loading cards for "${activeDeck.name}"...`} />
       </div>
@@ -102,7 +102,7 @@ const StudySession = () => {
   if (status === "failed" || error) {
     return (
       <div
-        className={`h-screen flex items-center justify-center px-4 ${activeTheme.background.app}`}
+        className={`h-[100dvh] flex items-center justify-center px-4 ${activeTheme.background.app}`}
       >
         <p
           className={`${activeTheme.text.primary} text-lg md:text-xl text-center`}
@@ -119,7 +119,7 @@ const StudySession = () => {
   ) {
     return (
       <div
-        className={`h-screen flex flex-col items-center justify-center px-4 text-center ${activeTheme.background.app}`}
+        className={`h-full flex-1 min-h-0 w-full ${activeTheme.background.app}`}
       >
         <SessionMode
           mode={navMode}
@@ -134,7 +134,7 @@ const StudySession = () => {
   if (status === "succeeded") {
     return (
       <div
-        className={`h-screen flex flex-col items-center justify-center px-4 text-center ${activeTheme.background.app}`}
+        className={`h-[100dvh] flex flex-col items-center justify-center px-4 text-center ${activeTheme.background.app}`}
       >
         <p
           className={`${activeTheme.text.primary} text-xl md:text-2xl font-bold`}

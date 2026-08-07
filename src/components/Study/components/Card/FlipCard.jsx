@@ -89,7 +89,7 @@ const FlipCard = ({
             <div className="flex justify-center shrink-0">
               <span
                 className={`${
-                  isDemo ? "text-[10px]" : "text-sm md:text-md"
+                  isDemo ? "text-[10px]" : "text-xs md:text-md"
                 } uppercase tracking-[0.2em] font-bold ${activeTheme.text.muted}`}
               >
                 Question
@@ -100,9 +100,7 @@ const FlipCard = ({
             <div className="flex-1 flex items-center justify-center w-full px-2 pt-4 overflow-y-auto">
               <p
                 className={`font-bold ${activeTheme.text.primary} text-center break-words leading-snug ${
-                  isDemo
-                    ? "text-lg md:text-xl"
-                    : "text-2xl sm:text-2xl md:text-5xl"
+                  isDemo ? "text-lg md:text-xl" : "text-3xl md:text-5xl"
                 }`}
               >
                 {card?.front}
@@ -114,7 +112,7 @@ const FlipCard = ({
               {!showAnswer && displayState === "animation" && (
                 <button
                   onClick={handleReveal}
-                  className={`rounded-full font-semibold ${activeTheme.button.primary} ${activeTheme.text.activeButton} transition-all duration-300 shadow-md hover:shadow-md active:scale-95 px-6 py-2.5 text-sm md:text-base`}
+                  className={`rounded-full font-semibold ${activeTheme.button.primary} ${activeTheme.text.activeButton} transition-all duration-300 shadow-md active:scale-95 px-6 py-2.5 text-xs md:text-base`}
                 >
                   Show Answer
                 </button>
@@ -147,7 +145,7 @@ const FlipCard = ({
             <div className="flex justify-center shrink-0">
               <span
                 className={`${
-                  isDemo ? "text-[10px]" : "text-sm md:text-md"
+                  isDemo ? "text-[10px]" : "text-xs md:text-md"
                 } uppercase tracking-[0.2em] font-bold ${activeTheme.text.muted}`}
               >
                 Answer
@@ -159,9 +157,7 @@ const FlipCard = ({
               {showAnswer && (
                 <p
                   className={`font-semibold ${activeTheme.text.primary} text-center break-words leading-snug ${
-                    isDemo
-                      ? "text-lg md:text-xl"
-                      : "text-2xl sm:text-2xl md:text-5xl"
+                    isDemo ? "text-lg md:text-xl" : "text-3xl md:text-5xl"
                   }`}
                 >
                   {card?.back}

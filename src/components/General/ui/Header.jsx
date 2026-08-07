@@ -17,7 +17,7 @@ export default function Header({
 
   return (
     <header
-      className={`${activeTheme.background.secondary} ${activeTheme.text.primary} rounded-2xl px-4 pt-3 pb-1 md:p-6 shadow-md overflow-hidden relative w-full`}
+      className={`${activeTheme?.background?.secondary || "bg-white"} ${activeTheme?.text?.primary || "text-gray-900"} rounded-2xl px-4 py-3 md:p-6 shadow-md overflow-hidden relative w-full`}
     >
       {/* Top accent strip */}
       <div
@@ -37,7 +37,7 @@ export default function Header({
             </p>
             {description && (
               <p
-                className={`${activeTheme.text.secondary} text-xs md:text-sm mt-1 leading-relaxed`}
+                className={`${activeTheme?.text?.secondary || "text-gray-500"} text-xs md:text-sm mt-1 leading-relaxed`}
               >
                 {description}
               </p>
@@ -48,7 +48,9 @@ export default function Header({
         {/* Right side */}
         {(rightElement || children) && (
           <div
-            className={`flex flex-wrap items-center gap-2 md:gap-4 flex-shrink-0 w-full md:w-auto ${layout === "col" ? "justify-start" : "justify-end"}`}
+            className={`flex flex-wrap items-center gap-2 md:gap-4 flex-shrink-0 w-full md:w-auto ${
+              layout === "col" ? "justify-start" : "justify-end"
+            }`}
           >
             {rightElement}
             {children}

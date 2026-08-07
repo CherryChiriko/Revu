@@ -66,7 +66,10 @@ export function AvatarPick({
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState(null);
 
-  const history = settings.avatarHistory ?? [];
+  const history = React.useMemo(
+    () => settings.avatarHistory ?? [],
+    [settings.avatarHistory],
+  );
   const activeUrl = settings.avatarUrl; // null = icon mode
   const activeIcon = settings.avatarIcon ?? ""; // letter/emoji
   const activeColor = settings.profileColor ?? "#6366f1";
@@ -294,7 +297,7 @@ export function AvatarPick({
                   key={color}
                   onClick={() => selectColor(color)}
                   aria-label={color}
-                  className="relative size-9 rounded-xl focus:outline-none hover:scale-105 transition-transform active:scale-95"
+                  className="relative size-7 rounded-lg md:size-9 md:rounded-xl focus:outline-none hover:scale-105 transition-transform active:scale-95"
                   style={{ backgroundColor: color }}
                 >
                   {activeColor === color && (

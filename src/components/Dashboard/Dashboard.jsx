@@ -158,6 +158,7 @@ const Dashboard = () => {
               </button>
             </div>
           }
+          layout="row"
         />
 
         {/* Stats */}

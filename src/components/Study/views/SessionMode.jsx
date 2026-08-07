@@ -1,3 +1,4 @@
+// src/components/Study/views/SessionMode.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -91,7 +92,7 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
 
     return (
       <header
-        className={`mt-1 md:mt-8 ${activeTheme.background.secondary} rounded-2xl shadow-md border ${activeTheme.border.card} overflow-hidden relative`}
+        className={`mt-1 md:mt-4 ${activeTheme.background.secondary} rounded-2xl shadow-md border ${activeTheme.border.card} overflow-hidden relative shrink-0`}
       >
         <div
           className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${gradientFrom} ${gradientTo}`}
@@ -126,7 +127,7 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
               </p>
             )}
             {progress && (
-              <div className="w-full max-w-[180px] md:max-w-[220px] ">
+              <div className="w-full max-w-[180px] md:max-w-[220px]">
                 <Bar
                   activeTheme={activeTheme}
                   current={progress.current}
@@ -137,7 +138,7 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
             )}
           </div>
         </div>
-        {/* Help */}
+
         <button
           type="button"
           onClick={handleManualReplayTour}
@@ -154,7 +155,7 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
   if (sessionFinished) {
     return (
       <div
-        className={`min-h-[100dvh] flex flex-col items-center justify-center ${activeTheme.background.app} text-center px-4`}
+        className={`h-full flex-1 flex flex-col items-center justify-center ${activeTheme.background.app} text-center px-4`}
       >
         <SessionComplete
           isOpen={session.sessionFinished}
@@ -171,9 +172,9 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
   if (isTransitioning) {
     return (
       <div
-        className={`min-h-[100dvh] ${activeTheme.background.app} ${activeTheme.text.primary} w-full px-0 md:px-4`}
+        className={`h-full flex-1 ${activeTheme.background.app} ${activeTheme.text.primary} w-full px-0 md:px-4`}
       >
-        <div className="max-w-screen-xl mx-auto space-y-4 md:space-y-6">
+        <div className="max-w-screen-xl mx-auto h-full flex flex-col justify-center space-y-4 md:space-y-6">
           <SessionHeader title={activeDeck.name} />
           <LoadingSpinner label="Loading next card…" />
         </div>
@@ -186,7 +187,7 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
   if (!cards.length) {
     return (
       <div
-        className={`min-h-[100dvh] flex flex-col items-center justify-center px-0 md:px-4 ${activeTheme.background.app} text-center`}
+        className={`h-full flex-1 flex flex-col items-center justify-center px-0 md:px-4 ${activeTheme.background.app} text-center`}
       >
         <h3
           className={`text-xl md:text-2xl font-semibold mb-3 ${activeTheme.text.primary}`}
@@ -204,25 +205,30 @@ const SessionMode = ({ mode, activeTheme, activeDeck, session }) => {
   }
 
   return (
-    <div className={`min-h-[100dvh] w-full px-0 md:px-4 select-none`}>
-      <div className="max-w-screen-xl mx-auto space-y-4 md:space-y-6">
+    <div className="w-full h-full flex-1 min-h-0 px-2 md:px-4 select-none flex flex-col">
+      <div className="max-w-screen-xl mx-auto w-full h-full flex flex-col gap-2 md:gap-4 pb-2 md:pb-4">
         <SessionHeader title={activeDeck.name} progress={progress} />
 
-        <CardRenderer
-          key={currentCard.id}
-          card={currentCard}
-          study_mode={activeDeck.study_mode}
-          phase={currentPhase}
-          activeTheme={activeTheme}
-          displayState={currentPhase.displayState}
-          allowRating={currentPhase.allowRating}
-          onReveal={onReveal}
-          onRate={handleRate}
-          onPassComplete={handlePassComplete}
-          autoFlipEnabled={autoFlipEnabled}
-          autoFlipDelay={autoFlipDelay}
-          strokeAnimationSpeed={strokeAnimationSpeed}
-        />
+        {/* 
+            Added p-3 padding so the drop shadow on the card isn't clipped by container edges 
+        */}
+        <div className="flex-1 min-h-0 flex items-center justify-center w-full p-3 md:p-6">
+          <CardRenderer
+            key={currentCard.id}
+            card={currentCard}
+            study_mode={activeDeck.study_mode}
+            phase={currentPhase}
+            activeTheme={activeTheme}
+            displayState={currentPhase.displayState}
+            allowRating={currentPhase.allowRating}
+            onReveal={onReveal}
+            onRate={handleRate}
+            onPassComplete={handlePassComplete}
+            autoFlipEnabled={autoFlipEnabled}
+            autoFlipDelay={autoFlipDelay}
+            strokeAnimationSpeed={strokeAnimationSpeed}
+          />
+        </div>
       </div>
       {showTutorial && (
         <StudyTutorial activeTheme={activeTheme} onClose={closeTutorial} />

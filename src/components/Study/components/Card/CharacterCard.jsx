@@ -50,7 +50,7 @@ const CharacterCard = ({
 
   return (
     <div
-      className={`relative w-full h-full mx-auto md:max-w-2xl rounded-xl ${activeTheme.background.secondary} p-1.5 md:p-8 flex flex-col justify-between items-center shadow-2xl transition-all duration-300 overflow-y-auto`}
+      className={`relative w-full h-full mx-auto md:max-w-2xl rounded-xl ${activeTheme.background.secondary} p-2 md:p-8 flex flex-col justify-between items-center shadow-2xl transition-all duration-300 overflow-hidden`}
     >
       {/* Header — compact on mobile, centered reading, absolute audio */}
       <div className="w-full flex items-center justify-center relative shrink-0 px-1 md:px-2">
@@ -74,7 +74,7 @@ const CharacterCard = ({
         )}
       </div>
 
-      <div className="relative flex justify-center items-center w-full min-h-0 my-1 px-1 md:px-0">
+      <div className="relative flex justify-center items-center w-full flex-1 min-h-0 my-1 px-1 md:px-0">
         <HanziCanvas
           character={currentCharacter}
           displayState={displayState}
